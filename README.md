@@ -1,2 +1,2 @@
-# heart_at_crossroads
+# heart-at-crossroads
 romance visual novella
