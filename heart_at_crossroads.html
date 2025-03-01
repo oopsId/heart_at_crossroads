@@ -241,7 +241,7 @@
     <script>
         // Game state
         let currentChapter = 1;
-        let currentScene = 0; // Изменено на 0 для совместимости с новым кодом
+        let currentScene = 0;
         let choices = [];
         let stats = {
             crown: 0,
@@ -311,61 +311,110 @@
 
         // Check if user is authorized
         const checkAuthorization = async () => {
-            const authorizedUsers = await getFromCloud('authorized_users') || [];
-            if (userId && authorizedUsers.includes(userId)) {
-                startGame();
-                return;
+            try {
+                const authorizedUsers = await getFromCloud('authorized_users') || [];
+                if (userId && authorizedUsers.includes(userId)) {
+                    startGame();
+                } else {
+                    showPasswordScreen();
+                }
+            } catch (error) {
+                console.error('Ошибка при проверке авторизации:', error);
+                showPasswordScreen();
             }
-            showPasswordScreen();
         };
 
         // Initialize the game
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('start-game').addEventListener('touchstart', (e) => {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM загружен, регистрируем обработчики кнопок');
+
+            const startGameBtn = document.getElementById('start-game');
+            const continueGameBtn = document.getElementById('continue-game');
+            const showPasswordBtn = document.getElementById('show-password');
+            const passwordSubmitBtn = document.getElementById('password-submit');
+            const restartBtn = document.getElementById('restart');
+            const statsBtn = document.getElementById('stats');
+
+            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !restartBtn || !statsBtn) {
+                console.error('Одна или несколько кнопок не найдены в DOM');
+                return;
+            }
+
+            startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                console.log('Нажата кнопка "Начать игру"');
                 startNewGame();
             });
-            
-            document.getElementById('continue-game').addEventListener('touchstart', (e) => {
+
+            continueGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                console.log('Нажата кнопка "Продолжить"');
                 loadSession(() => startGame());
             });
-            
-            document.getElementById('show-password').addEventListener('touchstart', (e) => {
+
+            showPasswordBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                console.log('Нажата кнопка "Ввести пароль"');
                 document.getElementById('password-form').style.display = 'block';
             });
 
-            document.getElementById('password-submit').addEventListener('touchstart', handlePasswordSubmit);
-            
-            document.getElementById('restart').addEventListener('touchstart', handleRestart);
-            document.getElementById('stats').addEventListener('touchstart', handleShowStats);
-            
-            // Check if there's a saved session in the cloud
-            const session = await getFromCloud('last_session');
-            if (session) {
-                document.getElementById('start-screen').style.display = 'flex';
-            } else {
-                checkAuthorization();
-            }
+            passwordSubmitBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('Нажата кнопка "Войти"');
+                handlePasswordSubmit(e);
+            });
+
+            restartBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('Нажата кнопка "Рестарт"');
+                handleRestart(e);
+            });
+
+            statsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('Нажата кнопка "Статы"');
+                handleShowStats(e);
+            });
+
+            getFromCloud('last_session')
+                .then(session => {
+                    console.log('Сессия из облака:', session);
+                    if (session) {
+                        document.getElementById('start-screen').style.display = 'flex';
+                    } else {
+                        checkAuthorization();
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке сессии:', error);
+                    checkAuthorization();
+                });
         });
 
         async function handlePasswordSubmit(e) {
             e.preventDefault();
             const inputPassword = document.getElementById('password-input').value;
+            console.log('Введён пароль:', inputPassword);
             if (inputPassword === correctPassword) {
-                const authorizedUsers = (await getFromCloud('authorized_users')) || [];
-                if (userId && !authorizedUsers.includes(userId)) {
-                    authorizedUsers.push(userId);
-                    await saveToCloud('authorized_users', authorizedUsers);
+                try {
+                    const authorizedUsers = (await getFromCloud('authorized_users')) || [];
+                    if (userId && !authorizedUsers.includes(userId)) {
+                        authorizedUsers.push(userId);
+                        await saveToCloud('authorized_users', authorizedUsers);
+                    }
+                    console.log('Пароль верный, начинаем новую игру');
+                    startNewGame();
+                } catch (error) {
+                    console.error('Ошибка при сохранении авторизации:', error);
+                    alert('Ошибка при сохранении данных авторизации');
                 }
-                startNewGame();
             } else {
                 alert('Неверный пароль!');
             }
         }
 
         function startNewGame() {
+            console.log('Запуск новой игры');
             currentChapter = 1;
             currentScene = 0;
             choices = [];
@@ -377,7 +426,7 @@
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
                 appearance: "style1"
             };
-            saveSession(); // Сохраняем начальное состояние в облако
+            saveSession();
             startGame();
         }
 
@@ -391,55 +440,57 @@
         }
 
         function showPasswordScreen() {
+            console.log('Показываем экран пароля');
             document.getElementById('start-screen').style.display = 'flex';
         }
 
         function startGame() {
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('background').style.display = 'block';
-    document.getElementById('character-left').style.display = 'block';
-    document.getElementById('character-right').style.display = 'block';
-    document.getElementById('dialogue-box').style.display = 'block';
-    document.getElementById('menu').style.display = 'flex';
-    updateDiamondsDisplay();
-    
-    preloadAssets(currentChapter).then(() => {
-        loadChapter(currentChapter).then(() => {
-            showScene(currentScene);
-        }).catch(error => {
-            console.error('Не удалось запустить игру:', error);
-            document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
-        });
-    });
-}
+            console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('background').style.display = 'block';
+            document.getElementById('character-left').style.display = 'block';
+            document.getElementById('character-right').style.display = 'block';
+            document.getElementById('dialogue-box').style.display = 'block';
+            document.getElementById('menu').style.display = 'flex';
+            updateDiamondsDisplay();
+            
+            preloadAssets(currentChapter).then(() => {
+                loadChapter(currentChapter).then(() => {
+                    showScene(currentScene);
+                }).catch(error => {
+                    console.error('Не удалось запустить игру:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
+                });
+            });
+        }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
         }
 
         function preloadAssets(chapterId) {
-    const images = [
-        `assets/backgrounds/bg_apartment_morning.png`,
-        `assets/characters/anna_sad_style2.png`,
-        `assets/characters/vika_smile_style1.png`,
-        `assets/characters/anna_neutral_style1.png`, // Убедитесь, что стиль Анны соответствует stats.appearance
-        `assets/ui/diamonds.png`,
-        `assets/ui/crown.png`,
-        `assets/ui/heart.png`,
-        `assets/ui/leaf.png`
-    ];
-    return Promise.all(images.map(src => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = src;
-            img.onload = resolve;
-            img.onerror = () => {
-                console.warn(`Не удалось загрузить ${src}`);
-                resolve(); // Продолжаем, даже если ошибка
-            };
-        });
-    }));
-}
+            const images = [
+                `assets/backgrounds/bg_apartment_morning.png`,
+                `assets/characters/anna_sad_style2.png`,
+                `assets/characters/vika_smile_style1.png`,
+                `assets/characters/anna_neutral_style1.png`,
+                `assets/ui/diamonds.png`,
+                `assets/ui/crown.png`,
+                `assets/ui/heart.png`,
+                `assets/ui/leaf.png`
+            ];
+            return Promise.all(images.map(src => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = src;
+                    img.onload = resolve;
+                    img.onerror = () => {
+                        console.warn(`Не удалось загрузить ${src}`);
+                        resolve();
+                    };
+                });
+            }));
+        }
 
         async function loadSession(callback) {
             const session = await getFromCloud('last_session');
@@ -459,7 +510,6 @@
         }
 
         function loadChapter(chapterId) {
-            preloadAssets(chapterId);
             return fetch(`data/chapter${chapterId}.json`)
                 .then(response => {
                     if (!response.ok) throw new Error('Не удалось загрузить главу');
@@ -525,86 +575,83 @@
 
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
 
-    // Очищаем и обновляем персонажей
-    const charLeft = document.getElementById('character-left');
-    const charRight = document.getElementById('character-right');
-    charLeft.style.backgroundImage = 'none'; // Очистка перед обновлением
-    charRight.style.backgroundImage = 'none'; // Очистка перед обновлением
-    
-    if (scene.characterLeft) {
-        charLeft.style.backgroundImage = `url('assets/characters/${scene.characterLeft}.png')`;
-    }
-    if (scene.characterRight) {
-        const rightChar = scene.characterRight.includes('${stats.appearance}') 
-            ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-            : scene.characterRight;
-        charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
-    }
-
-    if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-    if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            charLeft.style.backgroundImage = 'none';
+            charRight.style.backgroundImage = 'none';
+            if (scene.characterLeft) {
+                charLeft.style.backgroundImage = `url('assets/characters/${scene.characterLeft}.png')`;
+            }
+            if (scene.characterRight) {
+                const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                    ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterRight;
+                charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+            }
+            if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+            if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
             document.getElementById('speaker-name').textContent = scene.speaker || '';
-    const dialogueElement = document.getElementById('dialogue-text');
-    const dialogueBox = document.querySelector('.dialogue-box');
+            const dialogueElement = document.getElementById('dialogue-text');
+            const dialogueBox = document.querySelector('.dialogue-box');
 
-    // Очистка предыдущих кнопок и обработчиков
-    document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-    if (dialogueBox.touchHandler) {
-        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-    }
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+            if (dialogueBox.touchHandler) {
+                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+                dialogueBox.touchHandler = null;
+            }
 
-    // Запуск печати текста с передачей логики кнопок как коллбэк
-    typeText(scene.text, dialogueElement, () => {
-        if (scene.choices && scene.choices.length > 0) {
-            document.body.ontouchstart = null;
-            scene.choices.forEach(choice => {
-                const btn = createChoiceButton(choice);
-                if (choice.condition && !checkCondition(choice.condition)) {
-                    btn.style.display = 'none';
-                } else if (choice.cost && stats.diamonds < choice.cost) {
-                    btn.disabled = true;
-                } else {
-                    btn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        if (choice.cost) stats.diamonds -= choice.cost;
-                        updateDiamondsDisplay();
-                        saveChoice(choice.id, choice.effects);
-                        if (choice.effects) showChoiceEffects(choice.effects);
-                        currentScene = choice.nextScene;
-                        showScene(currentScene);
+            typeText(scene.text, dialogueElement, () => {
+                if (scene.choices && scene.choices.length > 0) {
+                    document.body.ontouchstart = null;
+                    scene.choices.forEach(choice => {
+                        const btn = createChoiceButton(choice);
+                        if (choice.condition && !checkCondition(choice.condition)) {
+                            btn.style.display = 'none';
+                        } else if (choice.cost && stats.diamonds < choice.cost) {
+                            btn.disabled = true;
+                        } else {
+                            btn.addEventListener('touchstart', (e) => {
+                                e.preventDefault();
+                                if (choice.cost) stats.diamonds -= choice.cost;
+                                updateDiamondsDisplay();
+                                saveChoice(choice.id, choice.effects);
+                                if (choice.effects) showChoiceEffects(choice.effects);
+                                currentScene = choice.nextScene;
+                                showScene(currentScene);
+                            });
+                        }
+                        dialogueBox.appendChild(btn);
                     });
+                } else {
+                    dialogueBox.touchHandler = (e) => {
+                        e.preventDefault();
+                        if (!isTyping) {
+                            currentScene = scene.nextScene || currentScene + 1;
+                            saveSession();
+                            showScene(currentScene);
+                        }
+                    };
+                    dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
                 }
-                dialogueBox.appendChild(btn);
             });
-        } else {
-            dialogueBox.touchHandler = (e) => {
-                e.preventDefault();
-                if (!isTyping) {
-                    currentScene = scene.nextScene || currentScene + 1;
-                    saveSession();
-                    showScene(currentScene);
-                }
-            };
-            dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
         }
-    });
 
-       function showChoiceEffects(effects) {
-    for (let key in effects) {
-        if (key !== 'relationships') {
-            const feedback = document.createElement('img');
-            feedback.className = 'choice-feedback';
-            feedback.src = `assets/ui/${key}.png`;
-            feedback.onerror = () => {
-                console.warn(`Изображение для ${key} не найдено`);
-                feedback.src = 'assets/ui/default_effect.png'; // Запасной файл, если есть
-            };
-            document.body.appendChild(feedback);
-            setTimeout(() => feedback.remove(), 3000);
+        function showChoiceEffects(effects) {
+            for (let key in effects) {
+                if (key !== 'relationships') {
+                    const feedback = document.createElement('img');
+                    feedback.className = 'choice-feedback';
+                    feedback.src = `assets/ui/${key}.png`;
+                    feedback.onerror = () => {
+                        console.warn(`Изображение для ${key} не найдено`);
+                        feedback.src = 'assets/ui/default_effect.png';
+                    };
+                    document.body.appendChild(feedback);
+                    setTimeout(() => feedback.remove(), 3000);
+                }
+            }
         }
-    }
-}
 
         function showChapterPlaceholder() {
             const existingPlaceholder = document.querySelector('.placeholder-message');
@@ -643,35 +690,35 @@
             return true;
         }
 
-       function typeText(text, element, callback) {
-    element.textContent = '';
-    isTyping = true;
-    let i = 0;
-    const speed = 30;
+        function typeText(text, element, callback) {
+            element.textContent = '';
+            isTyping = true;
+            let i = 0;
+            const speed = 30;
 
-    function type() {
-        if (i < text.length) {
-            element.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
-        } else {
-            isTyping = false;
-            if (callback) callback(); // Вызываем коллбэк после завершения анимации
-        }
-    }
-    type();
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            }
+            type();
 
-    const dialogueBox = document.querySelector('.dialogue-box');
-    const skipHandler = (e) => {
-        e.preventDefault();
-        if (isTyping) {
-            element.textContent = text;
-            isTyping = false;
-            if (callback) callback(); // Вызываем коллбэк при пропуске
+            const dialogueBox = document.querySelector('.dialogue-box');
+            const skipHandler = (e) => {
+                e.preventDefault();
+                if (isTyping) {
+                    element.textContent = text;
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            };
+            dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
         }
-    };
-    dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
-}
 
         function fadeOut(callback) {
             const bg = document.getElementById('background');
