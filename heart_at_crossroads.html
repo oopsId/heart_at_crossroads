@@ -351,21 +351,34 @@
         }
 
         function typeText(text, element) {
-            element.textContent = '';
-            isTyping = true;
-            let i = 0;
-            const speed = 30;
-            function type() {
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    isTyping = false;
-                }
-            }
-            type();
+    element.textContent = '';
+    isTyping = true;
+    let i = 0;
+    const speed = 30;
+
+    function type() {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        } else {
+            isTyping = false;
+            console.log('Анимация текста завершена, isTyping:', isTyping);
         }
+    }
+    type();
+
+    const dialogueBox = document.querySelector('.dialogue-box');
+    const skipHandler = (e) => {
+        if (isTyping) {
+            element.textContent = text;
+            isTyping = false;
+            console.log('Анимация пропущена, isTyping:', isTyping);
+            dialogueBox.removeEventListener('touchstart', skipHandler);
+        }
+    };
+    dialogueBox.addEventListener('touchstart', skipHandler);
+}
 
         function fadeOut(callback) {
             const bg = document.getElementById('background');
