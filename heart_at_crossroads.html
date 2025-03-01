@@ -395,42 +395,51 @@
         }
 
         function startGame() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('background').style.display = 'block';
-            document.getElementById('character-left').style.display = 'block';
-            document.getElementById('character-right').style.display = 'block';
-            document.getElementById('dialogue-box').style.display = 'block';
-            document.getElementById('menu').style.display = 'flex';
-            updateDiamondsDisplay();
-            
-            loadChapter(currentChapter).then(() => {
-                showScene(currentScene);
-            }).catch(error => {
-                console.error('Не удалось запустить игру:', error);
-                document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
-            });
-        }
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('background').style.display = 'block';
+    document.getElementById('character-left').style.display = 'block';
+    document.getElementById('character-right').style.display = 'block';
+    document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('menu').style.display = 'flex';
+    updateDiamondsDisplay();
+    
+    preloadAssets(currentChapter).then(() => {
+        loadChapter(currentChapter).then(() => {
+            showScene(currentScene);
+        }).catch(error => {
+            console.error('Не удалось запустить игру:', error);
+            document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
+        });
+    });
+}
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
         }
 
         function preloadAssets(chapterId) {
-            const images = [
-                `assets/backgrounds/bg_apartment_morning.png`,
-                `assets/characters/anna_sad_style2.png`,
-                `assets/characters/vika_smile_style1.png`,
-                `assets/characters/anna_neutral_style2.png`,
-                `assets/ui/diamonds.png`,
-                `assets/ui/crown.png`,
-                `assets/ui/heart.png`,
-                `assets/ui/leaf.png`
-            ];
-            images.forEach(src => {
-                const img = new Image();
-                img.src = src;
-            });
-        }
+    const images = [
+        `assets/backgrounds/bg_apartment_morning.png`,
+        `assets/characters/anna_sad_style2.png`,
+        `assets/characters/vika_smile_style1.png`,
+        `assets/characters/anna_neutral_style1.png`, // Убедитесь, что стиль Анны соответствует stats.appearance
+        `assets/ui/diamonds.png`,
+        `assets/ui/crown.png`,
+        `assets/ui/heart.png`,
+        `assets/ui/leaf.png`
+    ];
+    return Promise.all(images.map(src => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = resolve;
+            img.onerror = () => {
+                console.warn(`Не удалось загрузить ${src}`);
+                resolve(); // Продолжаем, даже если ошибка
+            };
+        });
+    }));
+}
 
         async function loadSession(callback) {
             const session = await getFromCloud('last_session');
@@ -515,12 +524,25 @@
             console.log('Отображаем сцену:', scene.id || sceneId);
 
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}.png')` : 'none';
-            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}.png')` : 'none';
-            if (scene.characterLeft && scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-            if (scene.characterRight && scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+
+    // Очищаем и обновляем персонажей
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    charLeft.style.backgroundImage = 'none'; // Очистка перед обновлением
+    charRight.style.backgroundImage = 'none'; // Очистка перед обновлением
+    
+    if (scene.characterLeft) {
+        charLeft.style.backgroundImage = `url('assets/characters/${scene.characterLeft}.png')`;
+    }
+    if (scene.characterRight) {
+        const rightChar = scene.characterRight.includes('${stats.appearance}') 
+            ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+            : scene.characterRight;
+        charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+    }
+
+    if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+    if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
             document.getElementById('speaker-name').textContent = scene.speaker || '';
     const dialogueElement = document.getElementById('dialogue-text');
@@ -568,17 +590,21 @@
         }
     });
 
-        function showChoiceEffects(effects) {
-            for (let key in effects) {
-                if (key !== 'relationships') {
-                    const feedback = document.createElement('img');
-                    feedback.className = 'choice-feedback';
-                    feedback.src = `assets/ui/${key}.png`;
-                    document.body.appendChild(feedback);
-                    setTimeout(() => feedback.remove(), 3000);
-                }
-            }
+       function showChoiceEffects(effects) {
+    for (let key in effects) {
+        if (key !== 'relationships') {
+            const feedback = document.createElement('img');
+            feedback.className = 'choice-feedback';
+            feedback.src = `assets/ui/${key}.png`;
+            feedback.onerror = () => {
+                console.warn(`Изображение для ${key} не найдено`);
+                feedback.src = 'assets/ui/default_effect.png'; // Запасной файл, если есть
+            };
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 3000);
         }
+    }
+}
 
         function showChapterPlaceholder() {
             const existingPlaceholder = document.querySelector('.placeholder-message');
