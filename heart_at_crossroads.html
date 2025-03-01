@@ -20,8 +20,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
+            background-size: contain; /* Changed from cover to contain */
             background-position: center;
+            background-repeat: no-repeat; /* Added to prevent repeating */
+            background-color: #000; /* Added background color */
             transition: opacity 0.5s ease, background-image 0.5s ease;
             z-index: 1;
             opacity: 1;
@@ -29,11 +31,12 @@
         .character-left, .character-right {
             position: absolute;
             bottom: 20%;
-            max-height: 60%;
+            max-height: 70%; /* Increased from 60% to 70% */
             width: 40%;
-            height: 50vh;
+            height: 60vh; /* Increased from 50vh to 60vh */
             background-size: contain;
             background-repeat: no-repeat;
+            background-position: bottom; /* Added to ensure characters are positioned at bottom */
             transition: opacity 0.5s ease;
             z-index: 2;
             opacity: 1;
@@ -141,9 +144,67 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
         }
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('assets/backgrounds/start_screen.jpg') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+        #start-screen h1 {
+            color: blue;
+            font-size: 48px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        #password-input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            width: 200px;
+        }
+        #password-submit {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #password-submit:hover {
+            background: #45a049;
+        }
+        /* Added for temporary chapter placeholder */
+        .placeholder-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
+    <div id="start-screen">
+        <h1>Бета</h1>
+        <input type="text" id="password-input" placeholder="Введите пароль">
+        <button id="password-submit">Войти</button>
+    </div>
     <div class="parallax-bg" id="background" style="display: none;"></div>
     <div class="character-left" id="character-left" style="display: none;"></div>
     <div class="character-right" id="character-right" style="display: none;"></div>
@@ -163,7 +224,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let currentChapter = 1;
-        let currentScene = 0; // Изменено на 0 для соответствия новому коду
+        let currentScene = 1;
         let choices = [];
         let stats = {
             crown: 0,
@@ -175,22 +236,52 @@
         };
         let isTyping = false;
         let scriptData = null;
+        const correctPassword = "евбытрофко"; // Исправлена кодировка пароля
 
         Telegram.WebApp.ready();
 
-        startGame();
+        const userId = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
+        Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
+            if (!error && result) {
+                const authorizedUsers = JSON.parse(result);
+                if (authorizedUsers.includes(userId)) {
+                    startGame();
+                    return;
+                }
+            }
+            showPasswordScreen();
+        });
+
+        function showPasswordScreen() {
+            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('password-submit').ontouchstart = (e) => {
+                e.preventDefault();
+                const inputPassword = document.getElementById('password-input').value;
+                if (inputPassword === correctPassword) {
+                    Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
+                        let authorizedUsers = result ? JSON.parse(result) : [];
+                        if (!authorizedUsers.includes(userId)) {
+                            authorizedUsers.push(userId);
+                            Telegram.WebApp.CloudStorage.setItem('authorized_users', JSON.stringify(authorizedUsers));
+                        }
+                        startGame();
+                    });
+                } else {
+                    alert('Неверный пароль!');
+                }
+            };
+        }
 
         function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
             document.getElementById('background').style.display = 'block';
             document.getElementById('character-left').style.display = 'block';
             document.getElementById('character-right').style.display = 'block';
             document.getElementById('dialogue-box').style.display = 'block';
             document.getElementById('menu').style.display = 'flex';
             updateDiamondsDisplay();
-            
-            loadChapter(1).then(() => {
-                console.log('Глава загружена, начинаем с первой сцены', scriptData);
-                currentScene = 0; // Старт с первой сцены
+            loadChapter(1).then(() => {  // Ждём завершения загрузки
+                currentScene = 0;
                 showScene(currentScene);
             }).catch(error => {
                 console.error('Не удалось запустить игру:', error);
@@ -219,18 +310,45 @@
             });
         }
 
+        function loadSession(callback) {
+            Telegram.WebApp.CloudStorage.getItem('last_session', (error, result) => {
+                if (!error && result) {
+                    const session = JSON.parse(result);
+                    currentChapter = session.currentChapter;
+                    currentScene = session.currentScene;
+                    choices = session.choices;
+                    stats = session.stats;
+                }
+                if (callback) callback();
+            });
+        }
+
+        function saveSession() {
+            const session = { currentChapter, currentScene, choices, stats };
+            Telegram.WebApp.CloudStorage.setItem('last_session', JSON.stringify(session));
+            updateDiamondsDisplay();
+        }
+
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
-            return fetch(`data/chapter${chapterId}.json`)
+            return fetch(`data/chapter1.json`)  // Всегда загружаем первую главу для текущей версии
                 .then(response => {
-                    if (!response.ok) throw new Error('Не удалось загрузить главу');
+                    if (!response.ok) {
+                        console.error('Ошибка загрузки JSON:', response.status, response.statusText);
+                        return response.text().then(text => {
+                            console.error('Ответ сервера:', text);
+                            throw new Error('Не удалось загрузить JSON: ' + response.status);
+                        });
+                    }
                     return response.json();
                 })
                 .then(data => {
-                    scriptData = data;
+                    console.log('JSON успешно загружен:', data);
+                    scriptData = data;  // Устанавливаем scriptData
                 })
                 .catch(error => {
                     console.error('Ошибка загрузки главы:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы.";
                     throw error;
                 });
         }
@@ -252,70 +370,52 @@
         }
 
         function showScene(sceneId) {
-            // Check if scriptData is loaded
-            if (!scriptData || !scriptData.scenes) {
-                console.error('Script data not loaded properly');
-                document.getElementById('dialogue-text').textContent = "Ошибка загрузки данных!";
-                return;
-            }
-
-            // Get the scene - either by ID if string or by index if number
-            let scene;
-            if (typeof sceneId === 'number') {
-                scene = scriptData.scenes[sceneId];
-            } else {
-                scene = scriptData.scenes.find(s => s.id === sceneId);
-            }
-
+            let scene = scriptData.scenes.find(s => s.id === sceneId);
             if (!scene) {
-                console.error(`Сцена ${sceneId} не найдена`, scriptData.scenes);
+                // Временная заглушка для следующих глав
+                if (currentChapter >= 2) {
+                    showChapterPlaceholder();
+                    return;
+                }
+                
+                console.error(`Сцена с ID ${sceneId} не найдена`);
                 document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
                 return;
             }
 
-            console.log('Отображаем сцену:', scene.id || sceneId);
-
-            if (!checkSceneCondition(scene)) {
-                console.log('Сцена пропущена из-за условия:', scene.id || sceneId);
+            if (scene && !checkSceneCondition(scene)) {
+                console.log('Сцена пропущена из-за условия:', scene.id);
                 currentScene++;
                 showScene(currentScene);
                 return;
             }
 
-            // Update the background
+            console.log('Отображаем сцену:', scene.id);
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
-            
-            // Update characters
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
-            
             charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}.png')` : 'none';
             charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}.png')` : 'none';
-            
-            // Update character positioning if specified
-            if (scene.characterLeft && scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-            if (scene.characterRight && scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+            if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
+            if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
 
-            // Update dialogue
             document.getElementById('speaker-name').textContent = scene.speaker || '';
             typeText(scene.text, document.getElementById('dialogue-text'));
 
             const dialogueBox = document.querySelector('.dialogue-box');
             document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
 
-            // Remove previous event listeners
+            // Очищаем предыдущий обработчик
             if (dialogueBox.touchHandler) {
                 dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
             }
 
-            // Handle choices or continue to next scene
-            if (scene.choices && scene.choices.length > 0) {
+            if (scene.choices) {
                 document.body.ontouchstart = null;
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
                     btn.textContent = choice.cost ? `${choice.text} (${choice.cost} алмазов)` : choice.text;
                     btn.className = 'choice-btn';
-                    
                     if (choice.condition && !checkCondition(choice.condition)) {
                         btn.style.display = 'none';
                     } else if (choice.cost && stats.diamonds < choice.cost) {
@@ -324,9 +424,7 @@
                         btn.ontouchstart = (e) => {
                             e.preventDefault();
                             if (choice.cost) stats.diamonds -= choice.cost;
-                            updateDiamondsDisplay();
                             saveChoice(choice.id, choice.effects);
-                            
                             if (choice.effects) {
                                 for (let key in choice.effects) {
                                     if (key !== 'relationships') {
@@ -338,7 +436,6 @@
                                     }
                                 }
                             }
-                            
                             currentScene = choice.nextScene;
                             showScene(currentScene);
                         };
@@ -348,26 +445,50 @@
             } else {
                 dialogueBox.touchHandler = (e) => {
                     e.preventDefault();
-                    console.log('Тап на dialogue-box, isTyping:', isTyping);
-                    
+                    console.log('Тап на dialogue-box, isTyping:', isTyping, 'currentScene:', currentScene, 'nextScene:', scene.nextScene);
                     if (!isTyping) {
-                        console.log('Переход на следующую сцену:', scene.nextScene || (currentScene + 1));
+                        console.log('Переход на следующую сцену:', scene.nextScene);
                         currentScene = scene.nextScene || currentScene + 1;
                         saveSession();
                         showScene(currentScene);
                     } else {
-                        console.log('Тап заблокирован, текст все еще печатается');
+                        console.log('Тап заблокирован, isTyping всё ещё true');
                     }
                 };
-                
                 dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
             }
         }
 
-        function saveSession() {
-            console.log('Сохраняем сессию. Глава:', currentChapter, 'Сцена:', currentScene, 'Статы:', stats);
-            // Реализация сохранения в localStorage, если нужно
-            // localStorage.setItem('gameSession', JSON.stringify({ currentChapter, currentScene, stats, choices }));
+        function showChapterPlaceholder() {
+            // Удаляем существующую заглушку, если она есть
+            const existingPlaceholder = document.querySelector('.placeholder-message');
+            if (existingPlaceholder) {
+                existingPlaceholder.remove();
+            }
+            
+            // Создаем элемент заглушки
+            const placeholder = document.createElement('div');
+            placeholder.className = 'placeholder-message';
+            placeholder.textContent = 'Временная заглушка: эта глава находится в разработке. Мы сейчас отлаживаем первую главу и сцены. Пожалуйста, перезапустите игру.';
+            
+            document.body.appendChild(placeholder);
+            
+            // Очищаем текущий экран
+            document.getElementById('character-left').style.backgroundImage = 'none';
+            document.getElementById('character-right').style.backgroundImage = 'none';
+            document.getElementById('speaker-name').textContent = '';
+            document.getElementById('dialogue-text').textContent = '';
+            
+            // Добавляем обработчик нажатия для возврата в игру
+            document.body.ontouchstart = (e) => {
+                e.preventDefault();
+                placeholder.remove();
+                currentChapter = 1;
+                currentScene = 0;
+                loadChapter(1).then(() => {
+                    showScene(currentScene);
+                });
+            };
         }
 
         function checkSceneCondition(scene) {
@@ -387,7 +508,7 @@
         }
 
         function typeText(text, element) {
-            element.textContent = '';
+            element.textContent = ''; // Очищаем перед началом
             isTyping = true;
             let i = 0;
             const speed = 30;
@@ -406,7 +527,7 @@
 
             const dialogueBox = document.querySelector('.dialogue-box');
             const skipHandler = (e) => {
-                e.preventDefault();
+                e.preventDefault(); // Предотвращаем стандартное поведение
                 if (isTyping) {
                     element.textContent = text;
                     isTyping = false;
@@ -452,9 +573,18 @@
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
                 appearance: "style1"
             };
-            loadChapter(1).then(() => showScene(0));
+            
+            // Удаляем возможную плашку-заглушку
+            const existingPlaceholder = document.querySelector('.placeholder-message');
+            if (existingPlaceholder) {
+                existingPlaceholder.remove();
+            }
+            
+            loadChapter(1).then(() => {
+                showScene(currentScene);
+            });
         };
-
+        
         document.getElementById('stats').ontouchstart = () => {
             alert(`Короны: ${stats.crown}\nСердце: ${stats.heart}\nЛист: ${stats.leaf}\nАлмазы: ${stats.diamonds}\nОтношения:\nМарк: ${stats.relationships.mark}\nЛера: ${stats.relationships.lera}\nВика: ${stats.relationships.vika}\nСергей: ${stats.relationships.sergey}`);
         };
