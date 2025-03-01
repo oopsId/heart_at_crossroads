@@ -200,7 +200,8 @@
             const images = [
                 `assets/backgrounds/bg_apartment_morning.png`,
                 `assets/characters/anna_sad_style2.png`,
-                `assets/characters/vika_smile_style1.png`, // Обновлено
+                `assets/characters/vika_smile_style1.png`,
+                `assets/characters/anna_neutral_style2.png`,
                 `assets/ui/diamonds.png`,
                 `assets/ui/crown.png`,
                 `assets/ui/heart.png`,
@@ -216,7 +217,10 @@
             preloadAssets(chapterId);
             fetch(`data/chapter1.json`)
                 .then(response => {
-                    if (!response.ok) throw new Error('Не удалось загрузить JSON: ' + response.status);
+                    if (!response.ok) {
+                        console.error('Ошибка загрузки JSON:', response.status, response.statusText);
+                        throw new Error('Не удалось загрузить JSON: ' + response.status);
+                    }
                     return response.json();
                 })
                 .then(data => {
@@ -245,36 +249,9 @@
         function showScene(sceneId) {
             let scene = scriptData.scenes.find(s => s.id === sceneId);
             if (!scene) {
-                if (currentChapter === 11) {
-                    const ending = scriptData.endings.find(e => checkCondition(e.condition));
-                    if (ending) {
-                        currentScene = ending.nextScene || 1;
-                        scene = ending.scenes ? ending.scenes.find(s => s.id === currentScene) : null;
-                        if (!scene) {
-                            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${ending.background}')`;
-                            document.getElementById('character-left').style.backgroundImage = ending.characterLeft ? `url('assets/characters/${ending.characterLeft}')` : 'none';
-                            document.getElementById('character-right').style.backgroundImage = 'none';
-                            document.getElementById('speaker-name').textContent = ending.speaker || '';
-                            typeText(ending.text + '\n' + (ending.monologue || ''), document.getElementById('dialogue-text'));
-                            document.body.ontouchstart = () => Telegram.WebApp.close();
-                            Telegram.WebApp.sendData(JSON.stringify({ completed: true, choices, stats, ending: ending.id }));
-                            return;
-                        }
-                    } else {
-                        document.getElementById('dialogue-text').textContent = "Конец истории!";
-                        document.body.ontouchstart = () => Telegram.WebApp.close();
-                        Telegram.WebApp.sendData(JSON.stringify({ completed: true, choices, stats, ending: null }));
-                        return;
-                    }
-                } else {
-                    fadeOut(() => {
-                        currentChapter++;
-                        currentScene = 1;
-                        loadChapter(currentChapter);
-                        fadeIn();
-                    });
-                    return;
-                }
+                console.error(`Сцена с ID ${sceneId} не найдена`);
+                document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
+                return;
             }
 
             if (scene && !checkSceneCondition(scene)) {
@@ -286,8 +263,8 @@
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
-            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}')` : 'none';
-            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}')` : 'none';
+            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}.png')` : 'none';
+            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}.png')` : 'none';
             if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
             if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
 
