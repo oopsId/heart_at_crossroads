@@ -178,7 +178,6 @@
 
         Telegram.WebApp.ready();
 
-        // Убираем пароль, старт сразу
         startGame();
 
         function startGame() {
@@ -199,7 +198,6 @@
 
         function preloadAssets(chapterId) {
             const images = [
-                // Только фоны главы 1, все PNG
                 `assets/backgrounds/bg_apartment_morning.png`,
                 `assets/backgrounds/bg_street_day_trash.png`,
                 `assets/backgrounds/bg_subway_stop_day.png`,
@@ -208,14 +206,8 @@
                 `assets/backgrounds/bg_office_night_end.png`,
                 `assets/backgrounds/bg_street_night.png`,
                 `assets/backgrounds/bg_street_dusk_end.png`,
-                // Персонажи
-                `assets/characters/anna_neutral_style1.png`,
-                `assets/characters/anna_neutral_style2.png`,
-                `assets/characters/lera_serious.png`,
+                `assets/characters/anna_sad_style2.png`,
                 `assets/characters/vika_smile.png`,
-                `assets/characters/mark_hope.png`,
-                `assets/characters/sergey_serious.png`,
-                // UI
                 `assets/ui/diamonds.png`,
                 `assets/ui/crown.png`,
                 `assets/ui/heart.png`,
@@ -229,9 +221,11 @@
 
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
-            const fileName = chapterId <= 10 ? `chapter${chapterId}.json` : 'final.json';
-            fetch(`/data/${fileName}`)
-                .then(response => response.json())
+            fetch(`/chapter1.json`) // Путь верхнего уровня
+                .then(response => {
+                    if (!response.ok) throw new Error('Не удалось загрузить JSON: ' + response.status);
+                    return response.json();
+                })
                 .then(data => {
                     scriptData = data;
                     showScene(currentScene);
