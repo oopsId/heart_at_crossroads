@@ -141,53 +141,9 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
         }
-        #start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('assets/backgrounds/start_screen.jpg') center/cover no-repeat;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
-        }
-        #start-screen h1 {
-            color: blue;
-            font-size: 48px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
-        #password-input {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            width: 200px;
-        }
-        #password-submit {
-            padding: 10px 20px;
-            font-size: 16px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #password-submit:hover {
-            background: #45a049;
-        }
     </style>
 </head>
 <body>
-    <div id="start-screen">
-        <h1>Бета</h1>
-        <input type="text" id="password-input" placeholder="Введите пароль">
-        <button id="password-submit">Войти</button>
-    </div>
     <div class="parallax-bg" id="background" style="display: none;"></div>
     <div class="character-left" id="character-left" style="display: none;"></div>
     <div class="character-right" id="character-right" style="display: none;"></div>
@@ -219,51 +175,20 @@
         };
         let isTyping = false;
         let scriptData = null;
-        const correctPassword = "ev,thnj'rj";
 
         Telegram.WebApp.ready();
 
-        const userId = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
-        Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
-            if (!error && result) {
-                const authorizedUsers = JSON.parse(result);
-                if (authorizedUsers.includes(userId)) {
-                    startGame();
-                    return;
-                }
-            }
-            showPasswordScreen();
-        });
-
-        function showPasswordScreen() {
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('password-submit').ontouchstart = (e) => {
-                e.preventDefault();
-                const inputPassword = document.getElementById('password-input').value;
-                if (inputPassword === correctPassword) {
-                    Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
-                        let authorizedUsers = result ? JSON.parse(result) : [];
-                        if (!authorizedUsers.includes(userId)) {
-                            authorizedUsers.push(userId);
-                            Telegram.WebApp.CloudStorage.setItem('authorized_users', JSON.stringify(authorizedUsers));
-                        }
-                        startGame();
-                    });
-                } else {
-                    alert('Неверный пароль!');
-                }
-            };
-        }
+        // Убираем пароль, старт сразу
+        startGame();
 
         function startGame() {
-            document.getElementById('start-screen').style.display = 'none';
             document.getElementById('background').style.display = 'block';
             document.getElementById('character-left').style.display = 'block';
             document.getElementById('character-right').style.display = 'block';
             document.getElementById('dialogue-box').style.display = 'block';
             document.getElementById('menu').style.display = 'flex';
             updateDiamondsDisplay();
-            loadSession(() => loadChapter(currentChapter));
+            loadChapter(1);
             currentScene = 0;
             showScene(currentScene);
         }
@@ -274,21 +199,23 @@
 
         function preloadAssets(chapterId) {
             const images = [
-                `assets/backgrounds/bg_apartment_morning.jpg`,
-                `assets/backgrounds/bg_night.jpg`,
-                `assets/backgrounds/bg_office_day.jpg`,
-                `assets/backgrounds/bg_park_night.jpg`,
-                `assets/backgrounds/bg_office_night.jpg`,
-                `assets/backgrounds/bg_park_day.jpg`,
-                `assets/backgrounds/bg_train.jpg`,
-                `assets/backgrounds/bg_street_rain.jpg`,
-                `assets/backgrounds/bg_countryside.jpg`,
+                // Только фоны главы 1, все PNG
+                `assets/backgrounds/bg_apartment_morning.png`,
+                `assets/backgrounds/bg_street_day_trash.png`,
+                `assets/backgrounds/bg_subway_stop_day.png`,
+                `assets/backgrounds/bg_office_day.png`,
+                `assets/backgrounds/bg_office_night.png`,
+                `assets/backgrounds/bg_office_night_end.png`,
+                `assets/backgrounds/bg_street_night.png`,
+                `assets/backgrounds/bg_street_dusk_end.png`,
+                // Персонажи
                 `assets/characters/anna_neutral_style1.png`,
                 `assets/characters/anna_neutral_style2.png`,
                 `assets/characters/lera_serious.png`,
                 `assets/characters/vika_smile.png`,
                 `assets/characters/mark_hope.png`,
                 `assets/characters/sergey_serious.png`,
+                // UI
                 `assets/ui/diamonds.png`,
                 `assets/ui/crown.png`,
                 `assets/ui/heart.png`,
@@ -298,25 +225,6 @@
                 const img = new Image();
                 img.src = src;
             });
-        }
-
-        function loadSession(callback) {
-            Telegram.WebApp.CloudStorage.getItem('last_session', (error, result) => {
-                if (!error && result) {
-                    const session = JSON.parse(result);
-                    currentChapter = session.currentChapter;
-                    currentScene = session.currentScene;
-                    choices = session.choices;
-                    stats = session.stats;
-                }
-                callback();
-            });
-        }
-
-        function saveSession() {
-            const session = { currentChapter, currentScene, choices, stats };
-            Telegram.WebApp.CloudStorage.setItem('last_session', JSON.stringify(session));
-            updateDiamondsDisplay();
         }
 
         function loadChapter(chapterId) {
@@ -356,7 +264,7 @@
                         currentScene = ending.nextScene || 1;
                         scene = ending.scenes ? ending.scenes.find(s => s.id === currentScene) : null;
                         if (!scene) {
-                            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${ending.background}')`;
+                            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${ending.background}.png')`;
                             document.getElementById('character-left').style.backgroundImage = ending.characterLeft ? `url('assets/characters/${ending.characterLeft}')` : 'none';
                             document.getElementById('character-right').style.backgroundImage = 'none';
                             document.getElementById('speaker-name').textContent = ending.speaker || '';
@@ -388,7 +296,7 @@
                 return;
             }
 
-            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}')`;
+            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
             charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft.file || scene.characterLeft}')` : 'none';
