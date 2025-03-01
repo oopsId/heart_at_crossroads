@@ -200,7 +200,7 @@
             const images = [
                 `assets/backgrounds/bg_apartment_morning.png`,
                 `assets/characters/anna_sad_style2.png`,
-                `assets/characters/vika_smile.png`,
+                `assets/characters/vika_smile_style1.png`, // Обновлено
                 `assets/ui/diamonds.png`,
                 `assets/ui/crown.png`,
                 `assets/ui/heart.png`,
@@ -283,7 +283,7 @@
                 return;
             }
 
-            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}')`;
+            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
             charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}')` : 'none';
