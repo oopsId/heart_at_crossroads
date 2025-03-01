@@ -523,48 +523,50 @@
             if (scene.characterRight && scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
             document.getElementById('speaker-name').textContent = scene.speaker || '';
-            typeText(scene.text, document.getElementById('dialogue-text'));
+    const dialogueElement = document.getElementById('dialogue-text');
+    const dialogueBox = document.querySelector('.dialogue-box');
 
-            const dialogueBox = document.querySelector('.dialogue-box');
-            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+    // Очистка предыдущих кнопок и обработчиков
+    document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+    if (dialogueBox.touchHandler) {
+        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+    }
 
-            if (dialogueBox.touchHandler) {
-                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-            }
-
-            if (scene.choices && scene.choices.length > 0) {
-                document.body.ontouchstart = null;
-                scene.choices.forEach(choice => {
-                    const btn = createChoiceButton(choice);
-                    if (choice.condition && !checkCondition(choice.condition)) {
-                        btn.style.display = 'none';
-                    } else if (choice.cost && stats.diamonds < choice.cost) {
-                        btn.disabled = true;
-                    } else {
-                        btn.addEventListener('touchstart', (e) => {
-                            e.preventDefault();
-                            if (choice.cost) stats.diamonds -= choice.cost;
-                            updateDiamondsDisplay();
-                            saveChoice(choice.id, choice.effects);
-                            if (choice.effects) showChoiceEffects(choice.effects);
-                            currentScene = choice.nextScene;
-                            showScene(currentScene);
-                        });
-                    }
-                    dialogueBox.appendChild(btn);
-                });
-            } else {
-                dialogueBox.touchHandler = (e) => {
-                    e.preventDefault();
-                    if (!isTyping) {
-                        currentScene = scene.nextScene || currentScene + 1;
-                        saveSession();
+    // Запуск печати текста с передачей логики кнопок как коллбэк
+    typeText(scene.text, dialogueElement, () => {
+        if (scene.choices && scene.choices.length > 0) {
+            document.body.ontouchstart = null;
+            scene.choices.forEach(choice => {
+                const btn = createChoiceButton(choice);
+                if (choice.condition && !checkCondition(choice.condition)) {
+                    btn.style.display = 'none';
+                } else if (choice.cost && stats.diamonds < choice.cost) {
+                    btn.disabled = true;
+                } else {
+                    btn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        if (choice.cost) stats.diamonds -= choice.cost;
+                        updateDiamondsDisplay();
+                        saveChoice(choice.id, choice.effects);
+                        if (choice.effects) showChoiceEffects(choice.effects);
+                        currentScene = choice.nextScene;
                         showScene(currentScene);
-                    }
-                };
-                dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-            }
+                    });
+                }
+                dialogueBox.appendChild(btn);
+            });
+        } else {
+            dialogueBox.touchHandler = (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    currentScene = scene.nextScene || currentScene + 1;
+                    saveSession();
+                    showScene(currentScene);
+                }
+            };
+            dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
         }
+    });
 
         function showChoiceEffects(effects) {
             for (let key in effects) {
@@ -615,31 +617,35 @@
             return true;
         }
 
-        function typeText(text, element) {
-            element.textContent = '';
-            isTyping = true;
-            let i = 0;
-            const speed = 30;
-            function type() {
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    isTyping = false;
-                }
-            }
-            type();
-            const dialogueBox = document.querySelector('.dialogue-box');
-            const skipHandler = (e) => {
-                e.preventDefault();
-                if (isTyping) {
-                    element.textContent = text;
-                    isTyping = false;
-                }
-            };
-            dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
+       function typeText(text, element, callback) {
+    element.textContent = '';
+    isTyping = true;
+    let i = 0;
+    const speed = 30;
+
+    function type() {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        } else {
+            isTyping = false;
+            if (callback) callback(); // Вызываем коллбэк после завершения анимации
         }
+    }
+    type();
+
+    const dialogueBox = document.querySelector('.dialogue-box');
+    const skipHandler = (e) => {
+        e.preventDefault();
+        if (isTyping) {
+            element.textContent = text;
+            isTyping = false;
+            if (callback) callback(); // Вызываем коллбэк при пропуске
+        }
+    };
+    dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
+}
 
         function fadeOut(callback) {
             const bg = document.getElementById('background');
