@@ -510,16 +510,22 @@
         }
 
         function loadChapter(chapterId) {
-            return fetch(`data/chapter${chapterId}.json`)
+            return fetch(`data/chapter${chapterId}.json`, {
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8'
+                }
+            })
                 .then(response => {
                     if (!response.ok) throw new Error('Не удалось загрузить главу');
                     return response.json();
                 })
                 .then(data => {
                     scriptData = data;
+                    console.log('Загруженные данные:', scriptData);
                 })
                 .catch(error => {
                     console.error('Ошибка загрузки главы:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы.";
                     throw error;
                 });
         }
@@ -573,7 +579,10 @@
 
             console.log('Отображаем сцену:', scene.id || sceneId);
 
-            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
+            const backgroundElement = document.getElementById('background');
+            backgroundElement.style.backgroundImage = scene.background 
+                ? `url('assets/backgrounds/${scene.background}.png')` 
+                : 'none';
 
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
@@ -601,6 +610,7 @@
                 dialogueBox.touchHandler = null;
             }
 
+            console.log('Текст сцены:', scene.text);
             typeText(scene.text, dialogueElement, () => {
                 if (scene.choices && scene.choices.length > 0) {
                     document.body.ontouchstart = null;
@@ -696,13 +706,18 @@
             let i = 0;
             const speed = 30;
 
+            if (element.typeTimer) {
+                clearTimeout(element.typeTimer);
+            }
+
             function type() {
                 if (i < text.length) {
                     element.textContent += text.charAt(i);
                     i++;
-                    setTimeout(type, speed);
+                    element.typeTimer = setTimeout(type, speed);
                 } else {
                     isTyping = false;
+                    delete element.typeTimer;
                     if (callback) callback();
                 }
             }
@@ -712,11 +727,13 @@
             const skipHandler = (e) => {
                 e.preventDefault();
                 if (isTyping) {
+                    clearTimeout(element.typeTimer);
                     element.textContent = text;
                     isTyping = false;
                     if (callback) callback();
                 }
             };
+            dialogueBox.removeEventListener('touchstart', skipHandler);
             dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
         }
 
