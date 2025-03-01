@@ -200,18 +200,6 @@
             <img src="assets/ui/diamonds.png" alt="Diamonds">
             <span id="diamonds-count">10</span>
         </div>
-        <div id="crown">
-            <img src="assets/ui/crown.png" alt="Crown">
-            <span id="crown-count">0</span>
-        </div>
-        <div id="heart">
-            <img src="assets/ui/heart.png" alt="Heart">
-            <span id="heart-count">0</span>
-        </div>
-        <div id="leaf">
-            <img src="assets/ui/leaf.png" alt="Leaf">
-            <span id="leaf-count">0</span>
-        </div>
         <button id="restart">Рестарт</button>
         <button id="stats">Статы</button>
     </div>
@@ -276,15 +264,12 @@
             document.getElementById('menu').style.display = 'flex';
             updateDiamondsDisplay();
             loadSession(() => loadChapter(currentChapter));
-            currentScene = 0; // Старт с ID 0
+            currentScene = 0;
             showScene(currentScene);
         }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
-            document.getElementById('crown-count').textContent = stats.crown;
-            document.getElementById('heart-count').textContent = stats.heart;
-            document.getElementById('leaf-count').textContent = stats.leaf;
         }
 
         function preloadAssets(chapterId) {
