@@ -96,6 +96,21 @@
             flex-direction: column;
             align-items: flex-end;
         }
+        #menu div {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        #menu img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+        #menu span {
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
         #menu button {
             margin: 5px;
             padding: 5px 10px;
@@ -105,20 +120,19 @@
             border-radius: 3px;
             font-size: 12px;
         }
-        #diamonds {
-            display: flex;
-            align-items: center;
-            margin: 5px;
+        .choice-feedback {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            z-index: 4;
+            animation: flyUp 1s ease-out forwards;
         }
-        #diamonds img {
-            width: 24px;
-            height: 24px;
-            margin-right: 5px;
-        }
-        #diamonds span {
-            color: white;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        @keyframes flyUp {
+            0% { bottom: 50%; opacity: 1; }
+            100% { bottom: 70%; opacity: 0; }
         }
         .fade-out {
             opacity: 0;
@@ -183,8 +197,20 @@
     </div>
     <div id="menu" style="display: none;">
         <div id="diamonds">
-            <img src="assets/ui/diamonds.jpg" alt="Diamonds">
+            <img src="assets/ui/diamonds.png" alt="Diamonds">
             <span id="diamonds-count">10</span>
+        </div>
+        <div id="crown">
+            <img src="assets/ui/crown.png" alt="Crown">
+            <span id="crown-count">0</span>
+        </div>
+        <div id="heart">
+            <img src="assets/ui/heart.png" alt="Heart">
+            <span id="heart-count">0</span>
+        </div>
+        <div id="leaf">
+            <img src="assets/ui/leaf.png" alt="Leaf">
+            <span id="leaf-count">0</span>
         </div>
         <button id="restart">Рестарт</button>
         <button id="stats">Статы</button>
@@ -250,10 +276,15 @@
             document.getElementById('menu').style.display = 'flex';
             updateDiamondsDisplay();
             loadSession(() => loadChapter(currentChapter));
+            currentScene = 0; // Старт с ID 0
+            showScene(currentScene);
         }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
+            document.getElementById('crown-count').textContent = stats.crown;
+            document.getElementById('heart-count').textContent = stats.heart;
+            document.getElementById('leaf-count').textContent = stats.leaf;
         }
 
         function preloadAssets(chapterId) {
@@ -273,7 +304,10 @@
                 `assets/characters/vika_smile.png`,
                 `assets/characters/mark_hope.png`,
                 `assets/characters/sergey_serious.png`,
-                `assets/ui/diamonds.jpg`
+                `assets/ui/diamonds.png`,
+                `assets/ui/crown.png`,
+                `assets/ui/heart.png`,
+                `assets/ui/leaf.png`
             ];
             images.forEach(src => {
                 const img = new Image();
@@ -398,6 +432,19 @@
                             e.preventDefault();
                             if (choice.cost) stats.diamonds -= choice.cost;
                             saveChoice(choice.id, choice.effects);
+
+                            if (choice.effects) {
+                                for (let key in choice.effects) {
+                                    if (key !== 'relationships') {
+                                        const feedback = document.createElement('img');
+                                        feedback.className = 'choice-feedback';
+                                        feedback.src = `assets/ui/${key}.png`;
+                                        document.body.appendChild(feedback);
+                                        setTimeout(() => feedback.remove(), 1000);
+                                    }
+                                }
+                            }
+
                             currentScene = choice.nextScene;
                             showScene(currentScene);
                         };
@@ -473,7 +520,7 @@
 
         document.getElementById('restart').ontouchstart = () => {
             currentChapter = 1;
-            currentScene = 1;
+            currentScene = 0;
             choices = [];
             stats = {
                 crown: 0,
