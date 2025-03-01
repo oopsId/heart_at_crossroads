@@ -1,6 +1,15 @@
 {
     "scenes": [
         {
+            "id": 0,
+            "background": "bg_apartment_morning.jpg",
+            "characterLeft": null,
+            "characterRight": "anna_sad_style2.png",
+            "speaker": "Анна",
+            "text": "Я проснулась этим утром и поняла, что всё изменилось. Новая квартира, новая жизнь... Но почему так пусто?",
+            "nextScene": 1
+        },
+        {
             "id": 1,
             "background": "bg_apartment_morning.jpg",
             "characterLeft": "vika_smile.png",
