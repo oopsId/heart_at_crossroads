@@ -221,7 +221,7 @@
 
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
-            fetch(`data/chapter1.json`) // Ваш путь: рядом с assets, в data/
+            fetch(`data/chapter1.json`)
                 .then(response => {
                     if (!response.ok) throw new Error('Не удалось загрузить JSON: ' + response.status);
                     return response.json();
@@ -258,7 +258,7 @@
                         currentScene = ending.nextScene || 1;
                         scene = ending.scenes ? ending.scenes.find(s => s.id === currentScene) : null;
                         if (!scene) {
-                            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${ending.background}.png')`;
+                            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${ending.background}')`;
                             document.getElementById('character-left').style.backgroundImage = ending.characterLeft ? `url('assets/characters/${ending.characterLeft}')` : 'none';
                             document.getElementById('character-right').style.backgroundImage = 'none';
                             document.getElementById('speaker-name').textContent = ending.speaker || '';
@@ -290,7 +290,7 @@
                 return;
             }
 
-            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
+            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}')`;
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
             charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft.file || scene.characterLeft}')` : 'none';
