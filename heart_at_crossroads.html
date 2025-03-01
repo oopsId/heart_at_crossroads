@@ -46,8 +46,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: url('assets/ui/dialogue_frame.png') no-repeat center;
-            background-size: contain;
+            background: linear-gradient(to top, rgba(51, 51, 51, 0.8), transparent);
             color: white;
             padding: 20px;
             text-align: center;
@@ -55,6 +54,8 @@
             transition: opacity 0.5s ease;
             opacity: 1;
             min-height: 150px;
+            max-height: 30vh;
+            overflow-y: auto;
         }
         #speaker-name {
             font-weight: bold;
@@ -91,6 +92,9 @@
             top: 10px;
             right: 10px;
             z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
         #menu button {
             margin: 5px;
@@ -100,6 +104,21 @@
             border: none;
             border-radius: 3px;
             font-size: 12px;
+        }
+        #diamonds {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        #diamonds img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+        #diamonds span {
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         .fade-out {
             opacity: 0;
@@ -163,13 +182,16 @@
         <p id="dialogue-text"></p>
     </div>
     <div id="menu" style="display: none;">
+        <div id="diamonds">
+            <img src="assets/ui/diamonds.jpg" alt="Diamonds">
+            <span id="diamonds-count">10</span>
+        </div>
         <button id="restart">Рестарт</button>
         <button id="stats">Статы</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Глобальные переменные
         let currentChapter = 1;
         let currentScene = 1;
         let choices = [];
@@ -179,16 +201,14 @@
             leaf: 0,
             diamonds: 10,
             relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-            appearance: "style1" // Оставляем как "шутку" для будущего
+            appearance: "style1"
         };
         let isTyping = false;
         let scriptData = null;
         const correctPassword = "ev,thnj'rj";
 
-        // Инициализация Telegram Web App
         Telegram.WebApp.ready();
 
-        // Проверка авторизации по Telegram ID
         const userId = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
         Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
             if (!error && result) {
@@ -201,14 +221,12 @@
             showPasswordScreen();
         });
 
-        // Показ экрана ввода пароля
         function showPasswordScreen() {
             document.getElementById('start-screen').style.display = 'flex';
             document.getElementById('password-submit').ontouchstart = (e) => {
                 e.preventDefault();
                 const inputPassword = document.getElementById('password-input').value;
                 if (inputPassword === correctPassword) {
-                    // Сохраняем Telegram ID в облаке
                     Telegram.WebApp.CloudStorage.getItem('authorized_users', (error, result) => {
                         let authorizedUsers = result ? JSON.parse(result) : [];
                         if (!authorizedUsers.includes(userId)) {
@@ -223,30 +241,39 @@
             };
         }
 
-        // Запуск игры
         function startGame() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('background').style.display = 'block';
             document.getElementById('character-left').style.display = 'block';
             document.getElementById('character-right').style.display = 'block';
             document.getElementById('dialogue-box').style.display = 'block';
-            document.getElementById('menu').style.display = 'block';
+            document.getElementById('menu').style.display = 'flex';
+            updateDiamondsDisplay();
             loadSession(() => loadChapter(currentChapter));
         }
 
-        // Предзагрузка ресурсов
+        function updateDiamondsDisplay() {
+            document.getElementById('diamonds-count').textContent = stats.diamonds;
+        }
+
         function preloadAssets(chapterId) {
             const images = [
                 `assets/backgrounds/bg_apartment_morning.jpg`,
                 `assets/backgrounds/bg_night.jpg`,
                 `assets/backgrounds/bg_office_day.jpg`,
                 `assets/backgrounds/bg_park_night.jpg`,
+                `assets/backgrounds/bg_office_night.jpg`,
+                `assets/backgrounds/bg_park_day.jpg`,
+                `assets/backgrounds/bg_train.jpg`,
+                `assets/backgrounds/bg_street_rain.jpg`,
+                `assets/backgrounds/bg_countryside.jpg`,
                 `assets/characters/anna_neutral_style1.png`,
                 `assets/characters/anna_neutral_style2.png`,
                 `assets/characters/lera_serious.png`,
                 `assets/characters/vika_smile.png`,
                 `assets/characters/mark_hope.png`,
-                `assets/characters/sergey_serious.png`
+                `assets/characters/sergey_serious.png`,
+                `assets/ui/diamonds.jpg`
             ];
             images.forEach(src => {
                 const img = new Image();
@@ -254,7 +281,6 @@
             });
         }
 
-        // Загрузка сессии
         function loadSession(callback) {
             Telegram.WebApp.CloudStorage.getItem('last_session', (error, result) => {
                 if (!error && result) {
@@ -268,13 +294,12 @@
             });
         }
 
-        // Сохранение сессии
         function saveSession() {
             const session = { currentChapter, currentScene, choices, stats };
             Telegram.WebApp.CloudStorage.setItem('last_session', JSON.stringify(session));
+            updateDiamondsDisplay();
         }
 
-        // Загрузка главы
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
             const fileName = chapterId <= 10 ? `chapter${chapterId}.json` : 'final.json';
@@ -287,7 +312,6 @@
                 .catch(error => console.error('Ошибка загрузки главы:', error));
         }
 
-        // Сохранение выбора
         function saveChoice(choiceId, effects) {
             choices.push(choiceId);
             if (effects) {
@@ -304,11 +328,10 @@
             saveSession();
         }
 
-        // Показ сцены
         function showScene(sceneId) {
             let scene = scriptData.scenes.find(s => s.id === sceneId);
             if (!scene) {
-                if (currentChapter === 11) { // Финал
+                if (currentChapter === 11) {
                     const ending = scriptData.endings.find(e => checkCondition(e.condition));
                     if (ending) {
                         currentScene = ending.nextScene || 1;
@@ -347,8 +370,13 @@
             }
 
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}')`;
-            document.getElementById('character-left').style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}')` : 'none';
-            document.getElementById('character-right').style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}')` : 'none';
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft.file || scene.characterLeft}')` : 'none';
+            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight.file || scene.characterRight}')` : 'none';
+            if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
+            if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
+
             document.getElementById('speaker-name').textContent = scene.speaker || '';
             typeText(scene.text, document.getElementById('dialogue-text'));
 
@@ -387,13 +415,11 @@
             }
         }
 
-        // Проверка условий сцены
         function checkSceneCondition(scene) {
             if (!scene.condition) return true;
             return checkCondition(scene.condition);
         }
 
-        // Проверка условий для финала или выбора
         function checkCondition(condition) {
             for (let key in condition) {
                 const value = key.startsWith('relationships.') ? stats.relationships[key.split('.')[1]] || 0 : stats[key] || 0;
@@ -405,7 +431,6 @@
             }
         }
 
-        // Эффект печати текста
         function typeText(text, element) {
             element.textContent = '';
             isTyping = true;
@@ -423,7 +448,6 @@
             type();
         }
 
-        // Эффект затухания
         function fadeOut(callback) {
             const bg = document.getElementById('background');
             const charLeft = document.getElementById('character-left');
@@ -436,7 +460,6 @@
             setTimeout(callback, 500);
         }
 
-        // Эффект появления
         function fadeIn() {
             const bg = document.getElementById('background');
             const charLeft = document.getElementById('character-left');
@@ -448,7 +471,6 @@
             dialogue.classList.remove('fade-out');
         }
 
-        // Обработчики меню
         document.getElementById('restart').ontouchstart = () => {
             currentChapter = 1;
             currentScene = 1;
