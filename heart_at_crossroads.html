@@ -221,7 +221,7 @@
 
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
-            fetch(`/chapter1.json`) // Путь верхнего уровня
+            fetch(`data/chapter1.json`) // Ваш путь: рядом с assets, в data/
                 .then(response => {
                     if (!response.ok) throw new Error('Не удалось загрузить JSON: ' + response.status);
                     return response.json();
