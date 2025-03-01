@@ -230,7 +230,7 @@
         function loadChapter(chapterId) {
             preloadAssets(chapterId);
             const fileName = chapterId <= 10 ? `chapter${chapterId}.json` : 'final.json';
-            fetch(`assets/data/${fileName}`)
+            fetch(`/data/${fileName}`)
                 .then(response => response.json())
                 .then(data => {
                     scriptData = data;
