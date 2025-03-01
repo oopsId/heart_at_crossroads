@@ -199,13 +199,6 @@
         function preloadAssets(chapterId) {
             const images = [
                 `assets/backgrounds/bg_apartment_morning.png`,
-                `assets/backgrounds/bg_street_day_trash.png`,
-                `assets/backgrounds/bg_subway_stop_day.png`,
-                `assets/backgrounds/bg_office_day.png`,
-                `assets/backgrounds/bg_office_night.png`,
-                `assets/backgrounds/bg_office_night_end.png`,
-                `assets/backgrounds/bg_street_night.png`,
-                `assets/backgrounds/bg_street_dusk_end.png`,
                 `assets/characters/anna_sad_style2.png`,
                 `assets/characters/vika_smile.png`,
                 `assets/ui/diamonds.png`,
@@ -293,8 +286,8 @@
             document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}')`;
             const charLeft = document.getElementById('character-left');
             const charRight = document.getElementById('character-right');
-            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft.file || scene.characterLeft}')` : 'none';
-            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight.file || scene.characterRight}')` : 'none';
+            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}')` : 'none';
+            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}')` : 'none';
             if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
             if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
 
