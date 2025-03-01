@@ -257,7 +257,7 @@
             saveSession();
         }
 
-        function showScene(sceneId) {
+       function showScene(sceneId) {
     let scene = scriptData.scenes.find(s => s.id === sceneId);
     if (!scene) {
         console.error(`Сцена с ID ${sceneId} не найдена`);
@@ -281,13 +281,15 @@
     if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
 
     document.getElementById('speaker-name').textContent = scene.speaker || '';
-    typeText(scene.text, document.getElementById('dialogue-text')); // Вызов функции с пропуском анимации
+    typeText(scene.text, document.getElementById('dialogue-text'));
 
     const dialogueBox = document.querySelector('.dialogue-box');
     document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
 
+    // Очищаем предыдущий обработчик перед добавлением нового
+    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
     if (scene.choices) {
-        document.body.ontouchstart = null; // Отключаем обработчик на body
+        document.body.ontouchstart = null;
         scene.choices.forEach(choice => {
             const btn = document.createElement('button');
             btn.textContent = choice.cost ? `${choice.text} (${choice.cost} алмазов)` : choice.text;
@@ -301,7 +303,6 @@
                     e.preventDefault();
                     if (choice.cost) stats.diamonds -= choice.cost;
                     saveChoice(choice.id, choice.effects);
-
                     if (choice.effects) {
                         for (let key in choice.effects) {
                             if (key !== 'relationships') {
@@ -313,7 +314,6 @@
                             }
                         }
                     }
-
                     currentScene = choice.nextScene;
                     showScene(currentScene);
                 };
@@ -321,9 +321,8 @@
             dialogueBox.appendChild(btn);
         });
     } else {
-        // Привязываем событие к dialogue-box вместо body
-        dialogueBox.ontouchstart = (e) => {
-            e.preventDefault(); // Предотвращаем стандартное поведение
+        dialogueBox.touchHandler = (e) => {
+            e.preventDefault();
             console.log('Тап на dialogue-box, isTyping:', isTyping, 'currentScene:', currentScene, 'nextScene:', scene.nextScene);
             if (!isTyping) {
                 currentScene = scene.nextScene || currentScene + 1;
@@ -331,9 +330,9 @@
                 showScene(currentScene);
             }
         };
+        dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
     }
 }
-
         function checkSceneCondition(scene) {
             if (!scene.condition) return true;
             return checkCondition(scene.condition);
@@ -351,7 +350,7 @@
         }
 
         function typeText(text, element) {
-    element.textContent = '';
+    element.textContent = ''; // Очищаем текст перед началом
     isTyping = true;
     let i = 0;
     const speed = 30;
@@ -371,13 +370,13 @@
     const dialogueBox = document.querySelector('.dialogue-box');
     const skipHandler = (e) => {
         if (isTyping) {
-            element.textContent = text;
+            element.textContent = text; // Устанавливаем полный текст
             isTyping = false;
             console.log('Анимация пропущена, isTyping:', isTyping);
             dialogueBox.removeEventListener('touchstart', skipHandler);
         }
     };
-    dialogueBox.addEventListener('touchstart', skipHandler);
+    dialogueBox.addEventListener('touchstart', skipHandler, { once: true }); // Срабатывает только один раз
 }
 
         function fadeOut(callback) {
