@@ -219,15 +219,22 @@
                 .then(response => {
                     if (!response.ok) {
                         console.error('Ошибка загрузки JSON:', response.status, response.statusText);
-                        throw new Error('Не удалось загрузить JSON: ' + response.status);
+                        return response.text().then(text => {
+                            console.error('Ответ сервера:', text);
+                            throw new Error('Не удалось загрузить JSON: ' + response.status);
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
+                    console.log('JSON успешно загружен:', data);
                     scriptData = data;
                     showScene(currentScene);
                 })
-                .catch(error => console.error('Ошибка загрузки главы:', error));
+                .catch(error => {
+                    console.error('Ошибка загрузки главы:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы. Проверьте консоль.";
+                });
         }
 
         function saveChoice(choiceId, effects) {
