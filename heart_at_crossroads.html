@@ -181,16 +181,17 @@
         startGame();
 
         function startGame() {
-            document.getElementById('background').style.display = 'block';
-            document.getElementById('character-left').style.display = 'block';
-            document.getElementById('character-right').style.display = 'block';
-            document.getElementById('dialogue-box').style.display = 'block';
-            document.getElementById('menu').style.display = 'flex';
-            updateDiamondsDisplay();
-            loadChapter(1);
-            currentScene = 0;
-            showScene(currentScene);
-        }
+    document.getElementById('background').style.display = 'block';
+    document.getElementById('character-left').style.display = 'block';
+    document.getElementById('character-right').style.display = 'block';
+    document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('menu').style.display = 'flex';
+    updateDiamondsDisplay();
+    loadChapter(1).then(() => {
+        currentScene = 0;
+        showScene(currentScene);
+    });
+}
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
@@ -213,29 +214,29 @@
             });
         }
 
-        function loadChapter(chapterId) {
-            preloadAssets(chapterId);
-            fetch(`data/chapter1.json`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Ошибка загрузки JSON:', response.status, response.statusText);
-                        return response.text().then(text => {
-                            console.error('Ответ сервера:', text);
-                            throw new Error('Не удалось загрузить JSON: ' + response.status);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('JSON успешно загружен:', data);
-                    scriptData = data;
-                    showScene(currentScene);
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки главы:', error);
-                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы. Проверьте консоль.";
+       function loadChapter(chapterId) {
+    preloadAssets(chapterId);
+    return fetch(`data/chapter1.json`) // Возвращаем промис
+        .then(response => {
+            if (!response.ok) {
+                console.error('Ошибка загрузки JSON:', response.status, response.statusText);
+                return response.text().then(text => {
+                    console.error('Ответ сервера:', text);
+                    throw new Error('Не удалось загрузить JSON: ' + response.status);
                 });
-        }
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('JSON успешно загружен:', data);
+            scriptData = data;
+            // showScene больше не вызываем здесь
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки главы:', error);
+            document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы. Проверьте консоль.";
+        });
+}
 
         function saveChoice(choiceId, effects) {
             choices.push(choiceId);
