@@ -258,77 +258,81 @@
         }
 
         function showScene(sceneId) {
-            let scene = scriptData.scenes.find(s => s.id === sceneId);
-            if (!scene) {
-                console.error(`Сцена с ID ${sceneId} не найдена`);
-                document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
-                return;
-            }
+    let scene = scriptData.scenes.find(s => s.id === sceneId);
+    if (!scene) {
+        console.error(`Сцена с ID ${sceneId} не найдена`);
+        document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
+        return;
+    }
 
-            if (scene && !checkSceneCondition(scene)) {
-                currentScene++;
-                showScene(currentScene);
-                return;
-            }
+    if (scene && !checkSceneCondition(scene)) {
+        console.log('Сцена пропущена из-за условия:', scene.id);
+        currentScene++;
+        showScene(currentScene);
+        return;
+    }
 
-            document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}.png')` : 'none';
-            charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}.png')` : 'none';
-            if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
-            if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
+    document.getElementById('background').style.backgroundImage = `url('assets/backgrounds/${scene.background}.png')`;
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    charLeft.style.backgroundImage = scene.characterLeft ? `url('assets/characters/${scene.characterLeft}.png')` : 'none';
+    charRight.style.backgroundImage = scene.characterRight ? `url('assets/characters/${scene.characterRight}.png')` : 'none';
+    if (scene.characterLeft && scene.characterLeft.leftOffset) charLeft.style.left = scene.characterLeft.leftOffset;
+    if (scene.characterRight && scene.characterRight.rightOffset) charRight.style.right = scene.characterRight.rightOffset;
 
-            document.getElementById('speaker-name').textContent = scene.speaker || '';
-            typeText(scene.text, document.getElementById('dialogue-text'));
+    document.getElementById('speaker-name').textContent = scene.speaker || '';
+    typeText(scene.text, document.getElementById('dialogue-text')); // Вызов функции с пропуском анимации
 
-            const dialogueBox = document.querySelector('.dialogue-box');
-            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+    const dialogueBox = document.querySelector('.dialogue-box');
+    document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
 
-            if (scene.choices) {
-                document.body.ontouchstart = null;
-                scene.choices.forEach(choice => {
-                    const btn = document.createElement('button');
-                    btn.textContent = choice.cost ? `${choice.text} (${choice.cost} алмазов)` : choice.text;
-                    btn.className = 'choice-btn';
-                    if (choice.condition && !checkCondition(choice.condition)) {
-                        btn.style.display = 'none';
-                    } else if (choice.cost && stats.diamonds < choice.cost) {
-                        btn.disabled = true;
-                    } else {
-                        btn.ontouchstart = (e) => {
-                            e.preventDefault();
-                            if (choice.cost) stats.diamonds -= choice.cost;
-                            saveChoice(choice.id, choice.effects);
-
-                            if (choice.effects) {
-                                for (let key in choice.effects) {
-                                    if (key !== 'relationships') {
-                                        const feedback = document.createElement('img');
-                                        feedback.className = 'choice-feedback';
-                                        feedback.src = `assets/ui/${key}.png`;
-                                        document.body.appendChild(feedback);
-                                        setTimeout(() => feedback.remove(), 1000);
-                                    }
-                                }
-                            }
-
-                            currentScene = choice.nextScene;
-                            showScene(currentScene);
-                        };
-                    }
-                    dialogueBox.appendChild(btn);
-                });
+    if (scene.choices) {
+        document.body.ontouchstart = null; // Отключаем обработчик на body
+        scene.choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.textContent = choice.cost ? `${choice.text} (${choice.cost} алмазов)` : choice.text;
+            btn.className = 'choice-btn';
+            if (choice.condition && !checkCondition(choice.condition)) {
+                btn.style.display = 'none';
+            } else if (choice.cost && stats.diamonds < choice.cost) {
+                btn.disabled = true;
             } else {
-                document.body.ontouchstart = (e) => {
-                    if (!isTyping) {
-                        currentScene = scene.nextScene || currentScene + 1;
-                        saveSession();
-                        showScene(currentScene);
+                btn.ontouchstart = (e) => {
+                    e.preventDefault();
+                    if (choice.cost) stats.diamonds -= choice.cost;
+                    saveChoice(choice.id, choice.effects);
+
+                    if (choice.effects) {
+                        for (let key in choice.effects) {
+                            if (key !== 'relationships') {
+                                const feedback = document.createElement('img');
+                                feedback.className = 'choice-feedback';
+                                feedback.src = `assets/ui/${key}.png`;
+                                document.body.appendChild(feedback);
+                                setTimeout(() => feedback.remove(), 1000);
+                            }
+                        }
                     }
+
+                    currentScene = choice.nextScene;
+                    showScene(currentScene);
                 };
             }
-        }
+            dialogueBox.appendChild(btn);
+        });
+    } else {
+        // Привязываем событие к dialogue-box вместо body
+        dialogueBox.ontouchstart = (e) => {
+            e.preventDefault(); // Предотвращаем стандартное поведение
+            console.log('Тап на dialogue-box, isTyping:', isTyping, 'currentScene:', currentScene, 'nextScene:', scene.nextScene);
+            if (!isTyping) {
+                currentScene = scene.nextScene || currentScene + 1;
+                saveSession();
+                showScene(currentScene);
+            }
+        };
+    }
+}
 
         function checkSceneCondition(scene) {
             if (!scene.condition) return true;
