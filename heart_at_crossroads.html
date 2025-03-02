@@ -50,9 +50,20 @@
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 2;
+            transition: transform 0.3s ease, filter 0.3s ease; /* Плавный переход для эффекта */
         }
         .character-left { left: -15%; transform: translateX(0); }
         .character-right { right: -15%; transform: translateX(0); }
+        .character-speaker {
+            transform: scale(1.1); /* Увеличение на 10% */
+            filter: brightness(1.2); /* Подсветка */
+            z-index: 3; /* Выше не-spикера */
+        }
+        .character-non-speaker {
+            transform: scale(1); /* Обычный размер */
+            filter: brightness(1); /* Без подсветки */
+            z-index: 2; /* Ниже спикера */
+        }
         .dialogue-box {
             position: absolute;
             bottom: 0;
@@ -270,6 +281,9 @@
             <input type="text" id="password-input" placeholder="Введите пароль">
             <button id="password-submit">Войти</button>
         </div>
+        <button id="language-btn" style="position: absolute; top: 10px; right: 10px; padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 6;">
+            <span id="language-icon">🇷🇺</span>
+        </button>
     </div>
     <div class="parallax-bg" id="background" style="display: none;"></div>
     <div class="character-left" id="character-left" style="display: none;"></div>
@@ -383,11 +397,15 @@
             const passwordSubmitBtn = document.getElementById('password-submit');
             const restartBtn = document.getElementById('restart');
             const statsBtn = document.getElementById('stats');
+            const languageBtn = document.getElementById('language-btn');
+            const languageIcon = document.getElementById('language-icon');
 
-            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !restartBtn || !statsBtn) {
+            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !restartBtn || !statsBtn || !languageBtn) {
                 console.error('Одна или несколько кнопок не найдены в DOM');
                 return;
             }
+
+            languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
 
             startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
@@ -423,6 +441,13 @@
                 e.preventDefault();
                 console.log('Нажата кнопка "Статы"');
                 handleShowStats(e);
+            });
+
+            languageBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                stats.language = stats.language === "ru" ? "en" : "ru";
+                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
+                saveSession();
             });
 
             getFromStorage('last_session')
@@ -485,18 +510,19 @@
 
         function createChoiceButton(choice) {
             const btn = document.createElement('button');
-            btn.textContent = choice.cost && !choice.text.includes(`${choice.cost} алмазов`) 
-                ? `${choice.text} (${choice.cost} алмазов)` 
-                : choice.text;
+            btn.textContent = choice.cost && !choice.text[stats.language].includes(`${choice.cost} алмазов`) 
+                ? `${choice.text[stats.language]} (${choice.cost} алмазов)` 
+                : choice.text[stats.language];
             btn.className = 'choice-btn';
-            if (choice.text.length > 30) btn.style.fontSize = '12px';
-            if (choice.text.length > 60) btn.style.minHeight = '64px';
+            if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
+            if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
             return btn;
         }
 
         function showPasswordScreen() {
             console.log('Показываем экран пароля');
             document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('language-btn').style.display = 'block';
         }
 
         function startGame() {
@@ -508,6 +534,7 @@
             document.getElementById('dialogue-box').style.display = 'block';
             document.getElementById('menu').style.display = 'flex';
             document.getElementById('progress-bar').style.display = 'block';
+            document.getElementById('language-btn').style.display = 'none';
             const statsBtn = document.getElementById('stats');
             statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
             updateDiamondsDisplay();
@@ -675,22 +702,31 @@
             const progressPercent = ((scene.id + 1) / totalScenes) * 100;
             progressElement.style.width = `${progressPercent}%`;
 
-            fadeOut(() => {
-                const backgroundElement = document.getElementById('background');
-                backgroundElement.style.backgroundImage = scene.background 
-                    ? `url('assets/backgrounds/${scene.background}.png')` 
-                    : 'none';
+            const backgroundElement = document.getElementById('background');
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            const dialogueElement = document.getElementById('dialogue-text');
+            const dialogueBox = document.querySelector('.dialogue-box');
 
-                const charLeft = document.getElementById('character-left');
-                const charRight = document.getElementById('character-right');
+            const previousBackground = backgroundElement.style.backgroundImage;
+            const newBackground = scene.background ? `url('assets/backgrounds/${scene.background}.png')` : 'none';
+            const isLastScene = scene.id === 24;
+            const shouldFade = previousBackground !== newBackground || isLastScene;
+
+            const applyScene = () => {
+                backgroundElement.style.backgroundImage = newBackground;
                 charLeft.style.backgroundImage = 'none';
                 charRight.style.backgroundImage = 'none';
+                charLeft.classList.remove('character-speaker', 'character-non-speaker');
+                charRight.classList.remove('character-speaker', 'character-non-speaker');
 
+                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
                 if (scene.characterLeft) {
                     const leftChar = scene.characterLeft.includes('${stats.appearance}') 
                         ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                         : scene.characterLeft;
                     charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
+                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
                     console.log('Левый персонаж:', leftChar);
                 }
                 if (scene.characterRight) {
@@ -698,14 +734,12 @@
                         ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
                         : scene.characterRight;
                     charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
                     console.log('Правый персонаж:', rightChar);
                 }
 
                 if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
                 if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-                const dialogueElement = document.getElementById('dialogue-text');
-                const dialogueBox = document.querySelector('.dialogue-box');
 
                 document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
                 if (dialogueBox.touchHandler) {
@@ -726,9 +760,7 @@
                     }
                 }
 
-                fadeIn();
-
-                document.getElementById('speaker-name').textContent = scene.speaker ? scene.speaker[stats.language] : '';
+                document.getElementById('speaker-name').textContent = speakerName;
                 console.log('Текст сцены:', scene.text[stats.language]);
                 typeText(scene.text[stats.language], dialogueElement, () => {
                     if (scene.choices && scene.choices.length > 0) {
@@ -775,7 +807,16 @@
                         dialogueBox.style.bottom = '0';
                     }
                 });
-            });
+            };
+
+            if (shouldFade) {
+                fadeOut(() => {
+                    applyScene();
+                    fadeIn();
+                });
+            } else {
+                applyScene();
+            }
         }
 
         function showChoiceEffects(effects) {
