@@ -250,6 +250,9 @@
         <p id="speaker-name"></p>
         <p id="dialogue-text"></p>
     </div>
+<div id="progress-bar" style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #333; z-index: 4; display: none;">
+    <div id="progress" style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.5s ease;"></div>
+</div>
     <div id="menu" style="display: none;">
         <div id="diamonds">
             <img src="assets/ui/diamonds.png" alt="Diamonds">
@@ -469,18 +472,19 @@
         }
 
         function startGame() {
-        console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('background').style.display = 'block';
-        document.getElementById('character-left').style.display = 'block';
-        document.getElementById('character-right').style.display = 'block';
-        document.getElementById('dialogue-box').style.display = 'block';
-        document.getElementById('menu').style.display = 'flex';
-        const statsBtn = document.getElementById('stats');
-       statsBtn.style.display = stats.isAuthorized ? 'block' : 'none'; // Показываем только авторизованным
-       updateDiamondsDisplay();
+    console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('background').style.display = 'block';
+    document.getElementById('character-left').style.display = 'block';
+    document.getElementById('character-right').style.display = 'block';
+    document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('menu').style.display = 'flex';
+    document.getElementById('progress-bar').style.display = 'block'; // Показываем полосу
+    const statsBtn = document.getElementById('stats');
+    statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
+    updateDiamondsDisplay();
     
-       preloadAssets(currentChapter).then(() => {
+    preloadAssets(currentChapter).then(() => {
         loadChapter(currentChapter).then(() => {
             showScene(currentScene);
         }).catch(error => {
@@ -488,7 +492,7 @@
             document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
         });
     });
-  }
+}
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
@@ -631,6 +635,10 @@
             }
 
             console.log('Отображаем сцену:', scene.id || sceneId);
+           const progressElement = document.getElementById('progress');
+           const totalScenes = scriptData.scenes.length;
+           const progressPercent = ((scene.id + 1) / totalScenes) * 100; // Процент прогресса
+           progressElement.style.width = `${progressPercent}%`;
 
             const backgroundElement = document.getElementById('background');
             backgroundElement.style.backgroundImage = scene.background 
