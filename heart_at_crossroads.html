@@ -288,7 +288,9 @@
             diamonds: 10,
             relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
             appearance: "style1",
-            isAuthorized: false // Новый флаг
+            isAuthorized: false, // Новый флаг
+            memories: [],
+            language: "ru"
                     };
         let isTyping = false;
         let scriptData = null;
@@ -600,21 +602,29 @@
                             });
                                         }
 
-        function saveChoice(choiceId, effects) {
-            choices.push(choiceId);
+        function saveChoice(choiceId, effects, memoryTag) {
+         choices.push(choiceId);
             if (effects) {
-                for (let key in effects) {
-                    if (key === 'relationships') {
-                        for (let rel in effects[key]) {
-                            stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
-                        }
-                    } else {
-                        stats[key] = (stats[key] || 0) + effects[key];
-                    }
+            for (let key in effects) {
+            if (key === 'relationships') {
+                for (let rel in effects[key]) {
+                    stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
                 }
+            } else {
+                stats[key] = (stats[key] || 0) + effects[key];
             }
-            saveSession();
         }
+    }
+    if (memoryTag) {
+        stats.memories.push(memoryTag);
+        const notification = document.createElement('div');
+        notification.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; z-index: 5;';
+        notification.textContent = 'Вика запомнит ваш выбор';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+    saveSession();
+}
 
        function showScene(sceneId) {
     if (!scriptData || !scriptData.scenes) {
@@ -622,7 +632,7 @@
         document.getElementById('dialogue-text').textContent = "Ошибка: данные сценария не загружены.";
         return;
     }
-
+    
     let scene;
     if (typeof sceneId === 'number') {
         scene = scriptData.scenes[sceneId];
@@ -646,7 +656,8 @@
         showScene(currentScene);
         return;
     }
-
+    saveChoice(choice.id, choice.effects, choice.memoryTag);
+    if (choice.effects) showChoiceEffects(choice.effects);
     console.log('Отображаем сцену:', scene.id || sceneId);
 
     // Затухание перед сменой сцены
@@ -679,7 +690,11 @@
         if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
         if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
-        document.getElementById('speaker-name').textContent = scene.speaker || '';
+        document.getElementById('speaker-name').textContent = scene.speaker ? scene.speaker[stats.language] : '';
+        console.log('Текст сцены:', scene.text[stats.language]);
+         typeText(scene.text[stats.language], dialogueElement, () => {
+    
+
         const dialogueElement = document.getElementById('dialogue-text');
         const dialogueBox = document.querySelector('.dialogue-box');
 
@@ -751,6 +766,7 @@
             }
         });
     });
+});
 }
         function showChoiceEffects(effects) {
             for (let key in effects) {
