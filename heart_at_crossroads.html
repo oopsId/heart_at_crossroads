@@ -469,24 +469,26 @@
         }
 
         function startGame() {
-            console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('background').style.display = 'block';
-            document.getElementById('character-left').style.display = 'block';
-            document.getElementById('character-right').style.display = 'block';
-            document.getElementById('dialogue-box').style.display = 'block';
-            document.getElementById('menu').style.display = 'flex';
-            updateDiamondsDisplay();
-            
-            preloadAssets(currentChapter).then(() => {
-                loadChapter(currentChapter).then(() => {
-                    showScene(currentScene);
-                }).catch(error => {
-                    console.error('Не удалось запустить игру:', error);
-                    document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
-                });
-            });
-        }
+        console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('background').style.display = 'block';
+        document.getElementById('character-left').style.display = 'block';
+        document.getElementById('character-right').style.display = 'block';
+        document.getElementById('dialogue-box').style.display = 'block';
+        document.getElementById('menu').style.display = 'flex';
+        const statsBtn = document.getElementById('stats');
+       statsBtn.style.display = stats.isAuthorized ? 'block' : 'none'; // Показываем только авторизованным
+       updateDiamondsDisplay();
+    
+       preloadAssets(currentChapter).then(() => {
+        loadChapter(currentChapter).then(() => {
+            showScene(currentScene);
+        }).catch(error => {
+            console.error('Не удалось запустить игру:', error);
+            document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
+        });
+    });
+  }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
