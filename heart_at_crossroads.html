@@ -13,15 +13,22 @@
         }
         body {
             margin: 0;
-            overflow: hidden; /* Усиленная фиксация прокрутки */
             font-family: Arial, sans-serif;
             background: #000;
             -webkit-user-select: none;
             user-select: none;
-            touch-action: none; /* Отключаем стандартные жесты */
+            touch-action: manipulation;
+        }
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Фиксация прокрутки внутри контейнера */
         }
         .parallax-bg {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -239,7 +246,7 @@
             cursor: pointer;
         }
         .placeholder-message {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -268,45 +275,47 @@
             transition: width 0.5s ease;
         }
         #language-btn:hover {
-            background: rgba(255, 255, 255, 0.2); /* Лёгкая подсветка при наведении */
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
     <div id="start-screen">
-        <h1>Сердце на перекрёстке</h1>
+        <h1 id="title" data-ru="Сердце на перекрёстке" data-en="Heart at the Crossroads">Сердце на перекрёстке</h1>
         <div class="start-buttons">
-            <button id="start-game">Начать игру</button>
-            <button id="continue-game">Продолжить</button>
-            <button id="show-password">Ввести пароль</button>
+            <button id="start-game" data-ru="Начать игру" data-en="Start Game">Начать игру</button>
+            <button id="continue-game" data-ru="Продолжить" data-en="Continue">Продолжить</button>
+            <button id="show-password" data-ru="Ввести пароль" data-en="Enter Password">Ввести пароль</button>
         </div>
         <div id="password-form" style="display: none;">
             <input type="text" id="password-input" placeholder="Введите пароль">
-            <button id="password-submit">Войти</button>
+            <button id="password-submit" data-ru="Войти" data-en="Login">Войти</button>
         </div>
         <button id="language-btn" style="position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: transparent; border: 1px solid #fff; border-radius: 50%; color: white; cursor: pointer; z-index: 6; font-size: 20px; display: flex; justify-content: center; align-items: center;">
             <span id="language-icon">🇷🇺</span>
         </button>
     </div>
-    <div class="parallax-bg" id="background" style="display: none;"></div>
-    <div class="character-left" id="character-left" style="display: none;"></div>
-    <div class="character-right" id="character-right" style="display: none;"></div>
-    <div class="dialogue-box" id="dialogue-box" style="display: none;">
-        <p id="speaker-name"></p>
-        <p id="dialogue-text"></p>
-    </div>
-    <div id="progress-bar" style="display: none;">
-        <div id="progress"></div>
-    </div>
-    <div id="menu" style="display: none;">
-        <div id="diamonds">
-            <img src="assets/ui/diamonds.png" alt="Diamonds">
-            <span id="diamonds-count">10</span>
+    <div id="game-container">
+        <div class="parallax-bg" id="background" style="display: none;"></div>
+        <div class="character-left" id="character-left" style="display: none;"></div>
+        <div class="character-right" id="character-right" style="display: none;"></div>
+        <div class="dialogue-box" id="dialogue-box" style="display: none;">
+            <p id="speaker-name"></p>
+            <p id="dialogue-text"></p>
         </div>
-        <button id="restart">Рестарт</button>
-        <button id="stats">Статы</button>
+        <div id="progress-bar" style="display: none;">
+            <div id="progress"></div>
+        </div>
+        <div id="menu" style="display: none;">
+            <div id="diamonds">
+                <img src="assets/ui/diamonds.png" alt="Diamonds">
+                <span id="diamonds-count">10</span>
+            </div>
+            <button id="restart">Рестарт</button>
+            <button id="stats">Статы</button>
+        </div>
+        <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
     </div>
-    <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let currentChapter = 1;
@@ -325,7 +334,7 @@
         };
         let isTyping = false;
         let scriptData = null;
-        let currentBackground = null; // Для отслеживания текущего фона
+        let currentBackground = null;
         const correctPassword = "евбытрофко";
 
         const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
@@ -337,11 +346,6 @@
         }
 
         const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
-
-        // Предотвращение прокрутки при свайпе
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, { passive: false });
 
         const saveToStorage = (key, value) => {
             if (isTelegram && Telegram.WebApp.CloudStorage) {
@@ -408,13 +412,15 @@
             const statsBtn = document.getElementById('stats');
             const languageBtn = document.getElementById('language-btn');
             const languageIcon = document.getElementById('language-icon');
+            const title = document.getElementById('title');
 
             if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !restartBtn || !statsBtn || !languageBtn) {
                 console.error('Одна или несколько кнопок не найдены в DOM');
                 return;
             }
 
-            languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
+            // Инициализация текстов кнопок и заголовка
+            updateLanguage(stats.language);
 
             startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
@@ -456,6 +462,7 @@
                 e.preventDefault();
                 stats.language = stats.language === "ru" ? "en" : "ru";
                 languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
+                updateLanguage(stats.language);
                 saveSession();
             });
 
@@ -472,6 +479,14 @@
                     console.error('Ошибка при загрузке сессии:', error);
                     checkAuthorization();
                 });
+
+            function updateLanguage(lang) {
+                startGameBtn.textContent = startGameBtn.getAttribute(`data-${lang}`);
+                continueGameBtn.textContent = continueGameBtn.getAttribute(`data-${lang}`);
+                showPasswordBtn.textContent = showPasswordBtn.getAttribute(`data-${lang}`);
+                passwordSubmitBtn.textContent = passwordSubmitBtn.getAttribute(`data-${lang}`);
+                title.textContent = lang === "ru" ? title.getAttribute('data-ru') : title.getAttribute('data-en');
+            }
         });
 
         async function handlePasswordSubmit(e) {
@@ -513,7 +528,7 @@
                 memories: stats.memories || [],
                 language: stats.language || "ru"
             };
-            currentBackground = null; // Сбрасываем текущий фон
+            currentBackground = null;
             saveSession();
             startGame();
         }
@@ -669,7 +684,7 @@
                 const notification = document.createElement('div');
                 notification.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; z-index: 5;';
                 notification.textContent = 'Вика запомнит ваш выбор';
-                document.body.appendChild(notification);
+                document.getElementById('game-container').appendChild(notification);
                 setTimeout(() => notification.remove(), 3000);
             }
             saveSession();
@@ -724,7 +739,7 @@
 
             const applyScene = () => {
                 backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('assets/backgrounds/${newBackground}.png')`;
-                currentBackground = newBackground; // Обновляем текущий фон
+                currentBackground = newBackground;
                 charLeft.style.backgroundImage = 'none';
                 charRight.style.backgroundImage = 'none';
                 charLeft.classList.remove('character-speaker', 'character-non-speaker');
@@ -839,7 +854,7 @@
                         console.warn(`Изображение для ${key} не найдено`);
                         feedback.src = 'assets/ui/default_effect.png';
                     };
-                    document.body.appendChild(feedback);
+                    document.getElementById('game-container').appendChild(feedback);
                     setTimeout(() => feedback.remove(), 3000);
                 }
             }
@@ -851,7 +866,7 @@
             const placeholder = document.createElement('div');
             placeholder.className = 'placeholder-message';
             placeholder.textContent = 'Временная заглушка: эта глава находится в разработке. Мы сейчас отлаживаем первую главу и сцены. Пожалуйста, перезапустите игру.';
-            document.body.appendChild(placeholder);
+            document.getElementById('game-container').appendChild(placeholder);
             document.getElementById('character-left').style.backgroundImage = 'none';
             document.getElementById('character-right').style.backgroundImage = 'none';
             document.getElementById('speaker-name').textContent = '';
