@@ -13,12 +13,12 @@
         }
         body {
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Усиленная фиксация прокрутки */
             font-family: Arial, sans-serif;
             background: #000;
             -webkit-user-select: none;
             user-select: none;
-            touch-action: manipulation;
+            touch-action: none; /* Отключаем стандартные жесты */
         }
         .parallax-bg {
             position: fixed;
@@ -50,19 +50,19 @@
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 2;
-            transition: transform 0.3s ease, filter 0.3s ease; /* Плавный переход для эффекта */
+            transition: transform 0.3s ease, filter 0.3s ease;
         }
         .character-left { left: -15%; transform: translateX(0); }
         .character-right { right: -15%; transform: translateX(0); }
         .character-speaker {
-            transform: scale(1.1); /* Увеличение на 10% */
-            filter: brightness(1.2); /* Подсветка */
-            z-index: 3; /* Выше не-spикера */
+            transform: scale(1.1);
+            filter: brightness(1.2);
+            z-index: 3;
         }
         .character-non-speaker {
-            transform: scale(1); /* Обычный размер */
-            filter: brightness(1); /* Без подсветки */
-            z-index: 2; /* Ниже спикера */
+            transform: scale(1);
+            filter: brightness(1);
+            z-index: 2;
         }
         .dialogue-box {
             position: absolute;
@@ -267,6 +267,9 @@
             background: #4CAF50;
             transition: width 0.5s ease;
         }
+        #language-btn:hover {
+            background: rgba(255, 255, 255, 0.2); /* Лёгкая подсветка при наведении */
+        }
     </style>
 </head>
 <body>
@@ -281,7 +284,7 @@
             <input type="text" id="password-input" placeholder="Введите пароль">
             <button id="password-submit">Войти</button>
         </div>
-        <button id="language-btn" style="position: absolute; top: 10px; right: 10px; padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 6;">
+        <button id="language-btn" style="position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: transparent; border: 1px solid #fff; border-radius: 50%; color: white; cursor: pointer; z-index: 6; font-size: 20px; display: flex; justify-content: center; align-items: center;">
             <span id="language-icon">🇷🇺</span>
         </button>
     </div>
@@ -322,6 +325,7 @@
         };
         let isTyping = false;
         let scriptData = null;
+        let currentBackground = null; // Для отслеживания текущего фона
         const correctPassword = "евбытрофко";
 
         const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
@@ -333,6 +337,11 @@
         }
 
         const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
+
+        // Предотвращение прокрутки при свайпе
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
         const saveToStorage = (key, value) => {
             if (isTelegram && Telegram.WebApp.CloudStorage) {
@@ -504,6 +513,7 @@
                 memories: stats.memories || [],
                 language: stats.language || "ru"
             };
+            currentBackground = null; // Сбрасываем текущий фон
             saveSession();
             startGame();
         }
@@ -708,13 +718,13 @@
             const dialogueElement = document.getElementById('dialogue-text');
             const dialogueBox = document.querySelector('.dialogue-box');
 
-            const previousBackground = backgroundElement.style.backgroundImage;
-            const newBackground = scene.background ? `url('assets/backgrounds/${scene.background}.png')` : 'none';
+            const newBackground = scene.background || 'none';
             const isLastScene = scene.id === 24;
-            const shouldFade = previousBackground !== newBackground || isLastScene;
+            const shouldFade = currentBackground !== newBackground || isLastScene;
 
             const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground;
+                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('assets/backgrounds/${newBackground}.png')`;
+                currentBackground = newBackground; // Обновляем текущий фон
                 charLeft.style.backgroundImage = 'none';
                 charRight.style.backgroundImage = 'none';
                 charLeft.classList.remove('character-speaker', 'character-non-speaker');
@@ -948,6 +958,7 @@
                 memories: stats.memories || [],
                 language: stats.language || "ru"
             };
+            currentBackground = null;
             const existingPlaceholder = document.querySelector('.placeholder-message');
             if (existingPlaceholder) existingPlaceholder.remove();
             saveSession();
