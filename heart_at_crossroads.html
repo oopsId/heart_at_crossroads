@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Сердце на перекрёстке</title>
     <style>
+        @font-face {
+            font-family: 'LobsterTwo';
+            src: url('assets/fonts/LobsterTwo-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
         body {
             margin: 0;
             overflow: hidden;
@@ -160,7 +166,8 @@
             z-index: 5;
         }
         #start-screen h1 {
-            color: blue;
+            color: white;
+            font-family: 'LobsterTwo', sans-serif; /* Используем новый шрифт */
             font-size: 48px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             margin-bottom: 20px;
