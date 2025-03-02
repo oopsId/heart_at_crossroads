@@ -33,7 +33,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: slideBackground 20s ease-in-out infinite; /* Анимация фона */
+            animation: slideBackground 10s ease-in-out infinite; /* Анимация фона */
             z-index: 1; /* Фон на нижнем слое */
         }
         @keyframes slideBackground {
@@ -44,15 +44,15 @@
         .character-left, .character-right {
             position: absolute;
             bottom: 0;
-            width: 90%;
-            height: 110vh;
+            width: 95%;
+            height: 100vh;
             background-position: bottom center;
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 2; /* Поднимаем персонажей выше фона и диалогового окна */
         }
-        .character-left { left: -10%; transform: translateX(0); } /* Сдвигаем ближе к левому краю */
-        .character-right { right: -10%; transform: translateX(0); } /* Сдвигаем ближе к правому краю */
+        .character-left { left: -5%; transform: translateX(0); } /* Сдвигаем ближе к левому краю */
+        .character-right { right: -5%; transform: translateX(0); } /* Сдвигаем ближе к правому краю */
         .dialogue-box {
             position: absolute;
             bottom: 0;
