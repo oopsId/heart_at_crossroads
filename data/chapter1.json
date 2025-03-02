@@ -3,8 +3,8 @@
         {
             "id": 0,
             "background": "bg_apartment_morning",
-            "characterLeft": null,
-            "characterRight": "anna_sad_style2",
+            "characterLeft":"anna_sad_style2",
+            "characterRight": null,
             "speaker": "Анна",
             "text": "Я проснулась этим утром и поняла, что всё изменилось. Новая квартира, новая жизнь... Но почему так пусто?",
             "nextScene": 1
@@ -12,28 +12,28 @@
         {
             "id": 1,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": null,
+            "characterLeft": null,
+            "characterRight": "vika_smile_style1",
             "speaker": "Вика",
-            "text": "Вика смеётся, бросая ключи на стол: «Ты серьёзно хочешь жить в этом подвале? Даже окно на помойку выходит!»",
+            "text": "(смеётся, бросая ключи на стол): «Ты серьёзно хочешь жить в этом подвале? Даже окно на помойку выходит!»",
             "nextScene": 2
         },
         {
             "id": 2,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_smile_style1",
             "speaker": "Анна",
-            "text": "Анна сжимает руки: «Мне нравится близко к метро…»",
+            "text": "(сжимает руки): «Мне нравится близко к метро…»",
             "nextScene": 3
         },
         {
             "id": 3,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_smile_style1",
             "speaker": "Вика",
-            "text": "Вика подмигивает: «Не переживай, я подберу тебе стиль. Ты же не против, что я сегодня затащу сюда мебель?»",
+            "text": " (подмигивает): «Не переживай, я подберу тебе стиль. Ты же не против, что я сегодня затащу сюда мебель?»",
             "choices": [
                 {
                     "id": "sarcasm",
@@ -59,46 +59,46 @@
         {
             "id": 4,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_thoughtful_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_thoughtful_style1",
             "speaker": "Вика",
-            "text": "Вика: «Интересно… Ты умеешь удивлять.»",
+            "text": "«Интересно… Ты умеешь удивлять.»",
             "nextScene": 7
         },
         {
             "id": 5,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_worry_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_worry_style1",
             "speaker": "Вика",
-            "text": "Вика: «Как хочешь. Потом не ной, когда всё рухнет.»",
+            "text": "«Как хочешь. Потом не ной, когда всё рухнет.»",
             "nextScene": 7
         },
         {
             "id": 6,
             "background": "bg_apartment_morning",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_happy_${stats.appearance}",
+            "characterLeft": "anna_happy_${stats.appearance}",
+            "characterRight": "vika_smile_style1" ,
             "speaker": "Вика",
-            "text": "Вика: «Ого, у тебя вкус! Ладно, я добавлю пару штрихов.»",
+            "text": "«Ого, у тебя вкус! Ладно, я добавлю пару штрихов.»",
             "nextScene": 7
         },
         {
             "id": 7,
             "background": "bg_apartment_morning",
-            "characterLeft": null,
-            "characterRight": "anna_thoughtful_${stats.appearance}",
-            "speaker": "Анна",
+            "characterLeft": "anna_thoughtful_${stats.appearance}",
+            "characterRight": null,
+            "speaker": null,
             "text": "Вика уходит, хлопнув дверью. Анна стоит посреди пустой комнаты, слушая, как эхо её шагов гаснет в коридоре.",
             "nextScene": 8
         },
         {
             "id": 8,
             "background": "bg_street_day_trash",
-            "characterLeft": null,
-            "characterRight": "anna_sad_${stats.appearance}",
-            "speaker": "Анна",
-            "text": "Анна у окна. Среди отбросов — её старая кукла с треснувшей улыбкой.",
+            "characterLeft": "anna_sad_${stats.appearance}",
+            "characterRight": ,
+            "speaker": null,
+            "text": "Я стояла у окна. В куче мусора на улице лежала моя старая кукла с треснувшей улыбкой.",
             "nextScene": 9
         },
         {
