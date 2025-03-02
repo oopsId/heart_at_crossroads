@@ -104,8 +104,8 @@
         {
             "id": 9,
             "background": "bg_street_day_trash",
-            "characterLeft": null,
-            "characterRight": "anna_sad_${stats.appearance}",
+            "characterLeft": "anna_sad_${stats.appearance}",
+            "characterRight": null ,
             "speaker": "",
             "text": "Голос за спиной шептал: «Ты всегда будешь одна». Но кто это был, когда я обернулась - никого не было.",
             "nextScene": 10
@@ -122,8 +122,8 @@
         {
             "id": 11,
             "background": "bg_office_day",
-            "characterLeft": "vika_neutral_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_neutral_style1" ,
             "speaker": "Вика",
             "text": "Вика переворачивает бумаги: «Ты серьёзно пришла сюда в джинсах? Мы не на пикник.»",
             "nextScene": 12
@@ -131,19 +131,19 @@
         {
             "id": 12,
             "background": "bg_office_day",
-            "characterLeft": "vika_neutral_style1",
-            "characterRight": "anna_worry_${stats.appearance}",
+            "characterLeft": "anna_worry_${stats.appearance}",
+            "characterRight": "vika_neutral_style1",
             "speaker": "Анна",
-            "text": "Анна сжимает портфель: «Я готова работать.»",
+            "text": "(сжимает сумочку): «Я готова работать.»",
             "nextScene": 13
         },
         {
             "id": 13,
             "background": "bg_office_day",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_smile_style1" ,
             "speaker": "Вика",
-            "text": "Вика смеётся: «Почему-то не верится. Хорошо, дай материал о новом мосте. К вечеру.»",
+            "text": "(смеётся): «Почему-то не верится. Хорошо, дай материал о новом мосте. К вечеру.»",
             "choices": [
                 {
                     "id": "smile",
@@ -162,64 +162,64 @@
         {
             "id": 14,
             "background": "bg_office_day",
-            "characterLeft": "vika_thoughtful_style1",
-            "characterRight": "anna_happy_${stats.appearance}",
+            "characterLeft": "anna_happy_${stats.appearance}",
+            "characterRight": "vika_thoughtful_style1",
             "speaker": "Вика",
-            "text": "Вика: «Постараешься, хочешь сказать? Интересно.»",
+            "text": " «Постараешься, хочешь сказать? Интересно.»",
             "nextScene": 16
         },
         {
             "id": 15,
             "background": "bg_office_day",
-            "characterLeft": "vika_worry_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_worry_style1",
             "speaker": "Вика",
-            "text": "Вика: «Запомни: я вижу ложь. Не играй со мной.»",
+            "text": "«Не шути со мной, я вижу когда ты лжешь.»",
             "nextScene": 16
         },
         {
             "id": 16,
             "background": "bg_office_night",
-            "characterLeft": null,
-            "characterRight": "anna_sad_${stats.appearance}",
+            "characterLeft": "anna_sad_${stats.appearance}",
+            "characterRight": null,
             "speaker": "Анна",
-            "text": "Анна в крохотном офисе обхватила голову. За окном — тёмное небо. В сумке — старый билет на поезд.",
+            "text": "Я села и обхватила голову. За окном было тёмное небо. А в сумочке только старый билет на поезд.",
             "nextScene": 17
         },
         {
             "id": 17,
             "background": "bg_office_night_end",
-            "characterLeft": null,
-            "characterRight": "anna_sad_${stats.appearance}",
+            "characterLeft": "anna_sad_${stats.appearance}",
+            "characterRight": null,
             "speaker": "",
-            "text": "Анна на полу офиса обняла колени. Звук шагов Вики в коридоре.",
+            "text": "Я сидела на полу офиса обняв колени, прислушиваясь к звуку шагов Вики в коридоре.",
             "nextScene": 18
         },
         {
             "id": 18,
             "background": "bg_street_night",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_worry_${stats.appearance}",
+            "characterLeft": "anna_worry_${stats.appearance}",
+            "characterRight": "vika_smile_style1",
             "speaker": "Вика",
-            "text": "Анна выбегает на улицу и сталкивается с Викой: «Сергей — свинья. Он спал с женой мэра! Пиши материал!»",
+            "text": "Куда бежишь, Ань? У меня есть компромат на Сергея! Он спал с женой мэра! Пиши материал!»",
             "nextScene": 19
         },
         {
             "id": 19,
             "background": "bg_street_night",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_surprised_${stats.appearance}",
+            "characterLeft": "anna_surprised_${stats.appearance}",
+            "characterRight": "vika_smile_style1",
             "speaker": "Анна",
-            "text": "Анна побелела: «Откуда ты знаешь?»",
+            "text": "Я была побледнела: «Откуда ты знаешь?»",
             "nextScene": 20
         },
         {
             "id": 20,
             "background": "bg_street_night",
-            "characterLeft": "vika_smile_style1",
-            "characterRight": "anna_worry_${stats.appearance}",
+            "characterLeft": "anna_worry_${stats.appearance}",
+            "characterRight": "vika_smile_style1",
             "speaker": "Вика",
-            "text": "Вика приближается: «Я же говорила — у меня связи. Ты будешь звездой, если…»",
+            "text": "(подходя ближе) «Я же говорила — у меня связи. Ты будешь звездой журналистики, если опубликуешь…»",
             "choices": [
                 {
                     "id": "yes",
@@ -245,19 +245,19 @@
         {
             "id": 21,
             "background": "bg_street_night",
-            "characterLeft": "vika_happy_style1",
-            "characterRight": "anna_neutral_${stats.appearance}",
+            "characterLeft": "anna_neutral_${stats.appearance}",
+            "characterRight": "vika_happy_style1",
             "speaker": "Вика",
-            "text": "Вика: «Молодец. Мы сделаем это вместе.»",
+            "text": "«Ты лучшая. Мы сделаем это вместе.»",
             "nextScene": 24
         },
         {
             "id": 22,
             "background": "bg_street_night",
-            "characterLeft": "vika_worry_style1",
-            "characterRight": "anna_worry_${stats.appearance}",
+            "characterLeft": "anna_worry_${stats.appearance}",
+            "characterRight": "vika_worry_style1",
             "speaker": "Вика",
-            "text": "Вика: «Ты ещё та наивная. Пожалеешь.»",
+            "text": "«Ты такая наивная. Пожалеешь.»",
             "nextScene": 24
         },
         {
@@ -266,7 +266,7 @@
             "characterLeft": "vika_smile_style1",
             "characterRight": "anna_surprised_${stats.appearance}",
             "speaker": "Вика",
-            "text": "Вика шепчет: «У меня есть запись их разговора. Это твой билет наверх.»",
+            "text": " (шепчет): «У меня есть запись их разговора. Это твой билет к звездам.»",
             "nextScene": 24
         },
         {
