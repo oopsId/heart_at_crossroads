@@ -58,6 +58,12 @@
             background-repeat: no-repeat;
             z-index: 2;
             transition: transform 0.3s ease, filter 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); /* Виньетирование */
+            animation: appear 0.5s ease-in-out forwards; /* Анимация появления */
+        }
+        @keyframes appear {
+            0% { clip-path: circle(0% at center); }
+            100% { clip-path: circle(100% at center); }
         }
         .character-left { left: -15%; transform: translateX(0); }
         .character-right { right: -15%; transform: translateX(0); }
@@ -153,7 +159,22 @@
             font-size: 14px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-        #menu button {
+        #menu-btn {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        #menu-btn:hover {
+            background: #45a049;
+        }
+        #stats {
             margin: 0 5px;
             padding: 5px 10px;
             background: #333;
@@ -311,7 +332,7 @@
                 <img src="assets/ui/diamonds.png" alt="Diamonds">
                 <span id="diamonds-count">10</span>
             </div>
-            <button id="restart">Рестарт</button>
+            <button id="menu-btn" data-ru="Меню" data-en="Menu">Меню</button>
             <button id="stats">Статы</button>
         </div>
         <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
@@ -408,13 +429,13 @@
             const continueGameBtn = document.getElementById('continue-game');
             const showPasswordBtn = document.getElementById('show-password');
             const passwordSubmitBtn = document.getElementById('password-submit');
-            const restartBtn = document.getElementById('restart');
+            const menuBtn = document.getElementById('menu-btn');
             const statsBtn = document.getElementById('stats');
             const languageBtn = document.getElementById('language-btn');
             const languageIcon = document.getElementById('language-icon');
             const title = document.getElementById('title');
 
-            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !restartBtn || !statsBtn || !languageBtn) {
+            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !menuBtn || !statsBtn || !languageBtn) {
                 console.error('Одна или несколько кнопок не найдены в DOM');
                 return;
             }
@@ -446,10 +467,10 @@
                 handlePasswordSubmit(e);
             });
 
-            restartBtn.addEventListener('touchstart', (e) => {
+            menuBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Рестарт"');
-                handleRestart(e);
+                console.log('Нажата кнопка "Меню"');
+                handleMenu(e);
             });
 
             statsBtn.addEventListener('touchstart', (e) => {
@@ -485,6 +506,7 @@
                 continueGameBtn.textContent = continueGameBtn.getAttribute(`data-${lang}`);
                 showPasswordBtn.textContent = showPasswordBtn.getAttribute(`data-${lang}`);
                 passwordSubmitBtn.textContent = passwordSubmitBtn.getAttribute(`data-${lang}`);
+                menuBtn.textContent = menuBtn.getAttribute(`data-${lang}`);
                 title.textContent = lang === "ru" ? title.getAttribute('data-ru') : title.getAttribute('data-en');
             }
         });
@@ -957,7 +979,7 @@
             dialogue.classList.remove('fade-out');
         }
 
-        function handleRestart(e) {
+        function handleMenu(e) {
             e.preventDefault();
             currentChapter = 1;
             currentScene = 0;
@@ -969,15 +991,16 @@
                 diamonds: 10,
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
                 appearance: "style1",
-                isAuthorized: stats.isAuthorized,
-                memories: stats.memories || [],
-                language: stats.language || "ru"
+                isAuthorized: false,
+                memories: [],
+                language: stats.language
             };
             currentBackground = null;
             const existingPlaceholder = document.querySelector('.placeholder-message');
             if (existingPlaceholder) existingPlaceholder.remove();
             saveSession();
-            loadChapter(1).then(() => showScene(currentScene));
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
         }
 
         function handleShowStats(e) {
