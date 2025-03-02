@@ -96,7 +96,7 @@
             "id": 8,
             "background": "bg_street_day_trash",
             "characterLeft": "anna_sad_${stats.appearance}",
-            "characterRight": ,
+            "characterRight": null,
             "speaker": null,
             "text": "Я стояла у окна. В куче мусора на улице лежала моя старая кукла с треснувшей улыбкой.",
             "nextScene": 9
