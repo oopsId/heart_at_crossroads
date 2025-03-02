@@ -11,6 +11,18 @@
             font-weight: bold;
             font-style: normal;
         }
+        @font-face {
+            font-family: 'GreatVibes';
+            src: url('assets/fonts/GreatVibes-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'GoodVibesCyr';
+            src: url('assets/fonts/GoodVibesCyr.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -182,7 +194,7 @@
             font-size: 14px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-        #menu-btn, #stats {
+        #menu-btn, #stats, #gallery-btn {
             margin: 0 5px;
             width: 60px;
             height: 60px;
@@ -199,7 +211,12 @@
             align-items: center;
             transition: transform 0.3s, box-shadow 0.3s;
         }
-        #menu-btn:hover, #stats:hover {
+        #gallery-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 10px;
+        }
+        #menu-btn:hover, #stats:hover, #gallery-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             background: linear-gradient(to bottom, rgba(222, 184, 135, 0.9), rgba(160, 120, 90, 0.9));
@@ -250,10 +267,15 @@
         }
         #start-screen h1 {
             color: #A67C52;
-            font-family: 'LobsterTwo', sans-serif;
             font-size: 24px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             margin-bottom: 20px;
+        }
+        #start-screen h1.ru {
+            font-family: 'GoodVibesCyr', sans-serif;
+        }
+        #start-screen h1.en {
+            font-family: 'GreatVibes', sans-serif;
         }
         .start-buttons {
             display: flex;
@@ -378,6 +400,19 @@
         #language-btn:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        .memory-notification {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.7), rgba(160, 120, 90, 0.7));
+            color: #5D4037;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 5;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -408,6 +443,7 @@
             <div id="progress"></div>
         </div>
         <div id="menu" style="display: none;">
+            <button id="gallery-btn" data-ru="Галерея" data-en="Gallery">Галерея</button>
             <div id="diamonds">
                 <img src="assets/ui/diamonds.png" alt="Diamonds">
                 <span id="diamonds-count">10</span>
@@ -436,7 +472,7 @@
         let isTyping = false;
         let scriptData = null;
         let currentBackground = null;
-        const correctPassword = "евбытрофко";
+        const correctPassword = "umbertoeco";
 
         const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
         if (isTelegram) {
@@ -494,6 +530,7 @@
             const passwordSubmitBtn = document.getElementById('password-submit');
             const menuBtn = document.getElementById('menu-btn');
             const statsBtn = document.getElementById('stats');
+            const galleryBtn = document.getElementById('gallery-btn');
             const languageBtn = document.getElementById('language-btn');
             const languageIcon = document.getElementById('language-icon');
             const title = document.getElementById('title');
@@ -531,6 +568,11 @@
                 handleShowStats(e);
             });
 
+            galleryBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                // Пока ничего не делает
+            });
+
             languageBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 stats.language = stats.language === "ru" ? "en" : "ru";
@@ -565,7 +607,10 @@
             document.getElementById('show-password').textContent = document.getElementById('show-password').getAttribute(`data-${lang}`);
             document.getElementById('password-submit').textContent = document.getElementById('password-submit').getAttribute(`data-${lang}`);
             document.getElementById('menu-btn').textContent = document.getElementById('menu-btn').getAttribute(`data-${lang}`);
-            document.getElementById('title').textContent = lang === "ru" ? document.getElementById('title').getAttribute('data-ru') : document.getElementById('title').getAttribute('data-en');
+            document.getElementById('gallery-btn').textContent = document.getElementById('gallery-btn').getAttribute(`data-${lang}`);
+            const title = document.getElementById('title');
+            title.textContent = lang === "ru" ? title.getAttribute('data-ru') : title.getAttribute('data-en');
+            title.className = lang === "ru" ? "ru" : "en";
         }
 
         async function handlePasswordSubmit(e) {
@@ -777,8 +822,8 @@
             if (memoryTag) {
                 stats.memories.push(memoryTag);
                 const notification = document.createElement('div');
-                notification.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; z-index: 5;';
-                notification.textContent = 'Вика запомнит ваш выбор';
+                notification.className = 'memory-notification';
+                notification.textContent = stats.language === "ru" ? "Вика запомнит ваш выбор" : "Vika will remember your choice";
                 document.getElementById('game-container').appendChild(notification);
                 setTimeout(() => notification.remove(), 3000);
             }
