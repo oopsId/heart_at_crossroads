@@ -100,8 +100,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(222, 184, 135, 0.7), rgba(222, 184, 135, 0.3));
-            color: white;
+            background: linear-gradient(to top, rgba(93, 64, 55, 0.8), rgba(93, 64, 55, 0.4));
+            color: #F5F0E1;
             padding: 40px 20px 20px;
             text-align: center;
             z-index: 3;
@@ -118,21 +118,23 @@
             font-weight: bold;
             font-size: 18px;
             margin-bottom: 5px;
-            color: #DEB887;
+            color: #E6D5C0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         #dialogue-text {
             margin: 0;
             font-size: 16px;
             line-height: 1.4;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         .choice-btn {
             display: block;
             margin: 10px auto;
             padding: 10px;
             width: 90%;
-            background: #F5F0E1;
+            background: linear-gradient(to bottom, #F5F0E1, #E6D5C0);
             color: #5D4037;
-            border: none;
+            border: 1px solid rgba(93, 64, 55, 0.2);
             border-radius: 5px;
             font-size: 14px;
             cursor: pointer;
@@ -141,13 +143,16 @@
             height: auto;
             overflow: hidden;
             text-overflow: ellipsis;
+            box-shadow: 0 2px 5px rgba(93, 64, 55, 0.3);
         }
         .choice-btn:disabled {
-            background: #666;
+            background: linear-gradient(to bottom, #666, #555);
             opacity: 0.7;
+            box-shadow: none;
         }
         .choice-btn:hover:not(:disabled) {
-            background: #E6DFD0;
+            background: linear-gradient(to bottom, #E6D5C0, #D4BEA6);
+            box-shadow: 0 3px 7px rgba(93, 64, 55, 0.4);
         }
         #menu {
             position: absolute;
@@ -182,7 +187,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: rgba(245, 240, 225, 0.7);
+            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.8), rgba(160, 120, 90, 0.8));
             color: #5D4037;
             border: none;
             font-size: 12px;
@@ -197,7 +202,7 @@
         #menu-btn:hover, #stats:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            background: rgba(245, 240, 225, 0.9);
+            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.9), rgba(160, 120, 90, 0.9));
         }
         .choice-feedback {
             position: absolute;
