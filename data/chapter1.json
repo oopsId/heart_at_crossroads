@@ -225,6 +225,7 @@
                     "id": "yes",
                     "text": "Да, напишу",
                     "nextScene": 21,
+                    "memoryTag": "vika_remembers_yes",
                     "effects": { "crown": 2, "relationships.vika": 2 }
                 },
                 {
