@@ -49,7 +49,7 @@
             padding: 20px;
             text-align: center;
             z-index: 3;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, bottom 0.3s ease;
             opacity: 1;
             min-height: 150px;
             max-height: 30vh;
@@ -96,13 +96,17 @@
             right: 10px;
             z-index: 4;
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            max-width: calc(100% - 20px);
+            overflow-x: auto;
+            white-space: nowrap;
         }
         #menu div {
             display: flex;
             align-items: center;
-            margin: 5px;
+            margin: 0 10px;
         }
         #menu img {
             width: 24px;
@@ -115,7 +119,7 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         #menu button {
-            margin: 5px;
+            margin: 0 5px;
             padding: 5px 10px;
             background: #333;
             color: white;
@@ -432,7 +436,9 @@
 
         function createChoiceButton(choice) {
             const btn = document.createElement('button');
-            btn.textContent = choice.cost ? `${choice.text} (${choice.cost} алмазов)` : choice.text;
+            btn.textContent = choice.cost && !choice.text.includes(`${choice.cost} алмазов`) 
+                ? `${choice.text} (${choice.cost} алмазов)` 
+                : choice.text;
             btn.className = 'choice-btn';
             if (choice.text.length > 30) btn.style.fontSize = '12px';
             if (choice.text.length > 60) btn.style.minHeight = '64px';
@@ -650,6 +656,15 @@
                         }
                         dialogueBox.appendChild(btn);
                     });
+
+                    const dialogueBoxHeight = dialogueBox.offsetHeight;
+                    const windowHeight = window.innerHeight;
+                    if (dialogueBoxHeight > windowHeight * 0.7) {
+                        const offset = dialogueBoxHeight - (windowHeight * 0.7);
+                        dialogueBox.style.bottom = `${offset}px`;
+                    } else {
+                        dialogueBox.style.bottom = '0';
+                    }
                 } else if (scene.nextScene !== undefined) {
                     dialogueBox.touchHandler = (e) => {
                         e.preventDefault();
@@ -661,6 +676,7 @@
                         }
                     };
                     dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
+                    dialogueBox.style.bottom = '0';
                 }
             });
         }
