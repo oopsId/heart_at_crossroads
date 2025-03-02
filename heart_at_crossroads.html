@@ -471,9 +471,24 @@
         function preloadAssets(chapterId) {
             const images = [
                 `assets/backgrounds/bg_apartment_morning.png`,
+                `assets/backgrounds/bg_street_day_trash.png`,
+                `assets/backgrounds/bg_office_day.png`,
+                `assets/backgrounds/bg_office_night.png`,
+                `assets/backgrounds/bg_office_night_end.png`,
+                `assets/backgrounds/bg_street_night.png`,
+                `assets/backgrounds/bg_street_dusk_end.png`,
                 `assets/characters/anna_sad_style2.png`,
                 `assets/characters/vika_smile_style1.png`,
                 `assets/characters/anna_neutral_style1.png`,
+                `assets/characters/vika_thoughtful_style1.png`,
+                `assets/characters/vika_worry_style1.png`,
+                `assets/characters/anna_happy_style1.png`,
+                `assets/characters/anna_thoughtful_style1.png`,
+                `assets/characters/anna_sad_style1.png`,
+                `assets/characters/vika_neutral_style1.png`,
+                `assets/characters/anna_worry_style1.png`,
+                `assets/characters/anna_surprised_style1.png`,
+                `assets/characters/vika_happy_style1.png`,
                 `assets/ui/diamonds.png`,
                 `assets/ui/crown.png`,
                 `assets/ui/heart.png`,
@@ -517,9 +532,11 @@
             })
                 .then(response => {
                     if (!response.ok) throw new Error('Не удалось загрузить главу');
-                    return response.json();
+                    return response.text();
                 })
-                .then(data => {
+                .then(text => {
+                    console.log('Сырой текст JSON:', text);
+                    const data = JSON.parse(text);
                     scriptData = data;
                     console.log('Загруженные данные:', scriptData);
                 })
@@ -633,11 +650,12 @@
                         }
                         dialogueBox.appendChild(btn);
                     });
-                } else {
+                } else if (scene.nextScene !== undefined) {
                     dialogueBox.touchHandler = (e) => {
                         e.preventDefault();
                         if (!isTyping) {
-                            currentScene = scene.nextScene || currentScene + 1;
+                            console.log('Переход на следующую сцену:', scene.nextScene);
+                            currentScene = scene.nextScene;
                             saveSession();
                             showScene(currentScene);
                         }
@@ -702,13 +720,13 @@
 
         function typeText(text, element, callback) {
             element.textContent = '';
-            isTyping = true;
-            let i = 0;
-            const speed = 30;
-
             if (element.typeTimer) {
                 clearTimeout(element.typeTimer);
             }
+
+            isTyping = true;
+            let i = 0;
+            const speed = 30;
 
             function type() {
                 if (i < text.length) {
@@ -724,7 +742,8 @@
             type();
 
             const dialogueBox = document.querySelector('.dialogue-box');
-            const skipHandler = (e) => {
+            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
+            dialogueBox.skipHandler = (e) => {
                 e.preventDefault();
                 if (isTyping) {
                     clearTimeout(element.typeTimer);
@@ -733,8 +752,7 @@
                     if (callback) callback();
                 }
             };
-            dialogueBox.removeEventListener('touchstart', skipHandler);
-            dialogueBox.addEventListener('touchstart', skipHandler, { once: true });
+            dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
         }
 
         function fadeOut(callback) {
