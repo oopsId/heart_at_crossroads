@@ -46,20 +46,23 @@
         .character-left { left: 5%; transform: translateX(0); }
         .character-right { right: 5%; transform: translateX(0); }
         .dialogue-box {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(51, 51, 51, 0.8), transparent);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            z-index: 3;
-            transition: opacity 0.5s ease, bottom 0.3s ease;
-            opacity: 1;
-            min-height: 150px;
-            max-height: 30vh;
-            overflow-y: auto;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(51, 51, 51, 0.8), transparent);
+        color: white;
+        padding: 40px 20px 20px; /* Увеличиваем верхний отступ до 40px */
+        text-align: center;
+       z-index: 3;
+       transition: opacity 0.5s ease, bottom 0.3s ease;
+       opacity: 1;
+       min-height: 150px;
+       max-height: 40vh; /* Увеличиваем максимальную высоту до 40vh */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+     justify-content: flex-start; /* Текст начинается сверху */
         }
         #speaker-name {
             font-weight: bold;
