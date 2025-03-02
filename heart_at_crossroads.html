@@ -26,15 +26,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover; /* Возвращаем cover для полного покрытия */
-            background-position: 0% center; /* Начальная позиция для анимации */
+            background-size: cover;
+            background-position: 0% center;
             background-repeat: no-repeat;
             background-color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: slideBackground 60s linear infinite; /* Анимация фона */
-            z-index: 1; /* Фон на нижнем слое */
+            animation: slideBackground 60s linear infinite;
+            z-index: 1;
         }
         @keyframes slideBackground {
             0% { background-position: 0% center; }
@@ -49,20 +49,20 @@
             background-position: bottom center;
             background-size: contain;
             background-repeat: no-repeat;
-            z-index: 2; /* Поднимаем персонажей выше фона и диалогового окна */
+            z-index: 2;
         }
-        .character-left { left: -15%; transform: translateX(0); } /* Сдвигаем ближе к левому краю */
-        .character-right { right: -15%; transform: translateX(0); } /* Сдвигаем ближе к правому краю */
+        .character-left { left: -15%; transform: translateX(0); }
+        .character-right { right: -15%; transform: translateX(0); }
         .dialogue-box {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(51, 51, 51, 0.7), rgba(51, 51, 51, 0.3));;
+            background: linear-gradient(to top, rgba(51, 51, 51, 0.7), rgba(51, 51, 51, 0.3));
             color: white;
             padding: 40px 20px 20px;
             text-align: center;
-            z-index: 3; /* Диалоговое окно выше фона, но ниже персонажей */
+            z-index: 3;
             transition: opacity 0.5s ease, bottom 0.3s ease;
             opacity: 1;
             min-height: 150px;
@@ -111,7 +111,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 4; /* Меню выше всех слоёв */
+            z-index: 4;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -154,19 +154,18 @@
             z-index: 4;
             animation: flyUp 3s ease-out forwards;
         }
-         @keyframes fall {
-        0% { transform: translateY(-10vh); opacity: 1; }
-        100% { transform: translateY(100vh); opacity: 0; }
-                    }
-         .particle {
-         position: absolute;
-         background: white;
-         border-radius: 50%;
-         width: 5px;
-         height: 5px;
-         opacity: 0.7;
-                    }
-
+        @keyframes fall {
+            0% { transform: translateY(-10vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            width: 5px;
+            height: 5px;
+            opacity: 0.7;
+        }
         @keyframes flyUp {
             0% { bottom: 50%; opacity: 1; }
             50% { bottom: 60%; opacity: 0.8; }
@@ -241,6 +240,22 @@
             max-width: 80%;
             z-index: 10;
         }
+        #progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: #333;
+            z-index: 4;
+            display: none;
+        }
+        #progress {
+            width: 0%;
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
@@ -263,9 +278,9 @@
         <p id="speaker-name"></p>
         <p id="dialogue-text"></p>
     </div>
-<div id="progress-bar" style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #333; z-index: 4; display: none;">
-    <div id="progress" style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.5s ease;"></div>
-</div>
+    <div id="progress-bar" style="display: none;">
+        <div id="progress"></div>
+    </div>
     <div id="menu" style="display: none;">
         <div id="diamonds">
             <img src="assets/ui/diamonds.png" alt="Diamonds">
@@ -274,10 +289,9 @@
         <button id="restart">Рестарт</button>
         <button id="stats">Статы</button>
     </div>
-<div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
+    <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Game state
         let currentChapter = 1;
         let currentScene = 0;
         let choices = [];
@@ -288,15 +302,14 @@
             diamonds: 10,
             relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
             appearance: "style1",
-            isAuthorized: false, // Новый флаг
+            isAuthorized: false,
             memories: [],
             language: "ru"
-                    };
+        };
         let isTyping = false;
         let scriptData = null;
         const correctPassword = "евбытрофко";
 
-        // Detect Telegram or browser
         const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
         if (isTelegram) {
             Telegram.WebApp.ready();
@@ -305,10 +318,8 @@
             console.log('Запуск в браузере');
         }
 
-        // Get user ID if in Telegram
         const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
 
-        // Storage functions based on environment
         const saveToStorage = (key, value) => {
             if (isTelegram && Telegram.WebApp.CloudStorage) {
                 return new Promise((resolve, reject) => {
@@ -349,7 +360,6 @@
             }
         };
 
-        // Check if user is authorized
         const checkAuthorization = async () => {
             try {
                 const authorizedUsers = await getFromStorage('authorized_users') || [];
@@ -364,7 +374,6 @@
             }
         };
 
-        // Initialize the game
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM загружен, регистрируем обработчики кнопок');
 
@@ -432,27 +441,28 @@
         });
 
         async function handlePasswordSubmit(e) {
-        e.preventDefault();
-        const inputPassword = document.getElementById('password-input').value;
-        console.log('Введён пароль:', inputPassword);
-        if (inputPassword === correctPassword) {
-        try {
-            const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-            if (userId && !authorizedUsers.includes(userId)) {
-                authorizedUsers.push(userId);
-                await saveToStorage('authorized_users', authorizedUsers);
+            e.preventDefault();
+            const inputPassword = document.getElementById('password-input').value;
+            console.log('Введён пароль:', inputPassword);
+            if (inputPassword === correctPassword) {
+                try {
+                    const authorizedUsers = (await getFromStorage('authorized_users')) || [];
+                    if (userId && !authorizedUsers.includes(userId)) {
+                        authorizedUsers.push(userId);
+                        await saveToStorage('authorized_users', authorizedUsers);
+                    }
+                    stats.isAuthorized = true;
+                    console.log('Пароль верный, начинаем новую игру');
+                    startNewGame();
+                } catch (error) {
+                    console.error('Ошибка при сохранении авторизации:', error);
+                    alert('Ошибка при сохранении данных авторизации');
+                }
+            } else {
+                alert('Неверный пароль!');
             }
-            stats.isAuthorized = true; // Устанавливаем флаг
-            console.log('Пароль верный, начинаем новую игру');
-            startNewGame();
-          } catch (error) {
-            console.error('Ошибка при сохранении авторизации:', error);
-            alert('Ошибка при сохранении данных авторизации');
-          }
-        } else {
-        alert('Неверный пароль!');
-       }
-                                                 }
+        }
+
         function startNewGame() {
             console.log('Запуск новой игры');
             currentChapter = 1;
@@ -464,7 +474,10 @@
                 leaf: 0,
                 diamonds: 10,
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-                appearance: "style1"
+                appearance: "style1",
+                isAuthorized: stats.isAuthorized,
+                memories: stats.memories || [],
+                language: stats.language || "ru"
             };
             saveSession();
             startGame();
@@ -487,27 +500,27 @@
         }
 
         function startGame() {
-    console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('background').style.display = 'block';
-    document.getElementById('character-left').style.display = 'block';
-    document.getElementById('character-right').style.display = 'block';
-    document.getElementById('dialogue-box').style.display = 'block';
-    document.getElementById('menu').style.display = 'flex';
-    document.getElementById('progress-bar').style.display = 'block'; // Показываем полосу
-    const statsBtn = document.getElementById('stats');
-    statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
-    updateDiamondsDisplay();
-    
-    preloadAssets(currentChapter).then(() => {
-        loadChapter(currentChapter).then(() => {
-            showScene(currentScene);
-        }).catch(error => {
-            console.error('Не удалось запустить игру:', error);
-            document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
-        });
-    });
-}
+            console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('background').style.display = 'block';
+            document.getElementById('character-left').style.display = 'block';
+            document.getElementById('character-right').style.display = 'block';
+            document.getElementById('dialogue-box').style.display = 'block';
+            document.getElementById('menu').style.display = 'flex';
+            document.getElementById('progress-bar').style.display = 'block';
+            const statsBtn = document.getElementById('stats');
+            statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
+            updateDiamondsDisplay();
+            
+            preloadAssets(currentChapter).then(() => {
+                loadChapter(currentChapter).then(() => {
+                    showScene(currentScene);
+                }).catch(error => {
+                    console.error('Не удалось запустить игру:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
+                });
+            });
+        }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
@@ -569,205 +582,202 @@
             updateDiamondsDisplay();
         }
 
-       function loadChapter(chapterId) {
-          return fetch(`data/chapter${chapterId}.json`, {
-                  headers: {
-                            'Content-Type': 'application/json; charset=UTF-8'
-                           }
-                                                       })
-              .then(response => {
-              if (!response.ok) throw new Error('Не удалось загрузить главу');
-              return response.text();
-                                })
-             .then(text => {
-             console.log('Сырой текст JSON:', text);
-             // Валидация JSON
-             try {
-                const data = JSON.parse(text);
-                if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                    throw new Error('Некорректный формат JSON: отсутствует или неверный массив scenes');
-                                                                          }
-                scriptData = data;
-                console.log('Загруженные данные:', scriptData);
-                 } catch (parseError) {
-                console.error('Ошибка парсинга JSON:', parseError);
-                document.getElementById('dialogue-text').textContent = "Ошибка: некорректный JSON-файл.";
-                throw parseError;
+        function loadChapter(chapterId) {
+            return fetch(`data/chapter${chapterId}.json`, {
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8'
                 }
-                           })
-            .catch(error => {
-            console.error('Ошибка загрузки главы:', error);
-            document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы.";
-            throw error;
-                            });
-                                        }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Не удалось загрузить главу');
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Сырой текст JSON:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+                            throw new Error('Некорректный формат JSON: отсутствует или неверный массив scenes');
+                        }
+                        scriptData = data;
+                        console.log('Загруженные данные:', scriptData);
+                    } catch (parseError) {
+                        console.error('Ошибка парсинга JSON:', parseError);
+                        document.getElementById('dialogue-text').textContent = "Ошибка: некорректный JSON-файл.";
+                        throw parseError;
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки главы:', error);
+                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы.";
+                    throw error;
+                });
+        }
 
         function saveChoice(choiceId, effects, memoryTag) {
-         choices.push(choiceId);
+            choices.push(choiceId);
             if (effects) {
-            for (let key in effects) {
-            if (key === 'relationships') {
-                for (let rel in effects[key]) {
-                    stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
-                }
-            } else {
-                stats[key] = (stats[key] || 0) + effects[key];
-            }
-        }
-    }
-    if (memoryTag) {
-        stats.memories.push(memoryTag);
-        const notification = document.createElement('div');
-        notification.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; z-index: 5;';
-        notification.textContent = 'Вика запомнит ваш выбор';
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-    }
-    saveSession();
-}
-
-       function showScene(sceneId) {
-    if (!scriptData || !scriptData.scenes) {
-        console.error('Script data not loaded');
-        document.getElementById('dialogue-text').textContent = "Ошибка: данные сценария не загружены.";
-        return;
-    }
-    
-    let scene;
-    if (typeof sceneId === 'number') {
-        scene = scriptData.scenes[sceneId];
-    } else {
-        scene = scriptData.scenes.find(s => s.id === sceneId);
-    }
-
-    if (!scene) {
-        if (currentChapter >= 2) {
-            showChapterPlaceholder();
-            return;
-        }
-        console.error(`Сцена ${sceneId} не найдена`, scriptData.scenes);
-        document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
-        return;
-    }
-
-    if (!checkSceneCondition(scene)) {
-        console.log('Сцена пропущена из-за условия:', scene.id || sceneId);
-        currentScene++;
-        showScene(currentScene);
-        return;
-    }
-    saveChoice(choice.id, choice.effects, choice.memoryTag);
-    if (choice.effects) showChoiceEffects(choice.effects);
-    console.log('Отображаем сцену:', scene.id || sceneId);
-
-    // Затухание перед сменой сцены
-    fadeOut(() => {
-        const backgroundElement = document.getElementById('background');
-        backgroundElement.style.backgroundImage = scene.background 
-            ? `url('assets/backgrounds/${scene.background}.png')` 
-            : 'none';
-
-        const charLeft = document.getElementById('character-left');
-        const charRight = document.getElementById('character-right');
-        charLeft.style.backgroundImage = 'none';
-        charRight.style.backgroundImage = 'none';
-
-        if (scene.characterLeft) {
-            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                : scene.characterLeft;
-            charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
-            console.log('Левый персонаж:', leftChar);
-        }
-        if (scene.characterRight) {
-            const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                : scene.characterRight;
-            charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
-            console.log('Правый персонаж:', rightChar);
-        }
-
-        if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-        if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-        document.getElementById('speaker-name').textContent = scene.speaker ? scene.speaker[stats.language] : '';
-        console.log('Текст сцены:', scene.text[stats.language]);
-         typeText(scene.text[stats.language], dialogueElement, () => {
-    
-
-        const dialogueElement = document.getElementById('dialogue-text');
-        const dialogueBox = document.querySelector('.dialogue-box');
-
-        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-        if (dialogueBox.touchHandler) {
-            dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-            dialogueBox.touchHandler = null;
-
-        const particlesContainer = document.getElementById('particles');
-        particlesContainer.innerHTML = ''; // Очищаем предыдущие частицы
-        if (scene.background === 'bg_street_night') { // Пример для дождя
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.animation = `fall ${2 + Math.random() * 3}s linear infinite`;
-                particle.style.animationDelay = `${Math.random() * 5}s`;
-                particlesContainer.appendChild(particle);
-            }
-
-        }
-
-        fadeIn(); // Появление новой сцены
-
-        console.log('Текст сцены:', scene.text);
-        typeText(scene.text, dialogueElement, () => {
-            if (scene.choices && scene.choices.length > 0) {
-                document.body.ontouchstart = null;
-                scene.choices.forEach(choice => {
-                    const btn = createChoiceButton(choice);
-                    if (choice.condition && !checkCondition(choice.condition)) {
-                        btn.style.display = 'none';
-                    } else if (choice.cost && stats.diamonds < choice.cost) {
-                        btn.disabled = true;
+                for (let key in effects) {
+                    if (key === 'relationships') {
+                        for (let rel in effects[key]) {
+                            stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
+                        }
                     } else {
-                        btn.addEventListener('touchstart', (e) => {
-                            e.preventDefault();
-                            if (choice.cost) stats.diamonds -= choice.cost;
-                            updateDiamondsDisplay();
-                            saveChoice(choice.id, choice.effects);
-                            if (choice.effects) showChoiceEffects(choice.effects);
-                            currentScene = choice.nextScene;
-                            showScene(currentScene);
-                        });
+                        stats[key] = (stats[key] || 0) + effects[key];
                     }
-                    dialogueBox.appendChild(btn);
-                });
-
-                const dialogueBoxHeight = dialogueBox.offsetHeight;
-                const windowHeight = window.innerHeight;
-                if (dialogueBoxHeight > windowHeight * 0.7) {
-                    const offset = dialogueBoxHeight - (windowHeight * 0.7);
-                    dialogueBox.style.bottom = `${offset}px`;
-                } else {
-                    dialogueBox.style.bottom = '0';
                 }
-            } else if (scene.nextScene !== undefined) {
-                dialogueBox.touchHandler = (e) => {
-                    e.preventDefault();
-                    if (!isTyping) {
-                        console.log('Переход на следующую сцену:', scene.nextScene);
-                        currentScene = scene.nextScene;
-                        saveSession();
-                        showScene(currentScene);
-                    }
-                };
-                dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-                dialogueBox.style.bottom = '0';
             }
-        });
-    });
-});
-}
+            if (memoryTag) {
+                stats.memories.push(memoryTag);
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; z-index: 5;';
+                notification.textContent = 'Вика запомнит ваш выбор';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+            saveSession();
+        }
+
+        function showScene(sceneId) {
+            if (!scriptData || !scriptData.scenes) {
+                console.error('Script data not loaded');
+                document.getElementById('dialogue-text').textContent = "Ошибка: данные сценария не загружены.";
+                return;
+            }
+
+            let scene;
+            if (typeof sceneId === 'number') {
+                scene = scriptData.scenes[sceneId];
+            } else {
+                scene = scriptData.scenes.find(s => s.id === sceneId);
+            }
+
+            if (!scene) {
+                if (currentChapter >= 2) {
+                    showChapterPlaceholder();
+                    return;
+                }
+                console.error(`Сцена ${sceneId} не найдена`, scriptData.scenes);
+                document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
+                return;
+            }
+
+            if (!checkSceneCondition(scene)) {
+                console.log('Сцена пропущена из-за условия:', scene.id || sceneId);
+                currentScene++;
+                showScene(currentScene);
+                return;
+            }
+
+            console.log('Отображаем сцену:', scene.id || sceneId);
+            const progressElement = document.getElementById('progress');
+            const totalScenes = scriptData.scenes.length;
+            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+            progressElement.style.width = `${progressPercent}%`;
+
+            fadeOut(() => {
+                const backgroundElement = document.getElementById('background');
+                backgroundElement.style.backgroundImage = scene.background 
+                    ? `url('assets/backgrounds/${scene.background}.png')` 
+                    : 'none';
+
+                const charLeft = document.getElementById('character-left');
+                const charRight = document.getElementById('character-right');
+                charLeft.style.backgroundImage = 'none';
+                charRight.style.backgroundImage = 'none';
+
+                if (scene.characterLeft) {
+                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterLeft;
+                    charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
+                    console.log('Левый персонаж:', leftChar);
+                }
+                if (scene.characterRight) {
+                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterRight;
+                    charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+                    console.log('Правый персонаж:', rightChar);
+                }
+
+                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+
+                const dialogueElement = document.getElementById('dialogue-text');
+                const dialogueBox = document.querySelector('.dialogue-box');
+
+                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+                if (dialogueBox.touchHandler) {
+                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+                    dialogueBox.touchHandler = null;
+                }
+
+                const particlesContainer = document.getElementById('particles');
+                particlesContainer.innerHTML = '';
+                if (scene.background === 'bg_street_night') {
+                    for (let i = 0; i < 50; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = `${Math.random() * 100}%`;
+                        particle.style.animation = `fall ${2 + Math.random() * 3}s linear infinite`;
+                        particle.style.animationDelay = `${Math.random() * 5}s`;
+                        particlesContainer.appendChild(particle);
+                    }
+                }
+
+                fadeIn();
+
+                document.getElementById('speaker-name').textContent = scene.speaker ? scene.speaker[stats.language] : '';
+                console.log('Текст сцены:', scene.text[stats.language]);
+                typeText(scene.text[stats.language], dialogueElement, () => {
+                    if (scene.choices && scene.choices.length > 0) {
+                        document.body.ontouchstart = null;
+                        scene.choices.forEach(choice => {
+                            const btn = createChoiceButton(choice);
+                            if (choice.condition && !checkCondition(choice.condition)) {
+                                btn.style.display = 'none';
+                            } else if (choice.cost && stats.diamonds < choice.cost) {
+                                btn.disabled = true;
+                            } else {
+                                btn.addEventListener('touchstart', (e) => {
+                                    e.preventDefault();
+                                    if (choice.cost) stats.diamonds -= choice.cost;
+                                    updateDiamondsDisplay();
+                                    saveChoice(choice.id, choice.effects, choice.memoryTag);
+                                    if (choice.effects) showChoiceEffects(choice.effects);
+                                    currentScene = choice.nextScene;
+                                    showScene(currentScene);
+                                });
+                            }
+                            dialogueBox.appendChild(btn);
+                        });
+
+                        const dialogueBoxHeight = dialogueBox.offsetHeight;
+                        const windowHeight = window.innerHeight;
+                        if (dialogueBoxHeight > windowHeight * 0.7) {
+                            const offset = dialogueBoxHeight - (windowHeight * 0.7);
+                            dialogueBox.style.bottom = `${offset}px`;
+                        } else {
+                            dialogueBox.style.bottom = '0';
+                        }
+                    } else if (scene.nextScene !== undefined) {
+                        dialogueBox.touchHandler = (e) => {
+                            e.preventDefault();
+                            if (!isTyping) {
+                                console.log('Переход на следующую сцену:', scene.nextScene);
+                                currentScene = scene.nextScene;
+                                saveSession();
+                                showScene(currentScene);
+                            }
+                        };
+                        dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
+                        dialogueBox.style.bottom = '0';
+                    }
+                });
+            });
+        }
+
         function showChoiceEffects(effects) {
             for (let key in effects) {
                 if (key !== 'relationships') {
@@ -892,7 +902,10 @@
                 leaf: 0,
                 diamonds: 10,
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-                appearance: "style1"
+                appearance: "style1",
+                isAuthorized: stats.isAuthorized,
+                memories: stats.memories || [],
+                language: stats.language || "ru"
             };
             const existingPlaceholder = document.querySelector('.placeholder-message');
             if (existingPlaceholder) existingPlaceholder.remove();
