@@ -26,6 +26,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            max-width: 100vw; /* Предотвращение выхода за границы */
+            max-height: 100vh;
         }
         .parallax-bg {
             position: absolute;
@@ -52,7 +54,9 @@
             position: absolute;
             bottom: 0;
             width: 70%;
+            max-width: 100vw; /* Ограничение ширины */
             height: 100vh;
+            max-height: 100vh; /* Ограничение высоты */
             background-position: bottom center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -64,6 +68,21 @@
         @keyframes appear {
             0% { clip-path: circle(0% at center); }
             100% { clip-path: circle(100% at center); }
+        }
+        @keyframes shiver {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .shiver {
+            animation: shiver 0.5s infinite;
+        }
+        .heartbeat {
+            animation: heartbeat 1s 3;
         }
         .character-left { left: -15%; transform: translateX(0); }
         .character-right { right: -15%; transform: translateX(0); }
@@ -764,8 +783,8 @@
                 currentBackground = newBackground;
                 charLeft.style.backgroundImage = 'none';
                 charRight.style.backgroundImage = 'none';
-                charLeft.classList.remove('character-speaker', 'character-non-speaker');
-                charRight.classList.remove('character-speaker', 'character-non-speaker');
+                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
 
                 const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
                 if (scene.characterLeft) {
@@ -774,6 +793,8 @@
                         : scene.characterLeft;
                     charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
                     charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+                    if (scene.id === 9 || scene.id === 19) charLeft.classList.add('shiver'); // Дрожь для Анны
+                    if (scene.id === 6) charLeft.classList.add('heartbeat'); // Пульсация для Анны
                     console.log('Левый персонаж:', leftChar);
                 }
                 if (scene.characterRight) {
@@ -782,6 +803,7 @@
                         : scene.characterRight;
                     charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
                     charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+                    if (scene.id === 21) charRight.classList.add('heartbeat'); // Пульсация для Вики
                     console.log('Правый персонаж:', rightChar);
                 }
 
@@ -1001,6 +1023,7 @@
             saveSession();
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('language-btn').style.display = 'block'; // Восстановление кнопки языка
         }
 
         function handleShowStats(e) {
