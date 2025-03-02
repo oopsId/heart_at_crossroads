@@ -26,43 +26,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
+            background-size: 120%; /* Увеличиваем размер фона для анимации */
+            background-position: 0% center; /* Начальная позиция */
+            background-repeat: no-repeat;
             background-color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: slideBackground 20s ease-in-out infinite; /* Анимация фона */
+        }
+        @keyframes slideBackground {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
         }
         .character-left, .character-right {
-    position: absolute;
-    bottom: 0;
-    width: 60%; /* Увеличиваем ширину */
-    height: 95vh; /* Увеличиваем высоту */
-    background-position: bottom center;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-.character-left { left: 0; transform: translateX(0); } /* Сдвигаем чуть левее */
-.character-right { right: 0; transform: translateX(0); } /* Сдвигаем чуть правее */
-    .dialogue-box {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(51, 51, 51, 0.9), rgba(51, 51, 51, 0.5)); /* От 90% до 50% непрозрачности */
-    color: white;
-    padding: 40px 20px 20px;
-    text-align: center;
-    z-index: 3;
-    transition: opacity 0.5s ease, bottom 0.3s ease;
-    opacity: 1;
-    min-height: 150px;
-    max-height: 40vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
+            position: absolute;
+            bottom: 0;
+            width: 70%;
+            height: 100vh;
+            background-position: bottom center;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .character-left { left: 0; transform: translateX(0); }
+        .character-right { right: 0; transform: translateX(0); }
+        .dialogue-box {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(51, 51, 51, 0.9), rgba(51, 51, 51, 0.5));
+            color: white;
+            padding: 40px 20px 20px;
+            text-align: center;
+            z-index: 3;
+            transition: opacity 0.5s ease, bottom 0.3s ease;
+            opacity: 1;
+            min-height: 150px;
+            max-height: 40vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
         #speaker-name {
             font-weight: bold;
             font-size: 18px;
@@ -167,14 +174,13 @@
             align-items: center;
             z-index: 5;
         }
-        /* Обновление стилей для заголовка на стартовом экране */
         #start-screen h1 {
-        color: green; /* Зелёный цвет */
-        font-family: 'LobsterTwo', sans-serif; /* Используем новый шрифт */
-        font-size: 24px;
-       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-       margin-bottom: 20px;
-          }
+            color: green;
+            font-family: 'LobsterTwo', sans-serif;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
         .start-buttons {
             display: flex;
             flex-direction: column;
@@ -269,64 +275,63 @@
         let scriptData = null;
         const correctPassword = "евбытрофко";
 
-        // Initialize Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
+        // Detect Telegram or browser
+        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
+        if (isTelegram) {
             Telegram.WebApp.ready();
+            console.log('Запуск в Telegram');
+        } else {
+            console.log('Запуск в браузере');
         }
 
-        // Get user ID if available
-        const userId = window.Telegram && window.Telegram.WebApp && 
-                      Telegram.WebApp.initDataUnsafe && 
-                      Telegram.WebApp.initDataUnsafe.user ? 
-                      Telegram.WebApp.initDataUnsafe.user.id : null;
+        // Get user ID if in Telegram
+        const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
 
-        // Telegram Cloud Storage functions
-        const saveToCloud = (key, value) => {
-            return new Promise((resolve, reject) => {
-                if (Telegram.WebApp.CloudStorage) {
+        // Storage functions based on environment
+        const saveToStorage = (key, value) => {
+            if (isTelegram && Telegram.WebApp.CloudStorage) {
+                return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.setItem(
                         key,
                         JSON.stringify(value),
                         () => resolve(true),
                         (error) => {
-                            console.error('Ошибка сохранения в облако:', error);
+                            console.error('Ошибка сохранения в CloudStorage:', error);
                             reject(error);
                         }
                     );
-                } else {
-                    console.warn('CloudStorage не доступен, использую localStorage');
-                    localStorage.setItem(key, JSON.stringify(value));
-                    resolve(true);
-                }
-            });
+                });
+            } else {
+                localStorage.setItem(key, JSON.stringify(value));
+                return Promise.resolve(true);
+            }
         };
 
-        const getFromCloud = (key) => {
-            return new Promise((resolve, reject) => {
-                if (Telegram.WebApp.CloudStorage) {
+        const getFromStorage = (key) => {
+            if (isTelegram && Telegram.WebApp.CloudStorage) {
+                return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.getItem(
                         key,
                         (error, value) => {
                             if (error) {
-                                console.error('Ошибка загрузки из облака:', error);
+                                console.error('Ошибка загрузки из CloudStorage:', error);
                                 reject(error);
                             } else {
                                 resolve(value ? JSON.parse(value) : null);
                             }
                         }
                     );
-                } else {
-                    console.warn('CloudStorage не доступен, использую localStorage');
-                    const item = localStorage.getItem(key);
-                    resolve(item ? JSON.parse(item) : null);
-                }
-            });
+                });
+            } else {
+                const item = localStorage.getItem(key);
+                return Promise.resolve(item ? JSON.parse(item) : null);
+            }
         };
 
         // Check if user is authorized
         const checkAuthorization = async () => {
             try {
-                const authorizedUsers = await getFromCloud('authorized_users') || [];
+                const authorizedUsers = await getFromStorage('authorized_users') || [];
                 if (userId && authorizedUsers.includes(userId)) {
                     startGame();
                 } else {
@@ -390,9 +395,9 @@
                 handleShowStats(e);
             });
 
-            getFromCloud('last_session')
+            getFromStorage('last_session')
                 .then(session => {
-                    console.log('Сессия из облака:', session);
+                    console.log('Сессия из хранилища:', session);
                     if (session) {
                         document.getElementById('start-screen').style.display = 'flex';
                     } else {
@@ -411,10 +416,10 @@
             console.log('Введён пароль:', inputPassword);
             if (inputPassword === correctPassword) {
                 try {
-                    const authorizedUsers = (await getFromCloud('authorized_users')) || [];
+                    const authorizedUsers = (await getFromStorage('authorized_users')) || [];
                     if (userId && !authorizedUsers.includes(userId)) {
                         authorizedUsers.push(userId);
-                        await saveToCloud('authorized_users', authorizedUsers);
+                        await saveToStorage('authorized_users', authorizedUsers);
                     }
                     console.log('Пароль верный, начинаем новую игру');
                     startNewGame();
@@ -524,7 +529,7 @@
         }
 
         async function loadSession(callback) {
-            const session = await getFromCloud('last_session');
+            const session = await getFromStorage('last_session');
             if (session) {
                 currentChapter = session.currentChapter;
                 currentScene = session.currentScene;
@@ -536,7 +541,7 @@
 
         async function saveSession() {
             const session = { currentChapter, currentScene, choices, stats };
-            await saveToCloud('last_session', session);
+            await saveToStorage('last_session', session);
             updateDiamondsDisplay();
         }
 
@@ -621,15 +626,22 @@
             const charRight = document.getElementById('character-right');
             charLeft.style.backgroundImage = 'none';
             charRight.style.backgroundImage = 'none';
+
             if (scene.characterLeft) {
-                charLeft.style.backgroundImage = `url('assets/characters/${scene.characterLeft}.png')`;
+                const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                    ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterLeft;
+                charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
+                console.log('Левый персонаж:', leftChar);
             }
             if (scene.characterRight) {
                 const rightChar = scene.characterRight.includes('${stats.appearance}') 
                     ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
                     : scene.characterRight;
                 charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+                console.log('Правый персонаж:', rightChar);
             }
+
             if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
             if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
