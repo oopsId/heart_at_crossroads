@@ -34,17 +34,16 @@
             align-items: center;
         }
         .character-left, .character-right {
-            position: absolute;
-            bottom: 0;
-            max-height: 80%;
-            width: 45%;
-            height: 75vh;
-            background-position: bottom center;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-        .character-left { left: 5%; transform: translateX(0); }
-        .character-right { right: 5%; transform: translateX(0); }
+    position: absolute;
+    bottom: 0;
+    width: 50%; /* Увеличиваем ширину */
+    height: 85vh; /* Увеличиваем высоту */
+    background-position: bottom center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.character-left { left: 0; transform: translateX(0); } /* Сдвигаем чуть левее */
+.character-right { right: 0; transform: translateX(0); } /* Сдвигаем чуть правее */
         .dialogue-box {
         position: absolute;
         bottom: 0;
