@@ -62,7 +62,7 @@
             background-repeat: no-repeat;
             z-index: 2;
             transition: transform 0.3s ease, filter 0.3s ease;
-            animation: appear 0.5s ease-in-out forwards; /* Анимация прозрачности */
+            animation: appear 0.5s ease-in-out forwards;
         }
         @keyframes appear {
             0% { opacity: 0; }
@@ -100,7 +100,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(222, 184, 135, 0.7), rgba(222, 184, 135, 0.3)); /* Бежево-кремовый градиент */
+            background: linear-gradient(to top, rgba(222, 184, 135, 0.7), rgba(222, 184, 135, 0.3));
             color: white;
             padding: 40px 20px 20px;
             text-align: center;
@@ -118,7 +118,7 @@
             font-weight: bold;
             font-size: 18px;
             margin-bottom: 5px;
-            color: #DEB887; /* Бежево-коричневый вместо золотого */
+            color: #DEB887;
         }
         #dialogue-text {
             margin: 0;
@@ -130,8 +130,8 @@
             margin: 10px auto;
             padding: 10px;
             width: 90%;
-            background: #F5F0E1; /* Бежевый */
-            color: #5D4037; /* Темно-коричневый текст */
+            background: #F5F0E1;
+            color: #5D4037;
             border: none;
             border-radius: 5px;
             font-size: 14px;
@@ -147,7 +147,7 @@
             opacity: 0.7;
         }
         .choice-btn:hover:not(:disabled) {
-            background: #E6DFD0; /* Чуть темнее при наведении */
+            background: #E6DFD0;
         }
         #menu {
             position: absolute;
@@ -177,29 +177,27 @@
             font-size: 14px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-        #menu-btn {
+        #menu-btn, #stats {
             margin: 0 5px;
-            padding: 5px 10px;
-            background: #F5F0E1; /* Бежевый */
-            color: #5D4037; /* Темно-коричневый текст */
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(245, 240, 225, 0.7);
+            color: #5D4037;
             border: none;
-            border-radius: 5px;
             font-size: 12px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        #menu-btn:hover {
-            background: #E6DFD0; /* Чуть темнее при наведении */
-        }
-        #stats {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            font-size: 12px;
+        #menu-btn:hover, #stats:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: rgba(245, 240, 225, 0.9);
         }
         .choice-feedback {
             position: absolute;
@@ -238,7 +236,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6; /* Кремовый фон */
+            background: url('assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -246,7 +244,7 @@
             z-index: 5;
         }
         #start-screen h1 {
-            color: #A67C52; /* Теплый коричневый вместо зелёного */
+            color: #A67C52;
             font-family: 'LobsterTwo', sans-serif;
             font-size: 24px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -255,34 +253,76 @@
         .start-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            position: relative;
         }
         .start-buttons button {
-            padding: 10px 20px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(245, 240, 225, 0.7);
+            color: #5D4037;
             font-size: 16px;
-            background: #F5F0E1; /* Бежевый */
-            color: #5D4037; /* Темно-коричневый текст */
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .start-buttons button:nth-child(1) {
+            left: -30px;
+        }
+        .start-buttons button:nth-child(2) {
+            left: 30px;
+        }
+        .start-buttons button:nth-child(3) {
+            left: -30px;
+        }
+        .start-buttons button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: rgba(245, 240, 225, 0.9);
+        }
+        #password-form {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
         #password-input {
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            width: 200px;
+            border-radius: 20px;
+            border: 1px solid rgba(93, 64, 55, 0.3);
+            background: rgba(245, 240, 225, 0.7);
+            color: #5D4037;
+            width: 220px;
+            text-align: center;
         }
         #password-submit {
-            padding: 10px 20px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(245, 240, 225, 0.7);
+            color: #5D4037;
             font-size: 16px;
-            background: #F5F0E1; /* Бежевый */
-            color: #5D4037; /* Темно-коричневый текст */
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #back-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(200, 180, 160, 0.6);
+            color: #5D4037;
+            font-size: 14px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .placeholder-message {
             position: absolute;
@@ -310,8 +350,25 @@
         #progress {
             width: 0%;
             height: 100%;
-            background: #DEB887; /* Бежево-коричневый */
+            background: #DEB887;
             transition: width 0.5s ease;
+        }
+        #language-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            z-index: 6;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         #language-btn:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -326,11 +383,11 @@
             <button id="continue-game" data-ru="Продолжить" data-en="Continue">Продолжить</button>
             <button id="show-password" data-ru="Ввести пароль" data-en="Enter Password">Ввести пароль</button>
         </div>
-        <div id="password-form" style="display: none;">
+        <div id="password-form">
             <input type="text" id="password-input" placeholder="Введите пароль">
             <button id="password-submit" data-ru="Войти" data-en="Login">Войти</button>
         </div>
-        <button id="language-btn" style="position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: transparent; border: 1px solid #fff; border-radius: 50%; color: white; cursor: pointer; z-index: 6; font-size: 20px; display: flex; justify-content: center; align-items: center;">
+        <button id="language-btn">
             <span id="language-icon">🇷🇺</span>
         </button>
     </div>
@@ -393,10 +450,7 @@
                         key,
                         JSON.stringify(value),
                         () => resolve(true),
-                        (error) => {
-                            console.error('Ошибка сохранения в CloudStorage:', error);
-                            reject(error);
-                        }
+                        (error) => reject(error)
                     );
                 });
             } else {
@@ -410,14 +464,7 @@
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.getItem(
                         key,
-                        (error, value) => {
-                            if (error) {
-                                console.error('Ошибка загрузки из CloudStorage:', error);
-                                reject(error);
-                            } else {
-                                resolve(value ? JSON.parse(value) : null);
-                            }
-                        }
+                        (error, value) => error ? reject(error) : resolve(value ? JSON.parse(value) : null)
                     );
                 });
             } else {
@@ -427,22 +474,15 @@
         };
 
         const checkAuthorization = async () => {
-            try {
-                const authorizedUsers = await getFromStorage('authorized_users') || [];
-                if (userId && authorizedUsers.includes(userId)) {
-                    startGame();
-                } else {
-                    showPasswordScreen();
-                }
-            } catch (error) {
-                console.error('Ошибка при проверке авторизации:', error);
+            const authorizedUsers = await getFromStorage('authorized_users') || [];
+            if (userId && authorizedUsers.includes(userId)) {
+                startGame();
+            } else {
                 showPasswordScreen();
             }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM загружен, регистрируем обработчики кнопок');
-
             const startGameBtn = document.getElementById('start-game');
             const continueGameBtn = document.getElementById('continue-game');
             const showPasswordBtn = document.getElementById('show-password');
@@ -453,47 +493,36 @@
             const languageIcon = document.getElementById('language-icon');
             const title = document.getElementById('title');
 
-            if (!startGameBtn || !continueGameBtn || !showPasswordBtn || !passwordSubmitBtn || !menuBtn || !statsBtn || !languageBtn) {
-                console.error('Одна или несколько кнопок не найдены в DOM');
-                return;
-            }
-
-            // Инициализация текстов кнопок и заголовка
             updateLanguage(stats.language);
 
             startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Начать игру"');
                 startNewGame();
             });
 
             continueGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Продолжить"');
                 loadSession(() => startGame());
             });
 
             showPasswordBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Ввести пароль"');
-                document.getElementById('password-form').style.display = 'block';
+                document.getElementById('password-form').style.display = 'flex';
+                document.querySelector('.start-buttons').style.display = 'none';
             });
 
             passwordSubmitBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Войти"');
                 handlePasswordSubmit(e);
             });
 
             menuBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Меню"');
                 handleMenu(e);
             });
 
             statsBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('Нажата кнопка "Статы"');
                 handleShowStats(e);
             });
 
@@ -505,55 +534,51 @@
                 saveSession();
             });
 
+            const backButton = document.createElement('button');
+            backButton.id = 'back-button';
+            backButton.textContent = stats.language === "ru" ? "Назад" : "Back";
+            backButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                document.getElementById('password-form').style.display = 'none';
+                document.querySelector('.start-buttons').style.display = 'flex';
+            });
+            document.getElementById('password-form').appendChild(backButton);
+
             getFromStorage('last_session')
                 .then(session => {
-                    console.log('Сессия из хранилища:', session);
                     if (session) {
                         document.getElementById('start-screen').style.display = 'flex';
                     } else {
                         checkAuthorization();
                     }
-                })
-                .catch(error => {
-                    console.error('Ошибка при загрузке сессии:', error);
-                    checkAuthorization();
                 });
-
-            function updateLanguage(lang) {
-                startGameBtn.textContent = startGameBtn.getAttribute(`data-${lang}`);
-                continueGameBtn.textContent = continueGameBtn.getAttribute(`data-${lang}`);
-                showPasswordBtn.textContent = showPasswordBtn.getAttribute(`data-${lang}`);
-                passwordSubmitBtn.textContent = passwordSubmitBtn.getAttribute(`data-${lang}`);
-                menuBtn.textContent = menuBtn.getAttribute(`data-${lang}`);
-                title.textContent = lang === "ru" ? title.getAttribute('data-ru') : title.getAttribute('data-en');
-            }
         });
 
+        function updateLanguage(lang) {
+            document.getElementById('start-game').textContent = document.getElementById('start-game').getAttribute(`data-${lang}`);
+            document.getElementById('continue-game').textContent = document.getElementById('continue-game').getAttribute(`data-${lang}`);
+            document.getElementById('show-password').textContent = document.getElementById('show-password').getAttribute(`data-${lang}`);
+            document.getElementById('password-submit').textContent = document.getElementById('password-submit').getAttribute(`data-${lang}`);
+            document.getElementById('menu-btn').textContent = document.getElementById('menu-btn').getAttribute(`data-${lang}`);
+            document.getElementById('title').textContent = lang === "ru" ? document.getElementById('title').getAttribute('data-ru') : document.getElementById('title').getAttribute('data-en');
+        }
+
         async function handlePasswordSubmit(e) {
-            e.preventDefault();
             const inputPassword = document.getElementById('password-input').value;
-            console.log('Введён пароль:', inputPassword);
             if (inputPassword === correctPassword) {
-                try {
-                    const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-                    if (userId && !authorizedUsers.includes(userId)) {
-                        authorizedUsers.push(userId);
-                        await saveToStorage('authorized_users', authorizedUsers);
-                    }
-                    stats.isAuthorized = true;
-                    console.log('Пароль верный, начинаем новую игру');
-                    startNewGame();
-                } catch (error) {
-                    console.error('Ошибка при сохранении авторизации:', error);
-                    alert('Ошибка при сохранении данных авторизации');
+                const authorizedUsers = (await getFromStorage('authorized_users')) || [];
+                if (userId && !authorizedUsers.includes(userId)) {
+                    authorizedUsers.push(userId);
+                    await saveToStorage('authorized_users', authorizedUsers);
                 }
+                stats.isAuthorized = true;
+                startNewGame();
             } else {
                 alert('Неверный пароль!');
             }
         }
 
         function startNewGame() {
-            console.log('Запуск новой игры');
             currentChapter = 1;
             currentScene = 0;
             choices = [];
@@ -585,32 +610,48 @@
         }
 
         function showPasswordScreen() {
-            console.log('Показываем экран пароля');
             document.getElementById('start-screen').style.display = 'flex';
             document.getElementById('language-btn').style.display = 'block';
         }
 
         function startGame() {
             console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
+            
+            document.getElementById('game-container').style.display = 'block';
+            document.getElementById('background').style.display = 'none';
+            document.getElementById('character-left').style.display = 'none';
+            document.getElementById('character-right').style.display = 'none';
+            document.getElementById('dialogue-box').style.display = 'none';
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('progress-bar').style.display = 'none';
             document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block'; // Явно показываем игровой контейнер
-            document.getElementById('background').style.display = 'block';
-            document.getElementById('character-left').style.display = 'block';
-            document.getElementById('character-right').style.display = 'block';
-            document.getElementById('dialogue-box').style.display = 'block';
-            document.getElementById('menu').style.display = 'flex';
-            document.getElementById('progress-bar').style.display = 'block';
             document.getElementById('language-btn').style.display = 'none';
-            const statsBtn = document.getElementById('stats');
-            statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
-            updateDiamondsDisplay();
+            
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10;display:flex;justify-content:center;align-items:center;color:#fff;';
+            loadingOverlay.innerHTML = '<span>Загрузка...</span>';
+            document.body.appendChild(loadingOverlay);
             
             preloadAssets(currentChapter).then(() => {
                 loadChapter(currentChapter).then(() => {
+                    document.getElementById('background').style.display = 'block';
+                    document.getElementById('character-left').style.display = 'block';
+                    document.getElementById('character-right').style.display = 'block';
+                    document.getElementById('dialogue-box').style.display = 'block';
+                    document.getElementById('menu').style.display = 'flex';
+                    document.getElementById('progress-bar').style.display = 'block';
+                    
+                    const statsBtn = document.getElementById('stats');
+                    statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
+                    updateDiamondsDisplay();
+                    
+                    loadingOverlay.remove();
                     showScene(currentScene);
                 }).catch(error => {
                     console.error('Не удалось запустить игру:', error);
                     document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
+                    loadingOverlay.remove();
                 });
             });
         }
@@ -620,6 +661,11 @@
         }
 
         function preloadAssets(chapterId) {
+            const loadingStatus = document.createElement('div');
+            loadingStatus.id = 'loading-status';
+            loadingStatus.style.cssText = 'position:fixed;bottom:10px;left:10px;color:white;font-size:12px;z-index:11;';
+            document.body.appendChild(loadingStatus);
+            
             const images = [
                 `assets/backgrounds/bg_apartment_morning.png`,
                 `assets/backgrounds/bg_street_day_trash.png`,
@@ -645,17 +691,27 @@
                 `assets/ui/heart.png`,
                 `assets/ui/leaf.png`
             ];
+            let loaded = 0;
+            
             return Promise.all(images.map(src => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = src;
-                    img.onload = resolve;
+                    img.onload = () => {
+                        loaded++;
+                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
+                        resolve();
+                    };
                     img.onerror = () => {
                         console.warn(`Не удалось загрузить ${src}`);
+                        loaded++;
+                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
                         resolve();
                     };
                 });
-            }));
+            })).finally(() => {
+                loadingStatus.remove();
+            });
         }
 
         async function loadSession(callback) {
@@ -678,7 +734,8 @@
         function loadChapter(chapterId) {
             return fetch(`data/chapter${chapterId}.json`, {
                 headers: {
-                    'Content-Type': 'application/json; charset=UTF-8'
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Accept': 'application/json'
                 }
             })
                 .then(response => {
@@ -686,19 +743,11 @@
                     return response.text();
                 })
                 .then(text => {
-                    console.log('Сырой текст JSON:', text);
-                    try {
-                        const data = JSON.parse(text);
-                        if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                            throw new Error('Некорректный формат JSON: отсутствует или неверный массив scenes');
-                        }
-                        scriptData = data;
-                        console.log('Загруженные данные:', scriptData);
-                    } catch (parseError) {
-                        console.error('Ошибка парсинга JSON:', parseError);
-                        document.getElementById('dialogue-text').textContent = "Ошибка: некорректный JSON-файл.";
-                        throw parseError;
+                    const data = JSON.parse(text);
+                    if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+                        throw new Error('Некорректный формат JSON');
                     }
+                    scriptData = data;
                 })
                 .catch(error => {
                     console.error('Ошибка загрузки главы:', error);
@@ -733,7 +782,6 @@
 
         function showScene(sceneId) {
             if (!scriptData || !scriptData.scenes) {
-                console.error('Script data not loaded');
                 document.getElementById('dialogue-text').textContent = "Ошибка: данные сценария не загружены.";
                 return;
             }
@@ -750,19 +798,16 @@
                     showChapterPlaceholder();
                     return;
                 }
-                console.error(`Сцена ${sceneId} не найдена`, scriptData.scenes);
                 document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
                 return;
             }
 
             if (!checkSceneCondition(scene)) {
-                console.log('Сцена пропущена из-за условия:', scene.id || sceneId);
                 currentScene++;
                 showScene(currentScene);
                 return;
             }
 
-            console.log('Отображаем сцену:', scene.id || sceneId);
             const progressElement = document.getElementById('progress');
             const totalScenes = scriptData.scenes.length;
             const progressPercent = ((scene.id + 1) / totalScenes) * 100;
@@ -793,9 +838,8 @@
                         : scene.characterLeft;
                     charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
                     charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-                    if (scene.id === 9 || scene.id === 19) charLeft.classList.add('shiver'); // Дрожь для Анны
-                    if (scene.id === 6) charLeft.classList.add('heartbeat'); // Пульсация для Анны
-                    console.log('Левый персонаж:', leftChar);
+                    if (scene.id === 9 || scene.id === 19) charLeft.classList.add('shiver');
+                    if (scene.id === 6) charLeft.classList.add('heartbeat');
                 }
                 if (scene.characterRight) {
                     const rightChar = scene.characterRight.includes('${stats.appearance}') 
@@ -803,8 +847,7 @@
                         : scene.characterRight;
                     charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
                     charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-                    if (scene.id === 21) charRight.classList.add('heartbeat'); // Пульсация для Вики
-                    console.log('Правый персонаж:', rightChar);
+                    if (scene.id === 21) charRight.classList.add('heartbeat');
                 }
 
                 if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
@@ -830,7 +873,6 @@
                 }
 
                 document.getElementById('speaker-name').textContent = speakerName;
-                console.log('Текст сцены:', scene.text[stats.language]);
                 typeText(scene.text[stats.language], dialogueElement, () => {
                     if (scene.choices && scene.choices.length > 0) {
                         document.body.ontouchstart = null;
@@ -866,7 +908,6 @@
                         dialogueBox.touchHandler = (e) => {
                             e.preventDefault();
                             if (!isTyping) {
-                                console.log('Переход на следующую сцену:', scene.nextScene);
                                 currentScene = scene.nextScene;
                                 saveSession();
                                 showScene(currentScene);
@@ -1013,7 +1054,7 @@
                 diamonds: 10,
                 relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
                 appearance: "style1",
-                isAuthorized: stats.isAuthorized, // Сохраняем статус авторизации
+                isAuthorized: stats.isAuthorized,
                 memories: [],
                 language: stats.language
             };
