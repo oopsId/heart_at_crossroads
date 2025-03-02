@@ -271,8 +271,9 @@
             leaf: 0,
             diamonds: 10,
             relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-            appearance: "style1"
-        };
+            appearance: "style1",
+            isAuthorized: false // Новый флаг
+                    };
         let isTyping = false;
         let scriptData = null;
         const correctPassword = "евбытрофко";
@@ -413,27 +414,27 @@
         });
 
         async function handlePasswordSubmit(e) {
-            e.preventDefault();
-            const inputPassword = document.getElementById('password-input').value;
-            console.log('Введён пароль:', inputPassword);
-            if (inputPassword === correctPassword) {
-                try {
-                    const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-                    if (userId && !authorizedUsers.includes(userId)) {
-                        authorizedUsers.push(userId);
-                        await saveToStorage('authorized_users', authorizedUsers);
-                    }
-                    console.log('Пароль верный, начинаем новую игру');
-                    startNewGame();
-                } catch (error) {
-                    console.error('Ошибка при сохранении авторизации:', error);
-                    alert('Ошибка при сохранении данных авторизации');
-                }
-            } else {
-                alert('Неверный пароль!');
+        e.preventDefault();
+        const inputPassword = document.getElementById('password-input').value;
+        console.log('Введён пароль:', inputPassword);
+        if (inputPassword === correctPassword) {
+        try {
+            const authorizedUsers = (await getFromStorage('authorized_users')) || [];
+            if (userId && !authorizedUsers.includes(userId)) {
+                authorizedUsers.push(userId);
+                await saveToStorage('authorized_users', authorizedUsers);
             }
-        }
-
+            stats.isAuthorized = true; // Устанавливаем флаг
+            console.log('Пароль верный, начинаем новую игру');
+            startNewGame();
+          } catch (error) {
+            console.error('Ошибка при сохранении авторизации:', error);
+            alert('Ошибка при сохранении данных авторизации');
+          }
+        } else {
+        alert('Неверный пароль!');
+       }
+                                                 }
         function startNewGame() {
             console.log('Запуск новой игры');
             currentChapter = 1;
