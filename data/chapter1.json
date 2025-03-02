@@ -3,10 +3,16 @@
         {
             "id": 0,
             "background": "bg_apartment_morning",
-            "characterLeft":"anna_sad_style2",
+            "characterLeft": "anna_sad_style2",
             "characterRight": null,
-            "speaker": "Анна",
-            "text": "Я проснулась этим утром и поняла, что всё изменилось. Новая квартира, новая жизнь... Но почему так пусто?",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я проснулась этим утром и поняла, что всё изменилось. Новая квартира, новая жизнь... Но почему так пусто?",
+                "en": "I woke up this morning and realized everything had changed. New apartment, new life... But why does it feel so empty?"
+            },
             "nextScene": 1
         },
         {
@@ -14,8 +20,14 @@
             "background": "bg_apartment_morning",
             "characterLeft": null,
             "characterRight": "vika_smile_style1",
-            "speaker": "Вика",
-            "text": "(смеётся, бросая ключи на стол): «Ты серьёзно хочешь жить в этом подвале? Даже окно на помойку выходит!»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "(смеётся, бросая ключи на стол): «Ты серьёзно хочешь жить в этом подвале? Даже окно на помойку выходит!»",
+                "en": "(laughs, tossing keys on the table): 'Are you seriously going to live in this basement? Even the window looks out onto a dumpster!'"
+            },
             "nextScene": 2
         },
         {
@@ -23,8 +35,14 @@
             "background": "bg_apartment_morning",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_smile_style1",
-            "speaker": "Анна",
-            "text": "(сжимает руки): «Мне нравится близко к метро…»",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "(сжимает руки): «Мне нравится близко к метро…»",
+                "en": "(clasps hands): 'I like that it’s close to the metro…'"
+            },
             "nextScene": 3
         },
         {
@@ -32,24 +50,39 @@
             "background": "bg_apartment_morning",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_smile_style1",
-            "speaker": "Вика",
-            "text": " (подмигивает): «Не переживай, я подберу тебе стиль. Ты же не против, что я сегодня затащу сюда мебель?»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "(подмигивает): «Не переживай, я подберу тебе стиль. Ты же не против, что я сегодня затащу сюда мебель?»",
+                "en": "(winks): 'Don’t worry, I’ll pick out a style for you. You don’t mind if I drag some furniture in here today, do you?'"
+            },
             "choices": [
                 {
                     "id": "sarcasm",
-                    "text": "Ты платишь — ты командуешь",
+                    "text": {
+                        "ru": "Ты платишь — ты командуешь",
+                        "en": "You pay — you call the shots"
+                    },
                     "nextScene": 4,
                     "effects": { "crown": 1, "relationships.vika": 1 }
                 },
                 {
                     "id": "cold",
-                    "text": "Я сама справлюсь",
+                    "text": {
+                        "ru": "Я сама справлюсь",
+                        "en": "I’ll manage on my own"
+                    },
                     "nextScene": 5,
                     "effects": { "heart": 1, "relationships.vika": -1 }
                 },
                 {
                     "id": "premium",
-                    "text": "Позволь мне выбрать мебель (5 алмазов)",
+                    "text": {
+                        "ru": "Позволь мне выбрать мебель (5 алмазов)",
+                        "en": "Let me choose the furniture (5 diamonds)"
+                    },
                     "nextScene": 6,
                     "cost": 5,
                     "effects": { "crown": 2, "relationships.vika": 2 }
@@ -61,8 +94,14 @@
             "background": "bg_apartment_morning",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_thoughtful_style1",
-            "speaker": "Вика",
-            "text": "«Интересно… Ты умеешь удивлять.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Интересно… Ты умеешь удивлять.»",
+                "en": "'Interesting… You know how to surprise.'"
+            },
             "nextScene": 7
         },
         {
@@ -70,17 +109,29 @@
             "background": "bg_apartment_morning",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_worry_style1",
-            "speaker": "Вика",
-            "text": "«Как хочешь. Потом не ной, когда всё рухнет.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Как хочешь. Потом не ной, когда всё рухнет.»",
+                "en": "'As you wish. Don’t complain later when it all falls apart.'"
+            },
             "nextScene": 7
         },
         {
             "id": 6,
             "background": "bg_apartment_morning",
             "characterLeft": "anna_happy_${stats.appearance}",
-            "characterRight": "vika_smile_style1" ,
-            "speaker": "Вика",
-            "text": "«Ого, у тебя вкус! Ладно, я добавлю пару штрихов.»",
+            "characterRight": "vika_smile_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Ого, у тебя вкус! Ладно, я добавлю пару штрихов.»",
+                "en": "'Wow, you’ve got taste! Alright, I’ll add a few touches.'"
+            },
             "nextScene": 7
         },
         {
@@ -88,8 +139,14 @@
             "background": "bg_apartment_morning",
             "characterLeft": "anna_thoughtful_${stats.appearance}",
             "characterRight": null,
-            "speaker": "",
-            "text": "Вика ушла, закрыв дверь. А я продолжала стоять посреди пустой комнаты, слушая, как эхо её шагов гаснет в коридоре.",
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Вика ушла, закрыв дверь. А я продолжала стоять посреди пустой комнаты, слушая, как эхо её шагов гаснет в коридоре.",
+                "en": "Vika left, closing the door. And I kept standing in the middle of the empty room, listening to the echo of her footsteps fade in the hallway."
+            },
             "nextScene": 8
         },
         {
@@ -97,17 +154,29 @@
             "background": "bg_street_day_trash",
             "characterLeft": "anna_sad_${stats.appearance}",
             "characterRight": null,
-            "speaker": "",
-            "text": "Я стояла у окна. В куче мусора на улице лежала моя старая кукла с треснувшей улыбкой.",
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Я стояла у окна. В куче мусора на улице лежала моя старая кукла с треснувшей улыбкой.",
+                "en": "I stood by the window. In a pile of trash on the street lay my old doll with a cracked smile."
+            },
             "nextScene": 9
         },
         {
             "id": 9,
             "background": "bg_street_day_trash",
             "characterLeft": "anna_sad_${stats.appearance}",
-            "characterRight": null ,
-            "speaker": "",
-            "text": "Голос за спиной шептал: «Ты всегда будешь одна». Но кто это был, когда я обернулась - никого не было.",
+            "characterRight": null,
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Голос за спиной шептал: «Ты всегда будешь одна». Но кто это был, когда я обернулась - никого не было.",
+                "en": "A voice behind me whispered: 'You’ll always be alone.' But when I turned around, there was no one there."
+            },
             "nextScene": 10
         },
         {
@@ -115,17 +184,29 @@
             "background": "bg_street_day_trash",
             "characterLeft": null,
             "characterRight": "vika_neutral_style1",
-            "speaker": "",
-            "text": "Пока я бежала в редакцию, Вика стояла на улице и с сочуствием смотрела на меня через толпу.",
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Пока я бежала в редакцию, Вика стояла на улице и с сочувствием смотрела на меня через толпу.",
+                "en": "While I ran to the newsroom, Vika stood on the street, looking at me with sympathy through the crowd."
+            },
             "nextScene": 11
         },
         {
             "id": 11,
             "background": "bg_office_day",
             "characterLeft": "anna_neutral_${stats.appearance}",
-            "characterRight": "vika_neutral_style1" ,
-            "speaker": "Вика",
-            "text": "Вика переворачивает бумаги: «Ты серьёзно пришла сюда в джинсах? Мы не на пикник.»",
+            "characterRight": "vika_neutral_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "Вика переворачивает бумаги: «Ты серьёзно пришла сюда в джинсах? Мы не на пикник.»",
+                "en": "Vika flips through papers: 'You seriously came here in jeans? This isn’t a picnic.'"
+            },
             "nextScene": 12
         },
         {
@@ -133,27 +214,45 @@
             "background": "bg_office_day",
             "characterLeft": "anna_worry_${stats.appearance}",
             "characterRight": "vika_neutral_style1",
-            "speaker": "Анна",
-            "text": "(сжимает сумочку): «Я готова работать.»",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "(сжимает сумочку): «Я готова работать.»",
+                "en": "(clutches her bag): 'I’m ready to work.'"
+            },
             "nextScene": 13
         },
         {
             "id": 13,
             "background": "bg_office_day",
             "characterLeft": "anna_neutral_${stats.appearance}",
-            "characterRight": "vika_smile_style1" ,
-            "speaker": "Вика",
-            "text": "(смеётся): «Почему-то не верится. Хорошо, дай материал о новом мосте. К вечеру.»",
+            "characterRight": "vika_smile_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "(смеётся): «Почему-то не верится. Хорошо, дай материал о новом мосте. К вечеру.»",
+                "en": "(laughs): 'Somehow I don’t believe it. Fine, give me a piece on the new bridge. By tonight.'"
+            },
             "choices": [
                 {
                     "id": "smile",
-                    "text": "Я справлюсь",
+                    "text": {
+                        "ru": "Я справлюсь",
+                        "en": "I’ll manage"
+                    },
                     "nextScene": 14,
                     "effects": { "crown": 1, "relationships.vika": 1 }
                 },
                 {
                     "id": "cold",
-                    "text": "Это не моя задача",
+                    "text": {
+                        "ru": "Это не моя задача",
+                        "en": "That’s not my job"
+                    },
                     "nextScene": 15,
                     "effects": { "heart": 1, "relationships.vika": -1 }
                 }
@@ -164,8 +263,14 @@
             "background": "bg_office_day",
             "characterLeft": "anna_happy_${stats.appearance}",
             "characterRight": "vika_thoughtful_style1",
-            "speaker": "Вика",
-            "text": " «Постараешься, хочешь сказать? Интересно.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Постараешься, хочешь сказать? Интересно.»",
+                "en": "'You’ll try, you mean? Interesting.'"
+            },
             "nextScene": 16
         },
         {
@@ -173,8 +278,14 @@
             "background": "bg_office_day",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_worry_style1",
-            "speaker": "Вика",
-            "text": "«Не шути со мной, я вижу когда ты лжешь.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Не шути со мной, я вижу когда ты лжешь.»",
+                "en": "'Don’t joke with me, I can tell when you’re lying.'"
+            },
             "nextScene": 16
         },
         {
@@ -182,8 +293,14 @@
             "background": "bg_office_night",
             "characterLeft": "anna_sad_${stats.appearance}",
             "characterRight": null,
-            "speaker": "Анна",
-            "text": "Я села и обхватила голову. За окном было тёмное небо. А в сумочке только старый билет на поезд.",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я села и обхватила голову. За окном было тёмное небо. А в сумочке только старый билет на поезд.",
+                "en": "I sat down and clutched my head. Outside the window was a dark sky. And in my bag, just an old train ticket."
+            },
             "nextScene": 17
         },
         {
@@ -191,8 +308,14 @@
             "background": "bg_office_night_end",
             "characterLeft": "anna_sad_${stats.appearance}",
             "characterRight": null,
-            "speaker": "",
-            "text": "Я сидела на полу офиса обняв колени, прислушиваясь к звуку шагов Вики в коридоре.",
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Я сидела на полу офиса обняв колени, прислушиваясь к звуку шагов Вики в коридоре.",
+                "en": "I sat on the office floor, hugging my knees, listening to the sound of Vika’s footsteps in the hallway."
+            },
             "nextScene": 18
         },
         {
@@ -200,8 +323,14 @@
             "background": "bg_street_night",
             "characterLeft": "anna_worry_${stats.appearance}",
             "characterRight": "vika_smile_style1",
-            "speaker": "Вика",
-            "text": "Куда бежишь, Ань? У меня есть компромат на Сергея! Он спал с женой мэра! Пиши материал!»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "Куда бежишь, Ань? У меня есть компромат на Сергея! Он спал с женой мэра! Пиши материал!»",
+                "en": "'Where are you running off to, Anya? I’ve got dirt on Sergey! He slept with the mayor’s wife! Write the article!'"
+            },
             "nextScene": 19
         },
         {
@@ -209,8 +338,14 @@
             "background": "bg_street_night",
             "characterLeft": "anna_surprised_${stats.appearance}",
             "characterRight": "vika_smile_style1",
-            "speaker": "Анна",
-            "text": "Я была побледнела: «Откуда ты знаешь?»",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я была побледнела: «Откуда ты знаешь?»",
+                "en": "I turned pale: 'How do you know that?'"
+            },
             "nextScene": 20
         },
         {
@@ -218,25 +353,40 @@
             "background": "bg_street_night",
             "characterLeft": "anna_worry_${stats.appearance}",
             "characterRight": "vika_smile_style1",
-            "speaker": "Вика",
-            "text": "(подходя ближе) «Я же говорила — у меня связи. Ты будешь звездой журналистики, если опубликуешь…»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "(подходя ближе) «Я же говорила — у меня связи. Ты будешь звездой журналистики, если опубликуешь…»",
+                "en": "(stepping closer) 'I told you — I have connections. You’ll be a journalism star if you publish this…'"
+            },
             "choices": [
                 {
                     "id": "yes",
-                    "text": "Да, напишу",
+                    "text": {
+                        "ru": "Да, напишу",
+                        "en": "Yes, I’ll write it"
+                    },
                     "nextScene": 21,
                     "memoryTag": "vika_remembers_yes",
                     "effects": { "crown": 2, "relationships.vika": 2 }
                 },
                 {
                     "id": "no",
-                    "text": "Это опасно",
+                    "text": {
+                        "ru": "Это опасно",
+                        "en": "It’s dangerous"
+                    },
                     "nextScene": 22,
                     "effects": { "heart": 1, "relationships.vika": -1 }
                 },
                 {
                     "id": "premium",
-                    "text": "Узнаю больше деталей (5 алмазов)",
+                    "text": {
+                        "ru": "Узнаю больше деталей (5 алмазов)",
+                        "en": "I’ll find out more details (5 diamonds)"
+                    },
                     "nextScene": 23,
                     "cost": 5,
                     "effects": { "crown": 3, "relationships.vika": 3 }
@@ -248,8 +398,14 @@
             "background": "bg_street_night",
             "characterLeft": "anna_neutral_${stats.appearance}",
             "characterRight": "vika_happy_style1",
-            "speaker": "Вика",
-            "text": "«Ты лучшая. Мы сделаем это вместе.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Ты лучшая. Мы сделаем это вместе.»",
+                "en": "'You’re the best. We’ll do this together.'"
+            },
             "nextScene": 24
         },
         {
@@ -257,8 +413,14 @@
             "background": "bg_street_night",
             "characterLeft": "anna_worry_${stats.appearance}",
             "characterRight": "vika_worry_style1",
-            "speaker": "Вика",
-            "text": "«Ты такая наивная. Пожалеешь.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Ты такая наивная. Пожалеешь.»",
+                "en": "'You’re so naive. You’ll regret it.'"
+            },
             "nextScene": 24
         },
         {
@@ -266,8 +428,14 @@
             "background": "bg_street_night",
             "characterLeft": "vika_smile_style1",
             "characterRight": "anna_surprised_${stats.appearance}",
-            "speaker": "Вика",
-            "text": " (шепчет): «У меня есть запись их разговора. Это твой билет к звездам.»",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "(шепчет): «У меня есть запись их разговора. Это твой билет к звездам.»",
+                "en": "(whispers): 'I have a recording of their conversation. This is your ticket to the stars.'"
+            },
             "nextScene": 24
         },
         {
@@ -275,8 +443,14 @@
             "background": "bg_street_dusk_end",
             "characterLeft": null,
             "characterRight": null,
-            "speaker": "",
-            "text": "Конец первой главы: Анна стоит на пороге новой жизни."
+            "speaker": {
+                "ru": "",
+                "en": ""
+            },
+            "text": {
+                "ru": "Конец первой главы: Анна стоит на пороге новой жизни.",
+                "en": "End of Chapter One: Anna stands on the threshold of a new life."
+            }
         }
     ]
 }
