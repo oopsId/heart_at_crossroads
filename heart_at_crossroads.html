@@ -3,1177 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сердце на перекрёстке</title>
+    <title>Heart at Crossroads</title>
+    <link rel="stylesheet" href="/heart_at_crossroads/styles.css">
     <style>
-        @font-face {
-            font-family: 'LobsterTwo';
-            src: url('/heart_at_crossroads/assets/fonts/LobsterTwo-Bold.ttf') format('truetype');
-            font-weight: bold;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'GreatVibes';
-            src: url('/heart_at_crossroads/assets/fonts/GreatVibes-Regular.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'GoodVibesCyr';
-            src: url('/heart_at_crossroads/assets/fonts/GoodVibesCyr.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-        }
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            overflow: hidden;
             background: #000;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: manipulation;
+            font-family: 'GoodVibesCyr', cursive;
+            color: #fff;
         }
         #game-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            max-width: 100vw;
-            max-height: 100vh;
         }
-        .parallax-bg {
+        #background {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             background-size: cover;
-            background-position: 0% center;
-            background-repeat: no-repeat;
-            background-color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: slideBackground 60s linear infinite;
-            z-index: 1;
-            transition: opacity 1s ease;
+            transition: background-image 0.5s ease-in-out;
         }
-        @keyframes slideBackground {
-            0% { background-position: 0% center; }
-            50% { background-position: 100% center; }
-            100% { background-position: 0% center; }
-        }
-        .character-left, .character-right {
+        #parallax-layer1, #parallax-layer2 {
             position: absolute;
-            bottom: 0;
-            width: 70%;
-            max-width: 100vw;
-            height: 100vh;
-            max-height: 100vh;
-            background-position: bottom center;
-            background-size: contain;
-            background-repeat: no-repeat;
-            z-index: 2;
-            transition: opacity 1s ease, transform 0.3s ease, filter 0.3s ease;
-            animation: appear 0.5s ease-in-out forwards;
-        }
-        @keyframes appear {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        @keyframes shiver {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-2px); }
-            75% { transform: translateX(2px); }
-        }
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-        .shiver {
-            animation: shiver 0.5s infinite;
-        }
-        .heartbeat {
-            animation: heartbeat 1s 3;
-        }
-        .character-left { left: -15%; transform: translateX(0); }
-        .character-right { right: -15%; transform: translateX(0); }
-        .character-speaker {
-            transform: scale(1.1);
-            filter: brightness(1.2);
-            z-index: 3;
-        }
-        .character-non-speaker {
-            transform: scale(1);
-            filter: brightness(1);
-            z-index: 2;
-        }
-        .dialogue-box {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(93, 64, 55, 0.8), rgba(93, 64, 55, 0.4));
-            color: #F5F0E1;
-            padding: 40px 20px 20px;
-            text-align: center;
-            z-index: 3;
-            transition: opacity 1s ease, bottom 0.3s ease;
-            opacity: 1;
-            min-height: 150px;
-            max-height: 40vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-        #speaker-name {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 5px;
-            color: #E6D5C0;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        #dialogue-text {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1.4;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        .choice-btn {
-            display: block;
-            margin: 10px auto;
-            padding: 10px;
-            width: 90%;
-            background: linear-gradient(to bottom, #F5F0E1, #E6D5C0);
-            color: #5D4037;
-            border: 1px solid rgba(93, 64, 55, 0.2);
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            white-space: normal;
-            min-height: 44px;
-            height: auto;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            box-shadow: 0 2px 5px rgba(93, 64, 55, 0.3);
-        }
-        .choice-btn:disabled {
-            background: linear-gradient(to bottom, #666, #555);
-            opacity: 0.7;
-            box-shadow: none;
-        }
-        .choice-btn:hover:not(:disabled) {
-            background: linear-gradient(to bottom, #E6D5C0, #D4BEA6);
-            box-shadow: 0 3px 7px rgba(93, 64, 55, 0.4);
-        }
-        #menu {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 4;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-end;
-            max-width: calc(100% - 20px);
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-        #menu div {
-            display: flex;
-            align-items: center;
-            margin: 0 10px;
-        }
-        #menu img {
-            width: 24px;
-            height: 24px;
-            margin-right: 5px;
-        }
-        #menu span {
-            color: white;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        #menu-btn, #stats {
-            margin: 0 5px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.8), rgba(160, 120, 90, 0.8));
-            color: #5D4037;
-            border: none;
-            font-size: 12px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        #menu-btn:hover, #stats:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.9), rgba(160, 120, 90, 0.9));
-        }
-        .choice-feedback {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 32px;
-            height: 32px;
-            z-index: 4;
-            animation: flyUp 3s ease-out forwards;
-        }
-        @keyframes fall {
-            0% { transform: translateY(-10vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-        .particle {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            width: 5px;
-            height: 5px;
-            opacity: 0.7;
-        }
-        @keyframes flyUp {
-            0% { bottom: 50%; opacity: 1; }
-            50% { bottom: 60%; opacity: 0.8; }
-            100% { bottom: 70%; opacity: 0; }
-        }
-        .fade-out {
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-        #start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: url('/heart_at_crossroads/assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
+            background-size: cover;
+            transition: transform 0.5s ease-in-out;
         }
-        #start-screen h1 {
-            color: #A67C52;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 40px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-        #start-screen h1.ru {
-            font-family: 'GoodVibesCyr', sans-serif;
-        }
-        #start-screen h1.en {
-            font-family: 'GreatVibes', sans-serif;
-        }
-        #start-screen h1 span:first-child {
-            font-size: 48px;
-        }
-        #start-screen h1 span:last-child {
-            font-size: 40px;
-        }
-        .start-buttons {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        .start-buttons button {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: rgba(245, 240, 225, 0.7);
-            color: #5D4037;
-            font-size: 16px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-        .start-buttons button:nth-child(1) {
-            left: -30px;
-        }
-        .start-buttons button:nth-child(2) {
-            left: 30px;
-        }
-        .start-buttons button:nth-child(3) {
-            left: -30px;
-        }
-        #gallery-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(245, 240, 225, 0.7);
-            color: #5D4037;
-            font-size: 14px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        #character-left, #character-right {
             position: absolute;
-            left: -130px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 0;
+            width: 40%;
+            height: 80%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: bottom;
+            transition: opacity 0.5s ease-in-out;
         }
-        .start-buttons button:hover, #gallery-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            background: rgba(245, 240, 225, 0.9);
+        #character-left {
+            left: 0;
         }
-        #password-form {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        #character-right {
+            right: 0;
         }
-        #password-input {
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(93, 64, 55, 0.3);
-            background: rgba(245, 240, 225, 0.7);
-            color: #5D4037;
-            width: 220px;
-            text-align: center;
-        }
-        #password-submit {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: rgba(245, 240, 225, 0.7);
-            color: #5D4037;
-            font-size: 16px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        #back-button {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(200, 180, 160, 0.6);
-            color: #5D4037;
-            font-size: 14px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .placeholder-message {
+        #dialogue-box {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            bottom: 10%;
+            left: 10%;
+            width: 80%;
             background: rgba(0, 0, 0, 0.7);
-            color: white;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            max-width: 80%;
-            z-index: 10;
+            transition: opacity 0.3s ease-in-out;
         }
-        #progress-bar {
+        #choices {
+            margin-top: 20px;
+        }
+        .choice-btn {
+            background: #fff;
+            color: #000;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'GoodVibesCyr', cursive;
+        }
+        .choice-btn:hover {
+            background: #ddd;
+        }
+        #start-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background: #333;
-            z-index: 4;
-            display: none;
-        }
-        #progress {
-            width: 0%;
             height: 100%;
-            background: #DEB887;
-            transition: width 0.5s ease;
-        }
-        #language-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            background: transparent;
-            border: 1px solid #fff;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            z-index: 6;
-            font-size: 20px;
+            background: url('/heart_at_crossroads/assets/backgrounds/start_screen.png') no-repeat center/cover;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        #language-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .memory-notification {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to bottom, rgba(222, 184, 135, 0.7), rgba(160, 120, 90, 0.7));
-            color: #5D4037;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 5;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        #start-btn {
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="start-screen">
-        <h1 id="title" data-ru="Сердце<br>на перекрёстке" data-en="Heart<br>at the Crossroads">
-            <span>Сердце</span>
-            <span>на перекрёстке</span>
-        </h1>
-        <div class="start-buttons">
-            <button id="start-game" data-ru="Начать игру" data-en="Start Game">Начать игру</button>
-            <button id="continue-game" data-ru="Продолжить" data-en="Continue">Продолжить</button>
-            <button id="show-password" data-ru="Ввести пароль" data-en="Enter Password">Ввести пароль</button>
-            <button id="gallery-btn" data-ru="Галерея" data-en="Gallery">Галерея</button>
-        </div>
-        <div id="password-form">
-            <input type="text" id="password-input" placeholder="Введите пароль">
-            <button id="password-submit" data-ru="Войти" data-en="Login">Войти</button>
-        </div>
-        <button id="language-btn">
-            <span id="language-icon">🇷🇺</span>
-        </button>
-    </div>
     <div id="game-container">
-        <div class="parallax-bg" id="background" style="display: none;"></div>
-        <div class="character-left" id="character-left" style="display: none;"></div>
-        <div class="character-right" id="character-right" style="display: none;"></div>
-        <div class="dialogue-box" id="dialogue-box" style="display: none;">
-            <p id="speaker-name"></p>
-            <p id="dialogue-text"></p>
+        <div id="background"></div>
+        <div id="parallax-layer1"></div>
+        <div id="parallax-layer2"></div>
+        <div id="character-left"></div>
+        <div id="character-right"></div>
+        <div id="dialogue-box">
+            <div id="speaker"></div>
+            <div id="dialogue-text"></div>
+            <div id="choices"></div>
         </div>
-        <div id="progress-bar" style="display: none;">
-            <div id="progress"></div>
+        <div id="start-screen">
+            <button id="start-btn">Start</button>
         </div>
-        <div id="menu" style="display: none;">
-            <div id="diamonds">
-                <img src="/heart_at_crossroads/assets/ui/diamonds.png" alt="Diamonds">
-                <span id="diamonds-count">10</span>
-            </div>
-            <button id="menu-btn" data-ru="Меню" data-en="Menu">Меню</button>
-            <button id="stats">Статы</button>
-        </div>
-        <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
     </div>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <script>
-        let currentChapter = 1;
-        let currentScene = 0;
-        let choices = [];
+        const backgroundElement = document.getElementById('background');
+        const parallaxLayer1 = document.getElementById('parallax-layer1');
+        const parallaxLayer2 = document.getElementById('parallax-layer2');
+        const charLeft = document.getElementById('character-left');
+        const charRight = document.getElementById('character-right');
+        const dialogueBox = document.getElementById('dialogue-box');
+        const speakerElement = document.getElementById('speaker');
+        const dialogueElement = document.getElementById('dialogue-text');
+        const choicesElement = document.getElementById('choices');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+
+        let currentChapter = null;
+        let currentSceneIndex = 0;
         let stats = {
-            crown: 0,
-            heart: 0,
-            leaf: 0,
+            relationships: { anna: 0, vika: 0, dima: 0, mark: 0, sergey: 0, lesha: 0 },
             diamonds: 10,
-            relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-            appearance: "style1",
-            isAuthorized: false,
-            memories: [],
-            language: "ru"
+            crown: 0,
+            leaf: 0,
+            language: 'ru'
         };
-        let isTyping = false;
-        let scriptData = null;
-        let currentBackground = null;
-        const correctPassword = "umbertoeco";
-        const tempPassword = "999000";
 
-        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
-        if (isTelegram) {
-            Telegram.WebApp.ready();
-            console.log('Запуск в Telegram');
-        } else {
-            console.log('Запуск в браузере');
+        // Ассеты только для первой главы
+        const images = [
+            '/heart_at_crossroads/assets/backgrounds/start_screen.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
+            '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
+            '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
+            '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
+            '/heart_at_crossroads/assets/ui/crown.png',
+            '/heart_at_crossroads/assets/ui/diamonds.png',
+            '/heart_at_crossroads/assets/ui/heart.png',
+            '/heart_at_crossroads/assets/ui/leaf.png'
+        ];
+
+        const availableBackgrounds = [
+            'bg_apartment_morning', 'bg_phone_messenger', 'bg_webstudio_day'
+        ];
+        const availableCharacters = [
+            'anna_sad_style2', 'anna_neutral_style2', 'anna_happy_style2',
+            'vika_smile_style1', 'vika_neutral_style1', 'vika_happy_style1',
+            'dima_happy_style1', 'mark_neutral_style1', 'sergey_smile_style1'
+        ];
+
+        // Предзагрузка ассетов
+        function preloadAssets() {
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
         }
 
-        const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
-
-        const saveToStorage = (key, value) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
-                return new Promise((resolve, reject) => {
-                    Telegram.WebApp.CloudStorage.setItem(
-                        key,
-                        JSON.stringify(value),
-                        () => resolve(true),
-                        (error) => reject(error)
-                    );
-                });
-            } else {
-                localStorage.setItem(key, JSON.stringify(value));
-                return Promise.resolve(true);
+        // Загрузка главы
+        async function loadChapter(chapterId) {
+            if (chapterId > 1) {
+                showChapterPlaceholder(chapterId);
+                return;
             }
-        };
-
-        const getFromStorage = (key) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
-                return new Promise((resolve, reject) => {
-                    Telegram.WebApp.CloudStorage.getItem(
-                        key,
-                        (error, value) => error ? reject(error) : resolve(value ? JSON.parse(value) : null)
-                    );
-                });
-            } else {
-                const item = localStorage.getItem(key);
-                return Promise.resolve(item ? JSON.parse(item) : null);
+            try {
+                const response = await fetch(`/heart_at_crossroads/data/chapter${chapterId}.json`);
+                currentChapter = await response.json();
+                currentSceneIndex = 0;
+                showScene();
+            } catch (error) {
+                console.error('Ошибка загрузки главы:', error);
             }
-        };
+        }
 
-        const checkAuthorization = async () => {
-            const authorizedUsers = await getFromStorage('authorized_users') || [];
-            if (userId && authorizedUsers.includes(userId)) {
-                stats.isAuthorized = true;
-                startGame();
+        // Показ сцены
+        function showScene() {
+            const scene = currentChapter.scenes[currentSceneIndex];
+            applyScene(scene);
+        }
+
+        // Применение сцены
+        function applyScene(scene) {
+            // Фон
+            let newBackground = scene.background || 'bg_apartment_morning';
+            if (!availableBackgrounds.includes(newBackground)) {
+                backgroundElement.style.backgroundImage = "url('/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png')";
+                dialogueElement.innerHTML += "<p style='color: red;'>[Заглушка: Фон " + newBackground + " отсутствует]</p>";
             } else {
-                showPasswordScreen();
+                backgroundElement.style.backgroundImage = `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
             }
-        };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const startGameBtn = document.getElementById('start-game');
-            const continueGameBtn = document.getElementById('continue-game');
-            const showPasswordBtn = document.getElementById('show-password');
-            const passwordSubmitBtn = document.getElementById('password-submit');
-            const menuBtn = document.getElementById('menu-btn');
-            const statsBtn = document.getElementById('stats');
-            const galleryBtn = document.getElementById('gallery-btn');
-            const languageBtn = document.getElementById('language-btn');
-            const languageIcon = document.getElementById('language-icon');
-            const title = document.getElementById('title');
+            // Персонажи
+            charLeft.style.opacity = '0';
+            charRight.style.opacity = '0';
+            if (scene.characterLeft && availableCharacters.includes(scene.characterLeft)) {
+                charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${scene.characterLeft.split('_')[0]}/${scene.characterLeft}.png')`;
+                charLeft.style.opacity = '1';
+            } else if (scene.characterLeft) {
+                dialogueElement.innerHTML += "<p style='color: red;'>[Заглушка: Персонаж " + scene.characterLeft + " отсутствует]</p>";
+            }
+            if (scene.characterRight && availableCharacters.includes(scene.characterRight)) {
+                charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${scene.characterRight.split('_')[0]}/${scene.characterRight}.png')`;
+                charRight.style.opacity = '1';
+            } else if (scene.characterRight) {
+                dialogueElement.innerHTML += "<p style='color: red;'>[Заглушка: Персонаж " + scene.characterRight + " отсутствует]</p>";
+            }
 
-            updateLanguage(stats.language);
+            // Звуки (заглушка)
+            if (scene.sound || scene.music) {
+                console.log("[Заглушка: Звук " + (scene.sound || scene.music) + " отсутствует]");
+            }
 
-            startGameBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                checkTempPassword(() => startNewGame());
-            });
+            // Диалог
+            speakerElement.textContent = scene.speaker[stats.language];
+            dialogueElement.textContent = scene.text[stats.language];
 
-            continueGameBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                checkTempPassword(() => loadSession(() => startGame()));
-            });
-
-            showPasswordBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                document.getElementById('password-form').style.display = 'flex';
-                document.querySelector('.start-buttons').style.display = 'none';
-            });
-
-            passwordSubmitBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handlePasswordSubmit(e);
-            });
-
-            menuBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleMenu(e);
-            });
-
-            statsBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleShowStats(e);
-            });
-
-            galleryBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-            });
-
-            languageBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                stats.language = stats.language === "ru" ? "en" : "ru";
-                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
-                updateLanguage(stats.language);
-                saveSession();
-            });
-
-            const backButton = document.createElement('button');
-            backButton.id = 'back-button';
-            backButton.textContent = stats.language === "ru" ? "Назад" : "Back";
-            backButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                document.getElementById('password-form').style.display = 'none';
-                document.querySelector('.start-buttons').style.display = 'flex';
-            });
-            document.getElementById('password-form').appendChild(backButton);
-
-            getFromStorage('last_session')
-                .then(session => {
-                    if (session) {
-                        document.getElementById('start-screen').style.display = 'flex';
-                    } else {
-                        checkAuthorization();
+            // Выборы
+            choicesElement.innerHTML = '';
+            if (scene.choices) {
+                scene.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = choice.text[stats.language];
+                    if (choice.cost && stats.diamonds < choice.cost) {
+                        btn.disabled = true;
+                        btn.textContent += ` (${choice.cost} 💎)`;
                     }
+                    btn.onclick = () => makeChoice(choice);
+                    choicesElement.appendChild(btn);
                 });
-        });
-
-        function updateLanguage(lang) {
-            document.getElementById('start-game').textContent = document.getElementById('start-game').getAttribute(`data-${lang}`);
-            document.getElementById('continue-game').textContent = document.getElementById('continue-game').getAttribute(`data-${lang}`);
-            document.getElementById('show-password').textContent = document.getElementById('show-password').getAttribute(`data-${lang}`);
-            document.getElementById('password-submit').textContent = document.getElementById('password-submit').getAttribute(`data-${lang}`);
-            document.getElementById('menu-btn').textContent = document.getElementById('menu-btn').getAttribute(`data-${lang}`);
-            document.getElementById('gallery-btn').textContent = document.getElementById('gallery-btn').getAttribute(`data-${lang}`);
-            const title = document.getElementById('title');
-            title.innerHTML = lang === "ru" ? 
-                '<span>Сердце</span><span>на перекрёстке</span>' : 
-                '<span>Heart</span><span>at the Crossroads</span>';
-            title.className = lang === "ru" ? "ru" : "en";
-        }
-
-        async function handlePasswordSubmit(e) {
-            const inputPassword = document.getElementById('password-input').value;
-            if (inputPassword === tempPassword) {
-                startNewGame();
-            } else if (inputPassword === correctPassword) {
-                const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-                if (userId && !authorizedUsers.includes(userId)) {
-                    authorizedUsers.push(userId);
-                    await saveToStorage('authorized_users', authorizedUsers);
-                }
-                stats.isAuthorized = true;
-                startNewGame();
             } else {
-                alert('Неверный пароль!');
+                dialogueBox.onclick = nextScene;
             }
         }
 
-        function checkTempPassword(callback) {
-            getFromStorage('tempAccessGranted').then(granted => {
-                if (granted) {
-                    callback();
+        // Следующая сцена
+        function nextScene() {
+            currentSceneIndex++;
+            if (currentSceneIndex >= currentChapter.scenes.length) {
+                loadChapter(2); // Переход ко второй главе (вызовет заглушку)
+            } else {
+                showScene();
+            }
+        }
+
+        // Выбор
+        function makeChoice(choice) {
+            if (choice.cost) {
+                stats.diamonds -= choice.cost;
+            }
+            if (choice.effects) {
+                applyEffects(choice.effects);
+            }
+            if (choice.nextScene) {
+                currentSceneIndex = choice.nextScene;
+                showScene();
+            } else if (choice.nextChapter) {
+                loadChapter(choice.nextChapter);
+            }
+        }
+
+        // Применение эффектов
+        function applyEffects(effects) {
+            Object.keys(effects).forEach(key => {
+                if (key === 'relationships') {
+                    Object.keys(effects[key]).forEach(char => {
+                        stats.relationships[char] += effects[key][char];
+                    });
                 } else {
-                    const input = prompt('Игра временно закрыта на доработку. Введите временный пароль:');
-                    if (input === tempPassword || input === correctPassword) {
-                        saveToStorage('tempAccessGranted', true);
-                        if (input === correctPassword) {
-                            stats.isAuthorized = true;
-                        }
-                        callback();
-                    } else {
-                        alert('Неверный временный пароль! Доступ к игре ограничен.');
-                    }
+                    stats[key] += effects[key];
                 }
             });
         }
 
-        function startNewGame() {
-            currentChapter = 1;
-            currentScene = 0;
-            choices = [];
-            stats = {
-                crown: 0,
-                heart: 0,
-                leaf: 0,
-                diamonds: 10,
-                relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-                appearance: "style1",
-                isAuthorized: stats.isAuthorized,
-                memories: stats.memories || [],
-                language: stats.language || "ru"
-            };
-            currentBackground = null;
-            saveSession();
-            startGame();
+        // Заглушка для глав 2 и выше
+        function showChapterPlaceholder(chapterId) {
+            dialogueBox.innerHTML = `<p style='color: yellow;'>Глава ${chapterId} находится в разработке.</p>`;
+            choicesElement.innerHTML = '';
+            backgroundElement.style.backgroundImage = "url('/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png')";
+            charLeft.style.opacity = '0';
+            charRight.style.opacity = '0';
         }
 
-        function createChoiceButton(choice) {
-            const btn = document.createElement('button');
-            btn.textContent = choice.cost && !choice.text[stats.language].includes(`${choice.cost} алмазов`) 
-                ? `${choice.text[stats.language]} (${choice.cost} алмазов)` 
-                : choice.text[stats.language];
-            btn.className = 'choice-btn';
-            if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
-            if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
-            return btn;
-        }
+        // Старт игры
+        startBtn.onclick = () => {
+            startScreen.style.display = 'none';
+            dialogueBox.style.opacity = '1';
+            preloadAssets();
+            loadChapter(1);
+        };
 
-        function showPasswordScreen() {
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('language-btn').style.display = 'block';
-        }
-
-        function startGame() {
-            console.log('Запуск игры с текущими параметрами:', { currentChapter, currentScene });
-            
-            document.getElementById('game-container').style.display = 'block';
-            document.getElementById('background').style.display = 'none';
-            document.getElementById('character-left').style.display = 'none';
-            document.getElementById('character-right').style.display = 'none';
-            document.getElementById('dialogue-box').style.display = 'none';
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('progress-bar').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('language-btn').style.display = 'none';
-            
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.id = 'loading-overlay';
-            loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10;display:flex;justify-content:center;align-items:center;color:#fff;';
-            loadingOverlay.innerHTML = '<span>Загрузка...</span>';
-            document.body.appendChild(loadingOverlay);
-            
-            preloadAssets(currentChapter).then(() => {
-                console.log('Все ассеты загружены');
-                loadChapter(currentChapter).then(() => {
-                    console.log('Глава загружена:', scriptData);
-                    document.getElementById('background').style.display = 'block';
-                    document.getElementById('character-left').style.display = 'block';
-                    document.getElementById('character-right').style.display = 'block';
-                    document.getElementById('dialogue-box').style.display = 'block';
-                    document.getElementById('menu').style.display = 'flex';
-                    document.getElementById('progress-bar').style.display = 'block';
-                    
-                    const statsBtn = document.getElementById('stats');
-                    statsBtn.style.display = stats.isAuthorized ? 'block' : 'none';
-                    updateDiamondsDisplay();
-                    
-                    loadingOverlay.remove();
-                    showScene(currentScene);
-                }).catch(error => {
-                    console.error('Не удалось запустить игру:', error);
-                    document.getElementById('dialogue-text').textContent = "Ошибка запуска игры!";
-                    loadingOverlay.remove();
-                });
-            });
-        }
-
-        function updateDiamondsDisplay() {
-            document.getElementById('diamonds-count').textContent = stats.diamonds;
-        }
-
-        function preloadAssets(chapterId) {
-            const loadingStatus = document.createElement('div');
-            loadingStatus.id = 'loading-status';
-            loadingStatus.style.cssText = 'position:fixed;bottom:10px;left:10px;color:white;font-size:12px;z-index:11;';
-            document.body.appendChild(loadingStatus);
-            
-            const images = [
-                '/heart_at_crossroads/assets/backgrounds/start_screen.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_office_day.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_office_night.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_office_night_end.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_thoughtful_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_worry_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_happy_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_sad_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_worry_style1.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_surprised_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
-                '/heart_at_crossroads/assets/ui/diamonds.png',
-                '/heart_at_crossroads/assets/ui/crown.png',
-                '/heart_at_crossroads/assets/ui/heart.png',
-                '/heart_at_crossroads/assets/ui/leaf.png'
-            ];
-            let loaded = 0;
-            
-            return Promise.all(images.map(src => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = src;
-                    img.onload = () => {
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.warn(`Не удалось загрузить ${src}`);
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        resolve();
-                    };
-                });
-            })).finally(() => {
-                loadingStatus.remove();
-            });
-        }
-
-        async function loadSession(callback) {
-            const session = await getFromStorage('last_session');
-            if (session) {
-                currentChapter = session.currentChapter;
-                currentScene = session.currentScene;
-                choices = session.choices;
-                stats = session.stats;
-            }
-            if (callback) callback();
-        }
-
-        async function saveSession() {
-            const session = { currentChapter, currentScene, choices, stats };
-            await saveToStorage('last_session', session);
-            updateDiamondsDisplay();
-        }
-
-        function loadChapter(chapterId) {
-            return fetch(`/heart_at_crossroads/data/chapter${chapterId}.json`, {
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Не удалось загрузить главу');
-                    return response.text();
-                })
-                .then(text => {
-                    const data = JSON.parse(text);
-                    if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                        throw new Error('Некорректный формат JSON');
-                    }
-                    scriptData = data;
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки главы:', error);
-                    document.getElementById('dialogue-text').textContent = "Ошибка загрузки главы.";
-                    throw error;
-                });
-        }
-
-        function saveChoice(choiceId, effects, memoryTag) {
-            choices.push(choiceId);
-            if (effects) {
-                for (let key in effects) {
-                    if (key === 'relationships') {
-                        for (let rel in effects[key]) {
-                            stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
-                        }
-                    } else {
-                        stats[key] = (stats[key] || 0) + effects[key];
-                    }
-                }
-            }
-            if (memoryTag) {
-                stats.memories.push(memoryTag);
-                const notification = document.createElement('div');
-                notification.className = 'memory-notification';
-                notification.textContent = stats.language === "ru" ? "Вика запомнит ваш выбор" : "Vika will remember your choice";
-                document.getElementById('game-container').appendChild(notification);
-                setTimeout(() => notification.remove(), 3000);
-            }
-            saveSession();
-        }
-
-        function showScene(sceneId) {
-            if (!scriptData || !scriptData.scenes) {
-                document.getElementById('dialogue-text').textContent = "Ошибка: данные сценария не загружены.";
-                return;
-            }
-
-            let scene;
-            if (typeof sceneId === 'number') {
-                scene = scriptData.scenes[sceneId];
-            } else {
-                scene = scriptData.scenes.find(s => s.id === sceneId);
-            }
-
-            if (!scene) {
-                if (currentChapter >= 2) {
-                    showChapterPlaceholder();
-                    return;
-                }
-                document.getElementById('dialogue-text').textContent = "Сцена не найдена. Конец главы.";
-                return;
-            }
-
-            if (!checkSceneCondition(scene)) {
-                currentScene++;
-                showScene(currentScene);
-                return;
-            }
-
-            const progressElement = document.getElementById('progress');
-            const totalScenes = scriptData.scenes.length;
-            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-            progressElement.style.width = `${progressPercent}%`;
-
-            const backgroundElement = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogueElement = document.getElementById('dialogue-text');
-            const dialogueBox = document.querySelector('.dialogue-box');
-
-            const newBackground = scene.background || 'none';
-            const isLastScene = scene.id === 24;
-            const shouldFade = currentBackground !== newBackground || isLastScene;
-
-            const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
-                currentBackground = newBackground;
-                charLeft.style.backgroundImage = 'none';
-                charRight.style.backgroundImage = 'none';
-                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-                if (scene.characterLeft) {
-                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterLeft;
-                    charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/anna/${leftChar}.png')`;
-                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-                    if (scene.id === 9 || scene.id === 19) charLeft.classList.add('shiver');
-                    if (scene.id === 6) charLeft.classList.add('heartbeat');
-                }
-                if (scene.characterRight) {
-                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterRight;
-                    charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/vika/${rightChar}.png')`;
-                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-                    if (scene.id === 21) charRight.classList.add('heartbeat');
-                }
-
-                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-                if (dialogueBox.touchHandler) {
-                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.touchHandler = null;
-                }
-
-                const particlesContainer = document.getElementById('particles');
-                particlesContainer.innerHTML = '';
-                if (scene.background === 'bg_street_night') {
-                    for (let i = 0; i < 50; i++) {
-                        const particle = document.createElement('div');
-                        particle.className = 'particle';
-                        particle.style.left = `${Math.random() * 100}%`;
-                        particle.style.animation = `fall ${2 + Math.random() * 3}s linear infinite`;
-                        particle.style.animationDelay = `${Math.random() * 5}s`;
-                        particlesContainer.appendChild(particle);
-                    }
-                }
-
-                document.getElementById('speaker-name').textContent = speakerName;
-                typeText(scene.text[stats.language], dialogueElement, () => {
-                    if (scene.choices && scene.choices.length > 0) {
-                        document.body.ontouchstart = null;
-                        scene.choices.forEach(choice => {
-                            const btn = createChoiceButton(choice);
-                            if (choice.condition && !checkCondition(choice.condition)) {
-                                btn.style.display = 'none';
-                            } else if (choice.cost && stats.diamonds < choice.cost) {
-                                btn.disabled = true;
-                            } else {
-                                btn.addEventListener('touchstart', (e) => {
-                                    e.preventDefault();
-                                    if (choice.cost) stats.diamonds -= choice.cost;
-                                    updateDiamondsDisplay();
-                                    saveChoice(choice.id, choice.effects, choice.memoryTag);
-                                    if (choice.effects) showChoiceEffects(choice.effects);
-                                    currentScene = choice.nextScene;
-                                    showScene(currentScene);
-                                });
-                            }
-                            dialogueBox.appendChild(btn);
-                        });
-
-                        const dialogueBoxHeight = dialogueBox.offsetHeight;
-                        const windowHeight = window.innerHeight;
-                        if (dialogueBoxHeight > windowHeight * 0.7) {
-                            const offset = dialogueBoxHeight - (windowHeight * 0.7);
-                            dialogueBox.style.bottom = `${offset}px`;
-                        } else {
-                            dialogueBox.style.bottom = '0';
-                        }
-                    } else if (scene.nextScene !== undefined) {
-                        dialogueBox.touchHandler = (e) => {
-                            e.preventDefault();
-                            if (!isTyping) {
-                                currentScene = scene.nextScene;
-                                saveSession();
-                                showScene(currentScene);
-                            }
-                        };
-                        dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-                        dialogueBox.style.bottom = '0';
-                    }
-                });
-            };
-
-            if (shouldFade) {
-                fadeOut(() => {
-                    applyScene();
-                    fadeIn();
-                });
-            } else {
-                applyScene();
-            }
-        }
-
-        function showChoiceEffects(effects) {
-            for (let key in effects) {
-                if (key !== 'relationships') {
-                    const feedback = document.createElement('img');
-                    feedback.className = 'choice-feedback';
-                    feedback.src = `/heart_at_crossroads/assets/ui/${key}.png`;
-                    feedback.onerror = () => {
-                        console.warn(`Изображение для ${key} не найдено`);
-                        feedback.src = '/heart_at_crossroads/assets/ui/default_effect.png';
-                    };
-                    document.getElementById('game-container').appendChild(feedback);
-                    setTimeout(() => feedback.remove(), 3000);
-                }
-            }
-        }
-
-        function showChapterPlaceholder() {
-            const existingPlaceholder = document.querySelector('.placeholder-message');
-            if (existingPlaceholder) existingPlaceholder.remove();
-            const placeholder = document.createElement('div');
-            placeholder.className = 'placeholder-message';
-            placeholder.textContent = 'Временная заглушка: эта глава находится в разработке. Мы сейчас отлаживаем первую главу и сцены. Пожалуйста, перезапустите игру.';
-            document.getElementById('game-container').appendChild(placeholder);
-            document.getElementById('character-left').style.backgroundImage = 'none';
-            document.getElementById('character-right').style.backgroundImage = 'none';
-            document.getElementById('speaker-name').textContent = '';
-            document.getElementById('dialogue-text').textContent = '';
-            document.body.ontouchstart = (e) => {
-                e.preventDefault();
-                placeholder.remove();
-                currentChapter = 1;
-                currentScene = 0;
-                loadChapter(1).then(() => showScene(currentScene));
-            };
-        }
-
-        function checkSceneCondition(scene) {
-            if (!scene.condition) return true;
-            return checkCondition(scene.condition);
-        }
-
-        function checkCondition(condition) {
-            for (let key in condition) {
-                const value = key.startsWith('relationships.') ? stats.relationships[key.split('.')[1]] || 0 : stats[key] || 0;
-                const cond = condition[key];
-                if (cond.startsWith('>=')) return value >= parseInt(cond.slice(2));
-                if (cond.startsWith('>')) return value > parseInt(cond.slice(1));
-                if (key === 'crown' && cond === '>heart+leaf') return value > (stats.heart + stats.leaf);
-                return value === parseInt(cond);
-            }
-            return true;
-        }
-
-        function typeText(text, element, callback) {
-            element.textContent = '';
-            if (element.typeTimer) {
-                clearTimeout(element.typeTimer);
-            }
-
-            isTyping = true;
-            let i = 0;
-            const speed = 30;
-
-            function type() {
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    element.typeTimer = setTimeout(type, speed);
-                } else {
-                    isTyping = false;
-                    delete element.typeTimer;
-                    if (callback) callback();
-                }
-            }
-            type();
-
-            const dialogueBox = document.querySelector('.dialogue-box');
-            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-            dialogueBox.skipHandler = (e) => {
-                e.preventDefault();
-                if (isTyping) {
-                    clearTimeout(element.typeTimer);
-                    element.textContent = text;
-                    isTyping = false;
-                    if (callback) callback();
-                }
-            };
-            dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-        }
-
-        function fadeOut(callback) {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.add('fade-out');
-            charLeft.classList.add('fade-out');
-            charRight.classList.add('fade-out');
-            dialogue.classList.add('fade-out');
-            setTimeout(callback, 1000);
-        }
-
-        function fadeIn() {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.remove('fade-out');
-            charLeft.classList.remove('fade-out');
-            charRight.classList.remove('fade-out');
-            dialogue.classList.remove('fade-out');
-        }
-
-        function handleMenu(e) {
-            e.preventDefault();
-            currentChapter = 1;
-            currentScene = 0;
-            choices = [];
-            stats = {
-                crown: 0,
-                heart: 0,
-                leaf: 0,
-                diamonds: 10,
-                relationships: { mark: 0, lera: 0, vika: 0, sergey: 0 },
-                appearance: "style1",
-                isAuthorized: stats.isAuthorized,
-                memories: [],
-                language: stats.language
-            };
-            currentBackground = null;
-            const existingPlaceholder = document.querySelector('.placeholder-message');
-            if (existingPlaceholder) existingPlaceholder.remove();
-            saveSession();
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('language-btn').style.display = 'block';
-        }
-
-        function handleShowStats(e) {
-            e.preventDefault();
-            alert(`Короны: ${stats.crown}\nСердце: ${stats.heart}\nЛист: ${stats.leaf}\nАлмазы: ${stats.diamonds}\nОтношения:\nМарк: ${stats.relationships.mark}\nЛера: ${stats.relationships.lera}\nВика: ${stats.relationships.vika}\nСергей: ${stats.relationships.sergey}`);
-        }
+        // Инициализация
+        dialogueBox.style.opacity = '0';
     </script>
 </body>
 </html>
