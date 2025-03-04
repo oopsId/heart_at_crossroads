@@ -1,0 +1,234 @@
+{
+    "chapter": "Finals",
+    "title": {
+        "ru": "Финалы",
+        "en": "Endings"
+    },
+    "endings": [
+        {
+            "id": "freedom_with_dima",
+            "title": {
+                "ru": "Свобода с Димой",
+                "en": "Freedom with Dima"
+            },
+            "requirements": {
+                "heart": 15
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_road_day_summer",
+                    "characterLeft": "anna_smile_style1_summer",
+                    "characterRight": "dima_happy_summer",
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Лето раскрасило дорогу слепящим солнцем, ветер рвал волосы, футболка липла к телу, сердце билось в такт рёву мотора. Дима гнал, льняная рубашка развевалась, его смех — как крик свободы, заглушал всё — боль, страх, пустоту города, что остался позади. Я смотрела на него, и слёзы жгли глаза — не от ветра, а от того, что я бросила всё ради этого мига. ‘Здесь нет никого, только ты и я’ — строка из песни всплыла в голове, как эхо этого мгновения. Я выбрала его, зная, что он может исчезнуть в любой момент, и всё равно не могу дышать без него.",
+                        "en": "Summer drenched the road in blinding sun, wind tore at my hair, my t-shirt clung to my skin, my heart pounded with the engine’s roar. Dima drove, his linen shirt flapping, his laughter — a cry of freedom — drowned out everything: the pain, the fear, the emptiness of the city left behind. I looked at him, tears burning my eyes — not from the wind, but from abandoning everything for this fleeting moment. ‘There’s no one here, just you and me’ — a song line surfaced in my mind, echoing this instant. I chose him, knowing he could vanish any second, and still I can’t breathe without him."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Лето раскрасило дорогу солнцем, ветер рвал волосы — ты ведь знаешь этот путь, да? Дима гнал, льняная рубашка развевалась, его смех заглушал всё, как тогда, только теперь я держала тот старый билет, который он спрятал в бардачке. Слёзы жгли глаза — не от ветра, а от того, что я выбрала его снова. ‘Здесь нет никого, только ты и я’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — его свободы, его ветра.",
+                        "en": "Summer painted the road with sun, wind tore at my hair — you know this path, don’t you? Dima drove, his linen shirt flapping, his laughter drowning everything, like before, only now I held that old ticket he hid in the glovebox. Tears burned my eyes — not from the wind, but from choosing him again. ‘There’s no one here, just you and me’ — now it’ll be special, now I won’t falter, I know exactly what I want — his freedom, his wind."
+                    },
+                    "sound": "sfx_car_engine",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна и Дима растворились в пыли летних дорог, их жизнь — вихрь закатов и кадров, где каждый миг — последний. Его тёмная сторона рвала её сердце, но она бежала с ним, пока могла, зная: это её свобода, её разрыв.",
+                "en": "Anna and Dima vanished into the dust of summer roads, their life a whirlwind of sunsets and frames, every moment the last. His dark side tore at her heart, but she ran with him as long as she could, knowing: this was her freedom, her breaking point."
+            }
+        },
+        {
+            "id": "silence_with_mark",
+            "title": {
+                "ru": "Тишина с Марком",
+                "en": "Silence with Mark"
+            },
+            "requirements": {
+                "heart": 15,
+                "leaf": 10
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_coffee_shop_summer",
+                    "characterLeft": "anna_smile_style2_summer",
+                    "characterRight": "mark_smile",
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Кофейня дышала летним теплом, окна впускали мягкий свет, запах кофе обволакивал, как объятия. Я сидела в футболке, Марк напротив — очки сползли, улыбка дрожала, как будто он боялся, что я исчезну. Что я чувствую? Тишина заполнила меня до краёв, и слёзы текли — не от боли, а от того, что я нашла его, нашла покой среди шума мира. ‘Ты моя, моя, моя меланхолия’ — песня шепнула в сердце, и я поняла: это он, мой дом, мой разрыв, который я не отдам никому.",
+                        "en": "The coffee shop breathed summer warmth, windows let in soft light, the scent of coffee wrapped around me like an embrace. I sat in a t-shirt, Mark across — glasses slipping, smile trembling, as if he feared I’d vanish. What do I feel? Silence filled me to the brim, and tears fell — not from pain, but from finding him, finding peace amid the world’s noise. ‘You’re my, my, my melancholy’ — the song murmured in my heart, and I knew: he’s my home, my breaking point, one I’d never give up."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Кофейня дышала теплом — ты ведь знаешь этот уют, да? Я сидела в футболке, Марк напротив — очки сползли, улыбка дрожала, но теперь я держала тот старый диск с его кодом, где он писал обо мне. Слёзы текли — не от боли, а от того, что я выбрала его снова. ‘Ты моя, моя, моя меланхолия’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — его тишины, его света.",
+                        "en": "The coffee shop breathed warmth — you know this coziness, don’t you? I sat in a t-shirt, Mark across — glasses slipping, smile trembling, but now I held that old disc with his code where he wrote about me. Tears fell — not from pain, but from choosing him again. ‘You’re my, my, my melancholy’ — now it’ll be special, now I won’t falter, I know exactly what I want — his silence, his light."
+                    },
+                    "sound": "sfx_coffee_shop_ambient",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна и Марк сбежали от ‘TrendWave’ в маленькую летнюю гавань, где кофе стал их спасением, а тишина — их криком. Его тайны остались позади, но каждый взгляд его глаз рвал её душу — это её покой, её вечный разрыв.",
+                "en": "Anna and Mark fled ‘TrendWave’ to a small summer haven, where coffee became their salvation and silence their scream. His secrets stayed behind, but every glance of his eyes tore her soul — this was her peace, her endless breaking."
+            }
+        },
+        {
+            "id": "summit_with_sergey",
+            "title": {
+                "ru": "Вершина с Сергеем",
+                "en": "Summit with Sergey"
+            },
+            "requirements": {
+                "crown": 15
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_webstudio_night",
+                    "characterLeft": "anna_neutral_style1_summer",
+                    "characterRight": "sergey_smile_summer",
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Офис ‘TrendWave’ пылал в летнюю ночь, белые стены слепили, золотые линии резали тьму. Сергей рядом — модная рубашка, лёгкая щетина, голос звенел хипстерским задором: ‘Ань, мы в топе!’ Что я чувствую? Сила захватила меня, но внутри — холод, как будто я продала душу за этот свет. ‘Начало есть, но нет продолжения’ — песня ударила в виски, и слёзы жгли — я выбрала его, его вершину, и теперь стою одна на краю, где нет тепла.",
+                        "en": "The ‘TrendWave’ office blazed in the summer night, white walls blinding, golden lines slicing the dark. Sergey beside me — trendy shirt, light stubble, voice ringing with hipster zeal: ‘Anya, we’re on top!’ What do I feel? Strength seized me, but inside — a chill, like I sold my soul for this light. ‘There’s a start, but no continuation’ — the song hit my temples, and tears burned — I chose him, his summit, and now I stand alone at the edge, where there’s no warmth."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Офис ‘TrendWave’ пылал в летнюю ночь — ты ведь знаешь этот свет, да? Белые стены слепили, золотые линии резали тьму. Сергей рядом — модная рубашка, голос звенел: ‘Ань, мы в топе!’ Теперь я держала тот старый ключ от офиса, который он мне оставил. Слёзы жгли — я выбрала его снова. ‘Начало есть, но нет продолжения’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — его вершины, его силы.",
+                        "en": "The ‘TrendWave’ office blazed in the summer night — you know this light, don’t you? White walls blinded, golden lines sliced the dark. Sergey beside me — trendy shirt, voice ringing: ‘Anya, we’re on top!’ Now I held that old office key he left me. Tears burned — I chose him again. ‘There’s a start, but no continuation’ — now it’ll be special, now I won’t falter, I know exactly what I want — his summit, his strength."
+                    },
+                    "sound": "sfx_office_night_ambient",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна и Сергей вознесли ‘TrendWave’ к вершинам лета, но её сердце разбилось о холод его амбиций. Друзья ушли, любовь угасла, и она знала: это её триумф, её разрыв, её ледяная цена.",
+                "en": "Anna and Sergey raised ‘TrendWave’ to summer peaks, but her heart shattered against the cold of his ambition. Friends faded, love died, and she knew: this was her triumph, her breaking, her icy cost."
+            }
+        },
+        {
+            "id": "lonely_path",
+            "title": {
+                "ru": "Одинокий путь",
+                "en": "Lonely Path"
+            },
+            "requirements": {
+                "crown": "> heart + leaf"
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_style1_dusk_end_summer",
+                    "characterLeft": "anna_thoughtful_style1_summer",
+                    "characterRight": null,
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Летний вечер укрыл город тёплыми тенями, ветерок касался кожи, футболка липла к телу, кроссовки бились о землю. Я шла одна, закат резал глаза, и слёзы текли — не от ветра, а от пустоты, что я выбрала. Что я чувствую? Свобода, что рвёт грудь, и одиночество, что душит. ‘По венам, словно вином белым, белым’ — песня звенела, как мой крик в тишине. Я выбрала себя, и этот путь — мой разрыв.",
+                        "en": "Summer evening cloaked the city in warm shadows, a breeze brushed my skin, my t-shirt clung to me, sneakers struck the ground. I walked alone, the sunset cutting my eyes, tears falling — not from the wind, but from the emptiness I chose. What do I feel? Freedom tearing my chest, loneliness choking me. ‘Through my veins, like white, white wine’ — the song rang, my scream in the silence. I chose myself, and this path is my breaking."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Летний вечер укрыл город тенями — ты ведь знаешь этот закат, да? Ветерок касался кожи, футболка липла, кроссовки бились о землю, а в кармане был тот старый билет на поезд, так и не использованный. Слёзы текли — я выбрала себя снова. ‘По венам, словно вином белым, белым’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — свой путь, свою тишину.",
+                        "en": "Summer evening cloaked the city in shadows — you know this sunset, don’t you? A breeze brushed my skin, my t-shirt clung, sneakers struck the ground, and in my pocket was that old unused train ticket. Tears fell — I chose myself again. ‘Through my veins, like white, white wine’ — now it’ll be special, now I won’t falter, I know exactly what I want — my path, my silence."
+                    },
+                    "sound": "sfx_footsteps_sneakers",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна ушла в летнюю ночь, оставив всё за спиной. Она искала себя в закатах, где ветер был её единственным спутником, и слёзы стали её правдой. Это её путь, её разрыв, её бесконечное лето.",
+                "en": "Anna stepped into the summer night, leaving everything behind. She sought herself in sunsets, where the wind was her only companion, and tears became her truth. This was her path, her breaking, her endless summer."
+            }
+        },
+        {
+            "id": "friendship_above_all",
+            "title": {
+                "ru": "Дружба превыше всего",
+                "en": "Friendship Above All"
+            },
+            "requirements": {
+                "leaf": 15
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_webstudio_day_summer",
+                    "characterLeft": "anna_smile_style1_summer",
+                    "characterRight": "vika_happy_style1_summer",
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Офис ‘TrendWave’ сиял под летним солнцем, белые стены отражали тепло, Вика рядом — платье лёгкое, улыбка рвала сердце. Я смотрела на неё, и слёзы текли — от боли прощения, от счастья, что она здесь. Что я чувствую? Связь, что сильнее всего, что я потеряла. ‘Держи в облаках, руки на руках’ — песня дрожала в груди, как наш обет. Я выбрала её, и этот разрыв стал моим спасением.",
+                        "en": "The ‘TrendWave’ office glowed under summer sun, white walls reflecting warmth, Vika beside me — light dress, smile tearing my heart. I looked at her, tears streaming — from the pain of forgiveness, from the joy that she’s here. What do I feel? A bond stronger than all I’ve lost. ‘Hold me in the clouds, hands on hands’ — the song trembled in my chest, our vow. I chose her, and this breaking became my salvation."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Офис ‘TrendWave’ сиял под солнцем — ты ведь знаешь этот свет, да? Вика рядом — платье лёгкое, улыбка рвала сердце, а в руках я держала тот старый браслет, что она спрятала, чтобы загладить вину. Слёзы текли — я выбрала её снова. ‘Держи в облаках, руки на руках’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — её дружбы, её тепла.",
+                        "en": "The ‘TrendWave’ office glowed under summer sun — you know this light, don’t you? Vika beside me — light dress, smile tearing my heart, and in my hands I held that old bracelet she hid to make amends. Tears streamed — I chose her again. ‘Hold me in the clouds, hands on hands’ — now it’ll be special, now I won’t falter, I know exactly what I want — her friendship, her warmth."
+                    },
+                    "sound": "sfx_office_ambient",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна и Вика остались вместе, сшив разорванное лето нитями дружбы. Они пережили тени, но каждый взгляд Вики рвал Анну счастьем и болью. Это её дом, её разрыв, её вечное тепло.",
+                "en": "Anna and Vika stayed together, stitching torn summer with threads of friendship. They survived shadows, but every glance from Vika tore Anna with joy and pain. This was her home, her breaking, her eternal warmth."
+            }
+        },
+        {
+            "id": "new_start",
+            "title": {
+                "ru": "Новый старт",
+                "en": "New Start"
+            },
+            "requirements": {
+                "crown": 10,
+                "heart": 10,
+                "leaf": 10
+            },
+            "scenes": [
+                {
+                    "id": 0,
+                    "background": "bg_style1_dusk_end_summer",
+                    "characterLeft": "anna_neutral_style1_summer",
+                    "characterRight": null,
+                    "speaker": {
+                        "ru": "Анна",
+                        "en": "Anna"
+                    },
+                    "text": {
+                        "ru": "Летний вечер укрыл город тёплым светом, ветерок касался лица, футболка липла к телу, кроссовки бились о землю. Я стояла, глядя на закат, и слёзы текли — от всего, что я любила и отпустила. Что я чувствую? Баланс, что рвёт меня пополам, и надежду, что я найду себя. ‘Я пою лишь для тебя любовные слова’ — песня звенела, как мой крик в пустоту. Я выбрала новый старт, и этот разрыв — мой свет.",
+                        "en": "Summer evening draped the city in warm light, a breeze brushed my face, my t-shirt clung to me, sneakers struck the ground. I stood, watching the sunset, tears falling — for all I loved and let go. What do I feel? Balance tearing me in two, and hope that I’ll find myself. ‘I sing love words just for you’ — the song rang, my cry into the void. I chose a new start, and this breaking is my light."
+                    },
+                    "second_playthrough_text": {
+                        "ru": "Летний вечер укрыл город тёплым светом — ты ведь знаешь этот закат, да? Ветерок касался лица, футболка липла, кроссовки бились о землю, а в сумке был тот старый билет, который я так и не использовала. Слёзы текли — я выбрала новый старт снова. ‘Я пою лишь для тебя любовные слова’ — теперь всё будет по-особенному, теперь я не ошибусь, я точно знаю, чего хочу — себя, свой свет.",
+                        "en": "Summer evening draped the city in warm light — you know this sunset, don’t you? A breeze brushed my face, my t-shirt clung, sneakers struck the ground, and in my bag was that old ticket I never used. Tears fell — I chose a new start again. ‘I sing love words just for you’ — now it’ll be special, now I won’t falter, I know exactly what I want — myself, my light."
+                    },
+                    "sound": "sfx_style1_ambient",
+                    "music": "ending_song_white.mp3",
+                    "epilogue_style": "running_text"
+                }
+            ],
+            "epilogue": {
+                "ru": "Анна ушла в летний закат, оставив всё, что рвало её душу. Она выбрала время, чтобы собрать себя заново, и каждый шаг был болью и светом. Это её новый старт, её разрыв, её бесконечная дорога.",
+                "en": "Anna stepped into a summer sunset, leaving all that tore her soul. She chose time to piece herself anew, every step pain and light. This was her new start, her breaking, her endless road."
+            }
+        }
+    ]
+}

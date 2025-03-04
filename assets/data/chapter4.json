@@ -1,0 +1,338 @@
+{
+    "chapter": 4,
+    "title": {
+        "ru": "Свет и тень",
+        "en": "Light and Shadow"
+    },
+    "scenes": [
+        {
+            "id": 0,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_style1",
+            "characterRight": "sergey_confident",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "Офис ‘TrendWave’ был залит дневным светом, но тени от золотых проводов падали на пол, как вопросы без ответов. Сергей подошёл ближе, его голос был тёплым, но острым: «Анна, ты мне нравишься. Не только для работы. Пойдём на кофе после?»",
+                "en": "The ‘TrendWave’ office was bathed in daylight, but shadows from golden wires fell across the floor like unanswered questions. Sergey stepped closer, his voice warm but sharp: ‘Anna, I like you. Not just for work. Coffee after?’"
+            },
+            "second_playthrough_text": {
+                "ru": "Офис ‘TrendWave’ был залит дневным светом, но тени от золотых проводов падали, как всегда — ты ведь помнишь это, да? Сергей подошёл ближе, его голос тёплый, но острый: «Анна, ты мне нравишься. Не только для работы. Пойдём на кофе после? Ты знаешь, что я уже спрашивал это, и всё равно жду твоего ответа, глядя на тот старый браслет от неё, который до сих пор ношу.»",
+                "en": "The ‘TrendWave’ office was bathed in daylight, but shadows from golden wires fell as always — you remember this, don’t you? Sergey stepped closer, his voice warm but sharp: ‘Anna, I like you. Not just for work. Coffee after? You know I’ve asked this before, and I still wait for your answer, looking at that old bracelet from her I still wear.’"
+            },
+            "sound": "sfx_office_ambient",
+            "music": "bgm_corporate_tension",
+            "choices": [
+                {
+                    "id": "yes",
+                    "text": {
+                        "ru": "Да, пойдём",
+                        "en": "Yes, let’s go"
+                    },
+                    "nextScene": 1,
+                    "effects": { "heart": 1, "relationships.sergey": 1 }
+                },
+                {
+                    "id": "no",
+                    "text": {
+                        "ru": "Не сейчас",
+                        "en": "Not now"
+                    },
+                    "nextScene": 2,
+                    "effects": { "leaf": 1 }
+                },
+                {
+                    "id": "premium",
+                    "text": {
+                        "ru": "А что ты имеешь в виду? (15 бриллиантов)",
+                        "en": "What do you mean? (15 diamonds)"
+                    },
+                    "nextScene": 3,
+                    "cost": 15,
+                    "effects": { "heart": 1, "relationships.sergey": 1 }
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_style1",
+            "characterRight": "sergey_smile",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Отлично. После работы жду.»",
+                "en": "‘Great. I’ll wait after work.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Отлично. После работы жду. Ты ведь знаешь, что я всегда держу слово, Ань — как тогда, когда обещал ей, но не смог?»",
+                "en": "‘Great. I’ll wait after work. You know I always keep my word, Anya — like back when I promised her but couldn’t?’"
+            },
+            "sound": "sfx_confident_step",
+            "music": null,
+            "nextScene": 4
+        },
+        {
+            "id": 2,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_style1",
+            "characterRight": "sergey_neutral",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Как хочешь. Но я не сдаюсь.»",
+                "en": "‘As you wish. But I don’t give up.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Как хочешь. Но я не сдаюсь — ты ведь видела это в прошлый раз, да? Даже когда всё пошло не так с ней.»",
+                "en": "‘As you wish. But I don’t give up — you saw that last time, didn’t you? Even when it all went wrong with her.’"
+            },
+            "sound": "sfx_subtle_sigh",
+            "music": null,
+            "nextScene": 4
+        },
+        {
+            "id": 3,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_surprised_style1",
+            "characterRight": "sergey_confident",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Ты другая. Не как все тут. Хочу узнать тебя лучше.»",
+                "en": "‘You’re different. Not like everyone here. I want to get to know you.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ты другая. Не как все тут. Хочу узнать тебя лучше — ты ведь знаешь, что я уже говорил это, Ань, но в прошлый раз не успел, пока она не начала угрожать.»",
+                "en": "‘You’re different. Not like everyone here. I want to get to know you — you know I’ve said this before, Anya, but last time I didn’t get the chance before she started threatening.’"
+            },
+            "sound": "sfx_quiet_whisper",
+            "music": "bgm_mystery_reveal",
+            "nextScene": 4
+        },
+        {
+            "id": 4,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_style1",
+            "characterRight": "mark_neutral",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я отошла от Сергея, сердце стучало — его слова были светом, но с тенью. У лифта снова Марк — очки сползли, взгляд мягкий. Что я чувствую? Тепло? Или это иллюзия?",
+                "en": "I stepped away from Sergey, my heart pounding — his words were light, but shadowed. At the elevator, Mark again — glasses slipping, gaze soft. What do I feel? Warmth? Or is it an illusion?"
+            },
+            "second_playthrough_text": {
+                "ru": "Я отошла от Сергея, сердце стучало — его слова всё те же, ты ведь знаешь их, да? У лифта снова Марк — очки сползли, взгляд мягкий, но теперь я вижу старый шрам на его руке, о котором он никогда не говорил. Что я чувствую? Тепло? Или это опять иллюзия, которую я уже видела?",
+                "en": "I stepped away from Sergey, my heart pounding — his words the same, you know them, don’t you? At the elevator, Mark again — glasses slipping, gaze soft, but now I see an old scar on his hand he never mentioned. What do I feel? Warmth? Or is it another illusion I’ve already seen?"
+            },
+            "sound": "sfx_office_ambient",
+            "music": "bgm_corporate_tension",
+            "nextScene": 5
+        },
+        {
+            "id": 5,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_surprised_style1",
+            "characterRight": "mark_blush",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Я… э… хотел сказать… Ты мне нравишься. Не знаю, как это говорить.»",
+                "en": "‘I… uh… wanted to say… I like you. Don’t know how to put it.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Я… э… хотел сказать… Ты мне нравишься. Ты ведь знаешь, что я уже говорил это, Ань, но всё равно краснею, как тогда, когда прятал ту старую флешку с прошлым.»",
+                "en": "‘I… uh… wanted to say… I like you. You know I’ve said this before, Anya, but I still blush like back then, when I hid that old USB with my past.’"
+            },
+            "sound": "sfx_nervous_laugh",
+            "music": null,
+            "choices": [
+                {
+                    "id": "smile",
+                    "text": {
+                        "ru": "Улыбнуться: ‘Это мило’",
+                        "en": "Smile: ‘That’s sweet’"
+                    },
+                    "nextScene": 6,
+                    "effects": { "heart": 1, "relationships.mark": 1 }
+                },
+                {
+                    "id": "hesitate",
+                    "text": {
+                        "ru": "Сказать: ‘Я не знаю, что ответить’",
+                        "en": "Say: ‘I don’t know what to say’"
+                    },
+                    "nextScene": 7,
+                    "effects": { "leaf": 1 }
+                },
+                {
+                    "id": "premium",
+                    "text": {
+                        "ru": "Обнять его: ‘Спасибо, что сказал’ (20 бриллиантов)",
+                        "en": "Hug him: ‘Thanks for saying that’ (20 diamonds)"
+                    },
+                    "nextScene": 8,
+                    "cost": 20,
+                    "effects": { "heart": 1, "relationships.mark": 2 }
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_style1",
+            "characterRight": "mark_smile",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Рад, что не молчишь. Увидимся?»",
+                "en": "‘Glad you didn’t stay quiet. See you?’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Рад, что не молчишь. Увидимся? Ты ведь знаешь, что я всегда жду твоей улыбки, Ань, как тогда, у лифта.»",
+                "en": "‘Glad you didn’t stay quiet. See you? You know I always wait for your smile, Anya, like back then at the elevator.’"
+            },
+            "sound": "sfx_awkward_silence",
+            "music": null,
+            "nextScene": 9
+        },
+        {
+            "id": 7,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_thoughtful_style1",
+            "characterRight": "mark_neutral",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Понимаю. Я подожду.»",
+                "en": "‘I get it. I’ll wait.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Понимаю. Я подожду — ты ведь знаешь, что я всегда жду, Ань, даже после того, как ты ушла в прошлый раз.»",
+                "en": "‘I get it. I’ll wait — you know I always wait, Anya, even after you left last time.’"
+            },
+            "sound": "sfx_subtle_sigh",
+            "music": null,
+            "nextScene": 9
+        },
+        {
+            "id": 8,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_style1",
+            "characterRight": "mark_blush",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Ох… Спасибо. Это… неожиданно.»",
+                "en": "‘Oh… Thanks. That’s… unexpected.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ох… Спасибо. Это… неожиданно, но ты ведь знаешь, Ань, что я мечтал об этом ещё с той первой встречи у лифта.»",
+                "en": "‘Oh… Thanks. That’s… unexpected, but you know, Anya, I’ve dreamed of this since that first meeting at the elevator.’"
+            },
+            "sound": "sfx_heartfelt_moment",
+            "music": "bgm_upbeat_friendship",
+            "nextScene": 9
+        },
+        {
+            "id": 9,
+            "background": "bg_style1_night",
+            "characterLeft": "anna_neutral_style1",
+            "characterRight": "dima_confident",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "Ночь обняла город, и я вышла к клубу. Дима ждал у входа — кожаная куртка, камера на шее, улыбка яркая. «Ань, вечеринка у меня! Пойдём, будет шумно!»",
+                "en": "Night embraced the city, and I stepped out to the club. Dima waited at the entrance — leather jacket, camera around his neck, bright smile. ‘Anya, party at my place! Come on, it’ll be loud!’"
+            },
+            "second_playthrough_text": {
+                "ru": "Ночь обняла город, и я вышла к клубу — ты ведь знаешь эту сцену, да? Дима ждал у входа — кожаная куртка, камера на шее, улыбка яркая, но теперь я заметила старый конверт в его кармане, где он хранит деньги для долгов. «Ань, вечеринка у меня! Пойдём, будет шумно — как тогда, помнишь?»",
+                "en": "Night embraced the city, and I stepped out to the club — you know this scene, don’t you? Dima waited at the entrance — leather jacket, camera around his neck, bright smile, but now I noticed an old envelope in his pocket where he keeps money for debts. ‘Anya, party at my place! Come on, it’ll be loud — like back then, remember?’"
+            },
+            "sound": "sfx_club_crowd",
+            "music": "bgm_club_vibes",
+            "choices": [
+                {
+                    "id": "yes",
+                    "text": {
+                        "ru": "Пойдём",
+                        "en": "Let’s go"
+                    },
+                    "nextScene": 10,
+                    "effects": { "heart": 1, "relationships.dima": 1 }
+                },
+                {
+                    "id": "no",
+                    "text": {
+                        "ru": "Не сегодня",
+                        "en": "Not tonight"
+                    },
+                    "nextScene": 11,
+                    "effects": { "leaf": 1 }
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "background": "bg_style1_night",
+            "characterLeft": "anna_smile_style1",
+            "characterRight": "dima_happy",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "«Класс! Ты не пожалеешь!»",
+                "en": "‘Awesome! You won’t regret it!’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Класс! Ты не пожалеешь — или пожалеешь, как в прошлый раз, Ань? Ты ведь знаешь, что я всегда зову тебя туда снова.»",
+                "en": "‘Awesome! You won’t regret it — or will you, like last time, Anya? You know I always call you back there.’"
+            },
+            "sound": "sfx_club_beat_drop",
+            "music": null,
+            "nextScene": null
+        },
+        {
+            "id": 11,
+            "background": "bg_style1_night",
+            "characterLeft": "anna_thoughtful_style1",
+            "characterRight": "dima_neutral",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "«Ладно, но я ещё позову.»",
+                "en": "‘Alright, but I’ll call you again.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ладно, но я ещё позову — ты ведь знаешь, Ань, что я не сдаюсь, даже после того, как ты уходила раньше.»",
+                "en": "‘Alright, but I’ll call you again — you know, Anya, I don’t give up, even after you walked away before.’"
+            },
+            "sound": "sfx_club_fade_out",
+            "music": null,
+            "nextScene": null
+        }
+    ]
+}
