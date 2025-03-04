@@ -1,0 +1,323 @@
+{
+    "chapter": 10,
+    "title": {
+        "ru": "Финальный выбор",
+        "en": "Final Choice"
+    },
+    "scenes": [
+        {
+            "id": 0,
+            "background": "bg_apartment_morning",
+            "characterLeft": "anna_thoughtful_home",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Утро пришло с тишиной, свет лился сквозь шторы, но я чувствовала тяжесть каждого шага. Кремовый свитер лежал рядом, телефон молчал — все ждали моего ответа. Что я чувствую? Правда вскрылась, и теперь всё зависит от меня. Во ‘ВКонтакте’ гороскоп: ‘Весы, конец — это начало.’ TikTok крутил про свободу и прощание. Интуиция шептала — выбор навсегда.",
+                "en": "Morning arrived with silence, light pouring through curtains, but I felt the weight of every step. My cream sweater lay beside me, my phone stayed quiet — everyone awaited my answer. What do I feel? The truth is out, and now it’s all on me. On ‘VKontakte’, a horoscope: ‘Libra, an end is a beginning.’ TikTok spun tales of freedom and farewell. My intuition whispered — a choice forever."
+            },
+            "second_playthrough_text": {
+                "ru": "Утро пришло с тишиной, свет лился сквозь шторы — ты ведь знаешь этот момент, да? Кремовый свитер лежал рядом, телефон молчал, но я чувствовала тяжесть, как тогда, когда нашла старую записку от Кати: ‘Не пропадай снова,’ спрятанную в ящике. Гороскоп в ‘ВКонтакте’ тот же: ‘Конец — это начало.’ Ты знаешь, что я выберу, но интуиция всё равно шепчет — выбор навсегда.",
+                "en": "Morning arrived with silence, light pouring through curtains — you know this moment, don’t you? My cream sweater lay beside me, my phone stayed quiet, but I felt the weight, like when I found Katya’s old note: ‘Don’t disappear again,’ hidden in the drawer. The ‘VKontakte’ horoscope the same: ‘An end is a beginning.’ You know what I’ll choose, but my intuition still whispers — a choice forever."
+            },
+            "sound": "sfx_morning_birds",
+            "music": "bgm_morning_melancholy",
+            "nextScene": 1
+        },
+        {
+            "id": 1,
+            "background": "bg_street_day_trash",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "dima_confident",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "День был серым, ветер гнал пыль по улице, шубка грела плечи. Дима ждал у машины: «Ань, это твой шанс! Поехали со мной, забудем всё!»",
+                "en": "The day was gray, wind chasing dust down the street, my fur coat warming my shoulders. Dima waited by the car: ‘Anya, this is your chance! Come with me, forget it all!’"
+            },
+            "second_playthrough_text": {
+                "ru": "День был серым, ветер гнал пыль — ты ведь знаешь этот ветер, да? Шубка грела плечи. Дима ждал у машины: «Ань, это твой шанс! Поехали со мной, забудем всё — ты помнишь, как я спрятал тот старый билет на поезд в кармане, чтобы сбежать с тобой тогда?»",
+                "en": "The day was gray, wind chasing dust — you know this wind, don’t you? My fur coat warming my shoulders. Dima waited by the car: ‘Anya, this is your chance! Come with me, forget it all — you remember how I hid that old train ticket in my pocket to run away with you back then?’"
+            },
+            "sound": "sfx_street_ambient_day",
+            "music": "bgm_crossroads_heart",
+            "nextScene": 2
+        },
+        {
+            "id": 2,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": "mark_neutral",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "Офис ‘TrendWave’ был холоден, но Марк стоял рядом, его взгляд был мягким: «Анна, останься со мной. Мы уйдём вместе, начнём заново.»",
+                "en": "The ‘TrendWave’ office was cold, but Mark stood beside me, his gaze gentle: ‘Anna, stay with me. We’ll leave together, start over.’"
+            },
+            "second_playthrough_text": {
+                "ru": "Офис ‘TrendWave’ был холоден — ты ведь знаешь этот холод, да? Марк стоял рядом, взгляд мягкий: «Анна, останься со мной. Мы уйдём вместе, начнём заново — ты помнишь, как я оставил тебе тот старый диск с кодом, где было моё признание ещё до всего этого?»",
+                "en": "The ‘TrendWave’ office was cold — you know this chill, don’t you? Mark stood beside me, his gaze gentle: ‘Anna, stay with me. We’ll leave together, start over — you remember how I left you that old disc with the code where I confessed before all this?’"
+            },
+            "sound": "sfx_office_ambient",
+            "music": "bgm_corporate_tension",
+            "nextScene": 3
+        },
+        {
+            "id": 3,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "sergey_confident",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "Сергей вышел из кабинета, его голос был твёрд: «Анна, ты можешь всё изменить. Останься, и мы поднимем ‘TrendWave’ выше. Это твой путь.»",
+                "en": "Sergey stepped out of his office, his voice firm: ‘Anna, you can change everything. Stay, and we’ll take ‘TrendWave’ higher. This is your path.’"
+            },
+            "second_playthrough_text": {
+                "ru": "Сергей вышел из кабинета, голос твёрд — ты ведь знаешь его тон, да? «Анна, ты можешь всё изменить. Останься, и мы поднимем ‘TrendWave’ выше — ты помнишь, как я оставил тебе тот старый ключ от офиса, думая, что ты выберешь меня ещё тогда? Это твой путь.»",
+                "en": "Sergey stepped out of his office, his voice firm — you know that tone, don’t you? ‘Anna, you can change everything. Stay, and we’ll take ‘TrendWave’ higher — you remember how I left you that old office key, thinking you’d choose me back then? This is your path.’"
+            },
+            "sound": "sfx_confident_step",
+            "music": "bgm_corporate_tension",
+            "nextScene": 4
+        },
+        {
+            "id": 4,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": "vika_sad_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "Вика подошла последней, её глаза блестели: «Аньчик, я знаю, что натворила. Но дай мне шанс. Мы справимся вместе, как раньше.»",
+                "en": "Vika approached last, her eyes glistening: ‘Anyushka, I know what I’ve done. But give me a chance. We’ll manage together, like before.’"
+            },
+            "second_playthrough_text": {
+                "ru": "Вика подошла последней, глаза блестели — ты ведь знаешь её слёзы, да? «Аньчик, я знаю, что натворила — ты помнишь, как я спрятала тот старый браслет в сумке, чтобы ты не узнала о клубе? Но дай мне шанс. Мы справимся вместе, как раньше.»",
+                "en": "Vika approached last, her eyes glistening — you know her tears, don’t you? ‘Anyushka, I know what I’ve done — you remember how I hid that old bracelet in my bag so you wouldn’t find out about the club? But give me a chance. We’ll manage together, like before.’"
+            },
+            "sound": "sfx_tearful_breath",
+            "music": "bgm_betrayal_tune",
+            "nextScene": 5
+        },
+        {
+            "id": 5,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Вечер укутал город мягкими тенями, шубка грела, но сердце билось в разнобой. Что я чувствую? Дима — свобода, Марк — тепло, Сергей — сила, Вика — прошлое. Все смотрят на меня, и я должна выбрать. Один путь — навсегда.",
+                "en": "Evening wrapped the city in soft shadows, my fur coat warmed me, but my heart beat out of sync. What do I feel? Dima — freedom, Mark — warmth, Sergey — strength, Vika — the past. They all look at me, and I must choose. One path — forever."
+            },
+            "second_playthrough_text": {
+                "ru": "Вечер укутал город мягкими тенями — ты ведь знаешь этот вечер, да? Шубка грела, но сердце билось в разнобой, когда я вспомнила тот старый билет на поезд в кармане, который так и не использовала, чтобы сбежать. Дима — свобода, Марк — тепло, Сергей — сила, Вика — прошлое. Все смотрят, и я должна выбрать — ты знаешь, что я выбрала раньше, но теперь всё иначе.",
+                "en": "Evening wrapped the city in soft shadows — you know this evening, don’t you? My fur coat warmed me, but my heart beat out of sync as I recalled that old train ticket in my pocket I never used to escape. Dima — freedom, Mark — warmth, Sergey — strength, Vika — the past. They all look at me, and I must choose — you know what I picked before, but now it’s different."
+            },
+            "sound": "sfx_street_ambient",
+            "music": "bgm_final_choice",
+            "choices": [
+                {
+                    "id": "dima",
+                    "text": {
+                        "ru": "Уйти с Димой",
+                        "en": "Leave with Dima"
+                    },
+                    "nextScene": 6,
+                    "effects": { "heart": 2, "relationships.dima": 2 },
+                    "leadsToEnding": "Свобода с Димой"
+                },
+                {
+                    "id": "mark",
+                    "text": {
+                        "ru": "Остаться с Марком",
+                        "en": "Stay with Mark"
+                    },
+                    "nextScene": 7,
+                    "effects": { "heart": 2, "leaf": 1, "relationships.mark": 2 },
+                    "leadsToEnding": "Тишина с Марком"
+                },
+                {
+                    "id": "sergey",
+                    "text": {
+                        "ru": "Довериться Сергею",
+                        "en": "Trust Sergey"
+                    },
+                    "nextScene": 8,
+                    "effects": { "crown": 2, "relationships.sergey": 2 },
+                    "leadsToEnding": "Вершина с Сергеем"
+                },
+                {
+                    "id": "vika",
+                    "text": {
+                        "ru": "Остаться с Викой",
+                        "en": "Stay with Vika"
+                    },
+                    "nextScene": 9,
+                    "effects": { "leaf": 2, "relationships.vika": 2 },
+                    "leadsToEnding": "Дружба превыше всего"
+                },
+                {
+                    "id": "alone",
+                    "text": {
+                        "ru": "Уйти одной",
+                        "en": "Leave alone"
+                    },
+                    "nextScene": 10,
+                    "effects": { "crown": 2 },
+                    "leadsToEnding": "Одинокий путь"
+                },
+                {
+                    "id": "premium",
+                    "text": {
+                        "ru": "Сказать: ‘Мне нужно время’ (20 бриллиантов)",
+                        "en": "Say: ‘I need time’ (20 diamonds)"
+                    },
+                    "nextScene": 11,
+                    "cost": 20,
+                    "effects": { "crown": 1, "heart": 1, "leaf": 1 },
+                    "leadsToEnding": "Новый старт"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "background": "bg_street_day_trash",
+            "characterLeft": "anna_smile_street",
+            "characterRight": "dima_happy",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "«Ты не пожалеешь, Ань! Мы свободны!»",
+                "en": "‘You won’t regret it, Anya! We’re free!’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ты не пожалеешь, Ань! Мы свободны — ты ведь знаешь, что я всегда хотел этого, как тогда, когда спрятал тот старый долг в бардачке, чтобы сбежать с тобой?»",
+                "en": "‘You won’t regret it, Anya! We’re free — you know I always wanted this, like when I hid that old debt in the glovebox to run away with you?’"
+            },
+            "sound": "sfx_car_engine",
+            "music": "bgm_upbeat_friendship",
+            "nextScene": null
+        },
+        {
+            "id": 7,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_street",
+            "characterRight": "mark_smile",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Вместе мы всё начнём заново. Спасибо, Анна.»",
+                "en": "‘Together, we’ll start anew. Thank you, Anna.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Вместе мы всё начнём заново. Спасибо, Анна — ты ведь знаешь, что я ждал этого, как тогда, когда оставил тебе тот старый код с моим признанием?»",
+                "en": "‘Together, we’ll start anew. Thank you, Anna — you know I waited for this, like when I left you that old code with my confession?’"
+            },
+            "sound": "sfx_comforting_tone",
+            "music": "bgm_upbeat_friendship",
+            "nextScene": null
+        },
+        {
+            "id": 8,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "sergey_smile",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Ты сделала выбор. Теперь мы поднимемся выше.»",
+                "en": "‘You’ve made your choice. Now we’ll rise higher.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ты сделала выбор. Теперь мы поднимемся выше — ты ведь знаешь, Ань, что я ждал этого, как тогда, когда оставил тебе тот старый ключ от офиса?»",
+                "en": "‘You’ve made your choice. Now we’ll rise higher — you know, Anya, I waited for this, like when I left you that old office key?’"
+            },
+            "sound": "sfx_confident_step",
+            "music": "bgm_corporate_tension",
+            "nextScene": null
+        },
+        {
+            "id": 9,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_street",
+            "characterRight": "vika_happy_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Аньчик, мы справимся! Спасибо, что осталась!»",
+                "en": "‘Anyushka, we’ll make it! Thank you for staying!’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Аньчик, мы справимся! Спасибо, что осталась — ты ведь знаешь, что я ждала этого, как тогда, когда спрятала тот старый браслет, чтобы загладить вину?»",
+                "en": "‘Anyushka, we’ll make it! Thank you for staying — you know I waited for this, like when I hid that old bracelet to make up for my guilt?’"
+            },
+            "sound": "sfx_excited_clap",
+            "music": "bgm_upbeat_friendship",
+            "nextScene": null
+        },
+        {
+            "id": 10,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я ушла одна, шаги гулко звучали в тишине. Что я чувствую? Свободу? Одиночество? Теперь только я и дорога впереди.",
+                "en": "I walked away alone, my steps echoing in the silence. What do I feel? Freedom? Loneliness? Now it’s just me and the road ahead."
+            },
+            "second_playthrough_text": {
+                "ru": "Я ушла одна, шаги гулко звучали в тишине — ты ведь знаешь этот звук, да? В кармане был тот старый билет на поезд, который я так и не использовала, чтобы сбежать. Что я чувствую? Свободу? Одиночество? Теперь только я и дорога впереди.",
+                "en": "I walked away alone, my steps echoing in the silence — you know this sound, don’t you? In my pocket was that old train ticket I never used to escape. What do I feel? Freedom? Loneliness? Now it’s just me and the road ahead."
+            },
+            "sound": "sfx_footsteps_sneakers",
+            "music": "bgm_evening_dusk",
+            "nextScene": null
+        },
+        {
+            "id": 11,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я стояла, глядя на город, и сердце билось ровно. Что я чувствую? Все пути открыты, и я уйду, чтобы найти себя.",
+                "en": "I stood, gazing at the city, my heart beating steady. What do I feel? All paths are open, and I’ll leave to find myself."
+            },
+            "second_playthrough_text": {
+                "ru": "Я стояла, глядя на город, сердце билось ровно — ты ведь знаешь этот ритм, да? В сумке лежала старая записка от Кати: ‘Не пропадай,’ но теперь все пути открыты, и я уйду, чтобы найти себя, как могла тогда.",
+                "en": "I stood, gazing at the city, my heart beating steady — you know this rhythm, don’t you? In my bag was Katya’s old note: ‘Don’t disappear,’ but now all paths are open, and I’ll leave to find myself, like I could have back then."
+            },
+            "sound": "sfx_street_ambient",
+            "music": "bgm_final_choice",
+            "nextScene": null
+        }
+    ]
+}

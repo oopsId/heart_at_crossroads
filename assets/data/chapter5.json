@@ -1,0 +1,349 @@
+{
+    "chapter": 5,
+    "title": {
+        "ru": "Предательство",
+        "en": "Betrayal"
+    },
+    "scenes": [
+        {
+            "id": 0,
+            "background": "bg_apartment_morning",
+            "characterLeft": "anna_sad_home",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Утро вползло в мою жизнь серой дымкой, свет едва пробивался сквозь шторы, а я лежала, уткнувшись в подушку. Кремовый свитер скомкался подо мной, телефон мигал — Лёша в Telegram: ‘Ань, ты где?’ Вчерашний вечер с Димой оставил жар в груди, но и холод сомнений. Что я чувствую? Сергей звал на кофе, Марк писал ночью, а Вика… Вика молчала. Во ‘ВКонтакте’ гороскоп: ‘Весы, берегись близких.’ TikTok крутил что-то про измены. Интуиция ныла — что-то не так, но я не хотела верить.",
+                "en": "Morning crept into my life like a gray haze, light barely seeping through the curtains, and I lay there, face buried in the pillow. My cream sweater crumpled beneath me, my phone blinked — Lyosha on Telegram: ‘Anya, where are you?’ Last night with Dima left a heat in my chest, but a chill of doubt too. What do I feel? Sergey invited me for coffee, Mark texted at night, and Vika… Vika was silent. On ‘VKontakte’, a horoscope: ‘Libra, beware of those close.’ TikTok spun something about betrayal. My intuition ached — something’s wrong, but I didn’t want to believe it."
+            },
+            "second_playthrough_text": {
+                "ru": "Утро вползло серой дымкой, свет еле пробивался, а я лежала, уткнувшись в подушку — ты ведь знаешь эту сцену, да? Кремовый свитер скомкался, телефон мигал — Лёша: ‘Ань, ты где?’ — как всегда. Вчера с Димой всё тот же жар и холод, но теперь я вижу его куртку на стуле — он оставил её после той ночи, когда обещал бросить всё. Вика молчит, а гороскоп в ‘ВКонтакте’ опять прав: ‘Берегись близких.’ Ты знаешь, что будет дальше, но я всё равно не хочу верить.",
+                "en": "Morning crept in like a gray haze, light barely seeping through, and I lay there, face in the pillow — you know this scene, don’t you? My cream sweater crumpled, phone blinked — Lyosha: ‘Anya, where are you?’ — as always. Last night with Dima, the same heat and chill, but now I see his jacket on the chair — he left it after that night he promised to quit everything. Vika’s silent, and the ‘VKontakte’ horoscope is right again: ‘Beware of those close.’ You know what’s coming, but I still don’t want to believe it."
+            },
+            "sound": "sfx_morning_birds",
+            "music": "bgm_morning_melancholy",
+            "nextScene": 1
+        },
+        {
+            "id": 1,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "vika_worry_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "Офис ‘TrendWave’ гудел — голоса, клавиатуры, запах кофе. Вика встретила меня у входа, её глаза бегали: «Аньчик, я… я взяла проект Сергея. Твой проект. Прости, мне это нужно было.»",
+                "en": "The ‘TrendWave’ office buzzed — voices, keyboards, the scent of coffee. Vika met me at the entrance, her eyes darting: ‘Anyushka, I… I took Sergey’s project. Your project. Sorry, I needed it.’"
+            },
+            "second_playthrough_text": {
+                "ru": "Офис ‘TrendWave’ гудел — голоса, клавиатуры, запах кофе, всё как тогда. Вика встретила меня у входа, её глаза бегали: «Аньчик, ты ведь знаешь, что я взяла проект Сергея — твой проект. Прости, мне это нужно было, как тогда в клубе, когда я танцевала, чтобы выбраться из долгов.»",
+                "en": "The ‘TrendWave’ office buzzed — voices, keyboards, the scent of coffee, just like back then. Vika met me at the entrance, her eyes darting: ‘Anyushka, you know I took Sergey’s project — your project. Sorry, I needed it, like back in the club when I danced to crawl out of debt.’"
+            },
+            "sound": "sfx_office_ambient",
+            "music": "bgm_corporate_tension",
+            "nextScene": 2
+        },
+        {
+            "id": 2,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_surprised_street",
+            "characterRight": "vika_worry_style1",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Сердце сжалось, как будто кто-то выдернул провод из розетки. Что я чувствую? Боль? Злость? «Вик, ты серьёзно? Это был мой шанс!»",
+                "en": "My heart clenched, as if someone yanked a cord from the socket. What do I feel? Pain? Anger? ‘Vik, are you serious? That was my chance!’"
+            },
+            "second_playthrough_text": {
+                "ru": "Сердце сжалось — ты ведь знаешь, как это больно, да? Всё тот же удар. «Вик, ты серьёзно? Это был мой шанс! Ты опять продала меня, как тогда, когда отдала мой старый ноутбук за долги клуба, думая, что я не узнаю!»",
+                "en": "My heart clenched — you know how much it hurts, don’t you? The same blow. ‘Vik, are you serious? That was my chance! You sold me out again, like when you gave away my old laptop for club debts, thinking I wouldn’t find out!’"
+            },
+            "sound": "sfx_dramatic_pause",
+            "music": null,
+            "choices": [
+                {
+                    "id": "yell",
+                    "text": {
+                        "ru": "Закричать: ‘Как ты могла?!’",
+                        "en": "Yell: ‘How could you?!’"
+                    },
+                    "nextScene": 3,
+                    "effects": { "heart": 1, "relationships.vika": -2 }
+                },
+                {
+                    "id": "calm",
+                    "text": {
+                        "ru": "Сказать тихо: ‘Я думала, мы подруги’",
+                        "en": "Say quietly: ‘I thought we were friends’"
+                    },
+                    "nextScene": 4,
+                    "effects": { "leaf": 1, "relationships.vika": -1 }
+                },
+                {
+                    "id": "premium",
+                    "text": {
+                        "ru": "Спросить: ‘Почему ты так поступила?’ (15 бриллиантов)",
+                        "en": "Ask: ‘Why did you do this?’ (15 diamonds)"
+                    },
+                    "nextScene": 5,
+                    "cost": 15,
+                    "effects": { "leaf": 1, "relationships.vika": 0 }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_angry_street",
+            "characterRight": "vika_sad_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Ань, не кричи… Я не хотела, но это моя карьера!»",
+                "en": "‘Anya, don’t yell… I didn’t mean it, but it’s my career!’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ань, не кричи… Ты ведь знаешь, что я не хотела, но это моя карьера! Как тогда, когда я взяла деньги из кассы клуба, чтобы не потерять всё.»",
+                "en": "‘Anya, don’t yell… You know I didn’t mean it, but it’s my career! Like back when I took cash from the club’s register so I wouldn’t lose everything.’"
+            },
+            "sound": "sfx_worried_gasp",
+            "music": "bgm_betrayal_tune",
+            "nextScene": 6
+        },
+        {
+            "id": 4,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_sad_street",
+            "characterRight": "vika_worry_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Мы подруги, Аньчик… Но мне пришлось. Прости.»",
+                "en": "‘We’re friends, Anyushka… But I had to. Sorry.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Мы подруги, Аньчик… Ты ведь знаешь, что мне пришлось — как тогда, когда я врала тебе про работу в клубе, чтобы ты не отвернулась. Прости.»",
+                "en": "‘We’re friends, Anyushka… You know I had to — like when I lied to you about the club job so you wouldn’t turn away. Sorry.’"
+            },
+            "sound": "sfx_disappointed_sigh",
+            "music": null,
+            "nextScene": 6
+        },
+        {
+            "id": 5,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": "vika_thoughtful_style1",
+            "speaker": {
+                "ru": "Вика",
+                "en": "Vika"
+            },
+            "text": {
+                "ru": "«Я… я давно хотела место здесь. Ты не поймёшь, Ань, у меня нет другого выхода.»",
+                "en": "‘I… I’ve wanted a spot here for a long time. You wouldn’t get it, Anya, I had no other choice.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Я… я давно хотела место здесь. Ты ведь знаешь, Ань, что у меня нет другого выхода — как тогда, когда я сбежала из того клуба, оставив всё, даже ту старую сумку с её метками.»",
+                "en": "‘I… I’ve wanted a spot here for a long time. You know, Anya, I had no other choice — like when I ran from that club, leaving everything, even that old bag with her tags.’"
+            },
+            "sound": "sfx_quiet_whisper",
+            "music": "bgm_mystery_reveal",
+            "nextScene": 6
+        },
+        {
+            "id": 6,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_sad_street",
+            "characterRight": "mark_neutral",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "Я отошла, слёзы жгли глаза. Марк появился из-за угла, очки сползли, взгляд мягкий: «Анна, ты… что-то случилось?»",
+                "en": "I stepped away, tears burning my eyes. Mark appeared from around the corner, glasses slipping, gaze gentle: ‘Anna, you… something wrong?’"
+            },
+            "second_playthrough_text": {
+                "ru": "Я отошла, слёзы жгли глаза — ты ведь знаешь, как это было, да? Марк появился из-за угла, очки сползли, взгляд мягкий: «Анна, ты… что-то случилось? Опять Вика? Я видел, как она прятала тот старый диск с её прошлым — ты ведь знаешь, о чём я.»",
+                "en": "I stepped away, tears burning my eyes — you know how it went, don’t you? Mark appeared from around the corner, glasses slipping, gaze gentle: ‘Anna, you… something wrong? Vika again? I saw her hide that old disc with her past — you know what I mean.’"
+            },
+            "sound": "sfx_office_chatter",
+            "music": null,
+            "nextScene": 7
+        },
+        {
+            "id": 7,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_sad_street",
+            "characterRight": "mark_concerned",
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Что я чувствую? Боль? Или тепло от его слов? «Вика… она забрала мой проект.»",
+                "en": "What do I feel? Pain? Or warmth from his words? ‘Vika… she took my project.’"
+            },
+            "second_playthrough_text": {
+                "ru": "Что я чувствую? Боль, ты ведь знаешь её вкус, да? Или тепло от его слов? «Вика… она забрала мой проект — как тогда, когда отдала мои черновики за ту старую флешку, чтобы скрыть свои следы.»",
+                "en": "What do I feel? Pain, you know its taste, don’t you? Or warmth from his words? ‘Vika… she took my project — like when she traded my drafts for that old USB to cover her tracks.’"
+            },
+            "sound": "sfx_tearful_breath",
+            "music": "bgm_betrayal_tune",
+            "choices": [
+                {
+                    "id": "trust",
+                    "text": {
+                        "ru": "Рассказать всё",
+                        "en": "Tell him everything"
+                    },
+                    "nextScene": 8,
+                    "effects": { "heart": 1, "relationships.mark": 1 }
+                },
+                {
+                    "id": "hide",
+                    "text": {
+                        "ru": "Сказать: ‘Ничего страшного’",
+                        "en": "Say: ‘It’s no big deal’"
+                    },
+                    "nextScene": 9,
+                    "effects": { "leaf": 1 }
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_sad_street",
+            "characterRight": "mark_smile",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Это… гадко. Но ты справишься. Я помогу, если хочешь.»",
+                "en": "‘That’s… awful. But you’ll manage. I’ll help if you want.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Это… гадко. Но ты справишься — ты ведь знаешь, Ань, что я всегда помогу, как тогда, когда нашёл её старый пароль в системе и замёл следы.»",
+                "en": "‘That’s… awful. But you’ll manage — you know, Anya, I’ll always help, like when I found her old password in the system and covered her tracks.’"
+            },
+            "sound": "sfx_comforting_tone",
+            "music": null,
+            "nextScene": 10
+        },
+        {
+            "id": 9,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "mark_neutral",
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "«Ладно… Но если что, я рядом.»",
+                "en": "‘Okay… But if anything, I’m here.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ладно… Но если что, я рядом — ты ведь знаешь, Ань, что я всегда рядом, даже после того, как ты не рассказала в прошлый раз.»",
+                "en": "‘Okay… But if anything, I’m here — you know, Anya, I’m always here, even after you didn’t tell me last time.’"
+            },
+            "sound": "sfx_awkward_silence",
+            "music": null,
+            "nextScene": 10
+        },
+        {
+            "id": 10,
+            "background": "bg_street_night",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": "dima_confident",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "Ночь упала на город, и я вышла к клубу. Дима ждал у входа — кожаная куртка, камера, улыбка яркая: «Ань, ты грустная? Пойдём, встряхнёмся!»",
+                "en": "Night fell over the city, and I stepped out to the club. Dima waited at the entrance — leather jacket, camera, bright smile: ‘Anya, you’re sad? Come on, let’s shake it off!’"
+            },
+            "second_playthrough_text": {
+                "ru": "Ночь упала на город, и я вышла к клубу — ты ведь знаешь этот момент, да? Дима ждал у входа — кожаная куртка, камера, улыбка яркая: «Ань, ты грустная? Опять из-за неё? Пойдём, встряхнёмся — ты ведь помнишь, как я прятал тот старый конверт с деньгами от кредиторов.»",
+                "en": "Night fell over the city, and I stepped out to the club — you know this moment, don’t you? Dima waited at the entrance — leather jacket, camera, bright smile: ‘Anya, you’re sad? Because of her again? Come on, let’s shake it off — you remember how I hid that old envelope with cash from the creditors.’"
+            },
+            "sound": "sfx_club_crowd",
+            "music": "bgm_club_vibes",
+            "choices": [
+                {
+                    "id": "yes",
+                    "text": {
+                        "ru": "Пойдём",
+                        "en": "Let’s go"
+                    },
+                    "nextScene": 11,
+                    "effects": { "heart": 1, "relationships.dima": 1 }
+                },
+                {
+                    "id": "no",
+                    "text": {
+                        "ru": "Не хочу",
+                        "en": "I don’t want to"
+                    },
+                    "nextScene": 12,
+                    "effects": { "leaf": 1 }
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "background": "bg_street_night",
+            "characterLeft": "anna_smile_street",
+            "characterRight": "dima_happy",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "«Вот это моя Анька! Пойдём, забудешь всё!»",
+                "en": "‘That’s my Anya! Come on, you’ll forget everything!’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Вот это моя Анька! Ты ведь знаешь, что я всегда вытащу тебя, да? Пойдём, забудешь всё — как тогда, когда я спрятал те старые долги.»",
+                "en": "‘That’s my Anya! You know I’ll always pull you out, don’t you? Come on, you’ll forget everything — like when I hid those old debts.’"
+            },
+            "sound": "sfx_club_beat_drop",
+            "music": null,
+            "nextScene": null
+        },
+        {
+            "id": 12,
+            "background": "bg_street_night",
+            "characterLeft": "anna_sad_street",
+            "characterRight": "dima_neutral",
+            "speaker": {
+                "ru": "Дима",
+                "en": "Dima"
+            },
+            "text": {
+                "ru": "«Ладно, но я рядом, если что.»",
+                "en": "‘Okay, but I’m here if you need me.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ладно, но я рядом, если что — ты ведь знаешь, Ань, что я всегда рядом, даже после того, как ты ушла в прошлый раз, оставив меня с теми пустыми обещаниями.»",
+                "en": "‘Okay, but I’m here if you need me — you know, Anya, I’m always here, even after you left last time, leaving me with those empty promises.’"
+            },
+            "sound": "sfx_club_fade_out",
+            "music": null,
+            "nextScene": null
+        }
+    ]
+}
