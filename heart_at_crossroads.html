@@ -7,19 +7,19 @@
     <style>
         @font-face {
             font-family: 'LobsterTwo';
-            src: url('assets/fonts/LobsterTwo-Bold.ttf') format('truetype');
+            src: url('heart_at_crossroads/assets/fonts/LobsterTwo-Bold.ttf') format('truetype');
             font-weight: bold;
             font-style: normal;
         }
         @font-face {
             font-family: 'GreatVibes';
-            src: url('assets/fonts/GreatVibes-Regular.ttf') format('truetype');
+            src: url('heart_at_crossroads/assets/fonts/GreatVibes-Regular.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @font-face {
             font-family: 'GoodVibesCyr';
-            src: url('assets/fonts/GoodVibesCyr.ttf') format('truetype');
+            src: url('heart_at_crossroads/assets/fonts/GoodVibesCyr.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
@@ -254,7 +254,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6;
+            background: url('heart_at_crossroads/assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -277,10 +277,10 @@
             font-family: 'GreatVibes', sans-serif;
         }
         #start-screen h1 span:first-child {
-            font-size: 48px; /* Более крупный текст для "Сердце"/"Heart" */
+            font-size: 48px;
         }
         #start-screen h1 span:last-child {
-            font-size: 40px; /* Чуть меньший текст для "на перекрёстке"/"at the Crossroads" */
+            font-size: 40px;
         }
         .start-buttons {
             display: flex;
@@ -330,7 +330,7 @@
             align-items: center;
             text-align: center;
             position: absolute;
-            left: -130px; /* Центрирование между "Продолжить" и левым краем */
+            left: -130px;
             top: 50%;
             transform: translateY(-50%);
         }
@@ -472,7 +472,7 @@
         </div>
         <div id="menu" style="display: none;">
             <div id="diamonds">
-                <img src="assets/ui/diamonds.png" alt="Diamonds">
+                <img src="heart_at_crossroads/assets/ui/diamonds.png" alt="Diamonds">
                 <span id="diamonds-count">10</span>
             </div>
             <button id="menu-btn" data-ru="Меню" data-en="Menu">Меню</button>
@@ -499,7 +499,8 @@
         let isTyping = false;
         let scriptData = null;
         let currentBackground = null;
-        const correctPassword = "umbertoeco";
+        const correctPassword = "umbertoeco"; // Пароль для разработчиков
+        const tempPassword = "999000"; // Временный пароль для ограничения доступа
 
         const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
         if (isTelegram) {
@@ -544,6 +545,7 @@
         const checkAuthorization = async () => {
             const authorizedUsers = await getFromStorage('authorized_users') || [];
             if (userId && authorizedUsers.includes(userId)) {
+                stats.isAuthorized = true;
                 startGame();
             } else {
                 showPasswordScreen();
@@ -566,12 +568,12 @@
 
             startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                startNewGame();
+                checkTempPassword(() => startNewGame());
             });
 
             continueGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                loadSession(() => startGame());
+                checkTempPassword(() => loadSession(() => startGame()));
             });
 
             showPasswordBtn.addEventListener('touchstart', (e) => {
@@ -644,7 +646,11 @@
 
         async function handlePasswordSubmit(e) {
             const inputPassword = document.getElementById('password-input').value;
-            if (inputPassword === correctPassword) {
+            if (inputPassword === tempPassword) {
+                // Временный пароль для доступа к игре
+                startNewGame();
+            } else if (inputPassword === correctPassword) {
+                // Пароль разработчика
                 const authorizedUsers = (await getFromStorage('authorized_users')) || [];
                 if (userId && !authorizedUsers.includes(userId)) {
                     authorizedUsers.push(userId);
@@ -655,6 +661,25 @@
             } else {
                 alert('Неверный пароль!');
             }
+        }
+
+        function checkTempPassword(callback) {
+            getFromStorage('tempAccessGranted').then(granted => {
+                if (granted) {
+                    callback();
+                } else {
+                    const input = prompt('Игра временно закрыта на доработку. Введите временный пароль:');
+                    if (input === tempPassword || input === correctPassword) {
+                        saveToStorage('tempAccessGranted', true);
+                        if (input === correctPassword) {
+                            stats.isAuthorized = true;
+                        }
+                        callback();
+                    } else {
+                        alert('Неверный временный пароль! Доступ к игре ограничен.');
+                    }
+                }
+            });
         }
 
         function startNewGame() {
@@ -746,29 +771,29 @@
             document.body.appendChild(loadingStatus);
             
             const images = [
-                `assets/backgrounds/bg_apartment_morning.png`,
-                `assets/backgrounds/bg_street_day_trash.png`,
-                `assets/backgrounds/bg_office_day.png`,
-                `assets/backgrounds/bg_office_night.png`,
-                `assets/backgrounds/bg_office_night_end.png`,
-                `assets/backgrounds/bg_street_night.png`,
-                `assets/backgrounds/bg_street_dusk_end.png`,
-                `assets/characters/anna_sad_style2.png`,
-                `assets/characters/vika_smile_style1.png`,
-                `assets/characters/anna_neutral_style1.png`,
-                `assets/characters/vika_thoughtful_style1.png`,
-                `assets/characters/vika_worry_style1.png`,
-                `assets/characters/anna_happy_style1.png`,
-                `assets/characters/anna_thoughtful_style1.png`,
-                `assets/characters/anna_sad_style1.png`,
-                `assets/characters/vika_neutral_style1.png`,
-                `assets/characters/anna_worry_style1.png`,
-                `assets/characters/anna_surprised_style1.png`,
-                `assets/characters/vika_happy_style1.png`,
-                `assets/ui/diamonds.png`,
-                `assets/ui/crown.png`,
-                `assets/ui/heart.png`,
-                `assets/ui/leaf.png`
+                `heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_office_day.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_office_night.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_office_night_end.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_street_night.png`,
+                `heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_sad_style2.png`,
+                `heart_at_crossroads/assets/characters/vika/vika_smile_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_neutral_style1.png`,
+                `heart_at_crossroads/assets/characters/vika/vika_thoughtful_style1.png`,
+                `heart_at_crossroads/assets/characters/vika/vika_worry_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_happy_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_sad_style1.png`,
+                `heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_worry_style1.png`,
+                `heart_at_crossroads/assets/characters/anna/anna_surprised_style1.png`,
+                `heart_at_crossroads/assets/characters/vika/vika_happy_style1.png`,
+                `heart_at_crossroads/assets/ui/diamonds.png`,
+                `heart_at_crossroads/assets/ui/crown.png`,
+                `heart_at_crossroads/assets/ui/heart.png`,
+                `heart_at_crossroads/assets/ui/leaf.png`
             ];
             let loaded = 0;
             
@@ -811,7 +836,7 @@
         }
 
         function loadChapter(chapterId) {
-            return fetch(`data/chapter${chapterId}.json`, {
+            return fetch(`heart_at_crossroads/data/chapter${chapterId}.json`, {
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8',
                     'Accept': 'application/json'
@@ -903,7 +928,7 @@
             const shouldFade = currentBackground !== newBackground || isLastScene;
 
             const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('assets/backgrounds/${newBackground}.png')`;
+                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
                 currentBackground = newBackground;
                 charLeft.style.backgroundImage = 'none';
                 charRight.style.backgroundImage = 'none';
@@ -915,7 +940,7 @@
                     const leftChar = scene.characterLeft.includes('${stats.appearance}') 
                         ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                         : scene.characterLeft;
-                    charLeft.style.backgroundImage = `url('assets/characters/${leftChar}.png')`;
+                    charLeft.style.backgroundImage = `url('heart_at_crossroads/assets/characters/anna/${leftChar}.png')`;
                     charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
                     if (scene.id === 9 || scene.id === 19) charLeft.classList.add('shiver');
                     if (scene.id === 6) charLeft.classList.add('heartbeat');
@@ -924,7 +949,7 @@
                     const rightChar = scene.characterRight.includes('${stats.appearance}') 
                         ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
                         : scene.characterRight;
-                    charRight.style.backgroundImage = `url('assets/characters/${rightChar}.png')`;
+                    charRight.style.backgroundImage = `url('heart_at_crossroads/assets/characters/vika/${rightChar}.png')`;
                     charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
                     if (scene.id === 21) charRight.classList.add('heartbeat');
                 }
@@ -1013,10 +1038,10 @@
                 if (key !== 'relationships') {
                     const feedback = document.createElement('img');
                     feedback.className = 'choice-feedback';
-                    feedback.src = `assets/ui/${key}.png`;
+                    feedback.src = `heart_at_crossroads/assets/ui/${key}.png`;
                     feedback.onerror = () => {
                         console.warn(`Изображение для ${key} не найдено`);
-                        feedback.src = 'assets/ui/default_effect.png';
+                        feedback.src = 'heart_at_crossroads/assets/ui/default_effect.png';
                     };
                     document.getElementById('game-container').appendChild(feedback);
                     setTimeout(() => feedback.remove(), 3000);
