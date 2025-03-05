@@ -1127,6 +1127,7 @@
         if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
         if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
+        // Очищаем существующие кнопки и обработчики
         document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
         if (dialogueBox.touchHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
@@ -1184,6 +1185,7 @@
                 dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
                 dialogueBox.addEventListener('click', dialogueBox.touchHandler);
             } else if (scene.nextChapter) {
+                console.log('Переход к следующей главе');
                 currentChapter = scene.nextChapter;
                 currentScene = 0;
                 loadChapter(currentChapter).then(() => showScene(currentScene));
