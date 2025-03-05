@@ -129,15 +129,15 @@
     box-sizing: border-box;
 }
 
-#timer-countdown {
+   #timer-countdown {
     position: absolute;
-    top: calc(100% - 20%); /* Нижняя граница цифр на верхнем краю градиента */
+    top: calc(100% - 20%); /* Нижняя граница цифр привязана к верхнему краю градиента */
     left: 50%;
     transform: translateX(-50%);
     font-size: 40px;
     color: #ff4444;
     font-weight: bold;
-    z-index: 5; /* Цифры над всем */
+    z-index: 5;
 }
 
 @keyframes flash {
