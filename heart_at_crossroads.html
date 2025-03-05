@@ -122,19 +122,19 @@
     opacity: 1;
     min-height: 150px;
     max-height: 50vh;
-    overflow-y: auto; /* Прокрутка при переполнении */
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    box-sizing: border-box; /* Учитываем padding */
+    box-sizing: border-box;
 }
 
 #timer-countdown {
     position: absolute;
-    top: 10px;
+    bottom: calc(20% + 150px); /* Над верхним краем градиента */
     left: 50%;
     transform: translateX(-50%);
-    font-size: 14px;
+    font-size: 40px; /* Удобный большой размер */
     color: #ff4444; /* Алое */
     font-weight: bold;
     z-index: 5;
@@ -144,11 +144,11 @@
     0% { filter: brightness(1); }
     50% { filter: brightness(1.5); }
     100% { filter: brightness(1); }
-}
+  }
 
-.flash-svg {
+   .flash-svg {
     animation: flash 0.5s ease;
-}
+   }
         #speaker-name {
             font-weight: bold;
             font-size: 18px;
@@ -1175,7 +1175,7 @@
         }
     }
 
-     function showSceneWithTimer(scene, timeoutMs = 10000) { // По умолчанию 10 секунд
+    function showSceneWithTimer(scene, timeoutMs = 10000) {
     const progressElement = document.getElementById('progress');
     const totalScenes = scriptData.scenes.length;
     const progressPercent = ((scene.id + 1) / totalScenes) * 100;
@@ -1270,7 +1270,7 @@
                 dialogueBox.appendChild(btn);
             });
 
-            // Таймер строго из JSON (10 секунд)
+            // Таймер из JSON (10 секунд)
             const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
             let timeLeft = timerDuration / 1000;
 
@@ -1327,23 +1327,24 @@
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'messenger-overlay');
     svg.setAttribute('width', '300');
-    svg.setAttribute('height', '60');
-    svg.setAttribute('viewBox', '0 0 300 60');
+    svg.setAttribute('height', '500');
+    svg.setAttribute('viewBox', '0 0 300 500');
     svg.style.position = 'absolute';
     svg.style.top = '0'; // Верхний край
-    svg.style.left = '50%';
-    svg.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
+    svg.style.left = '0'; // Левый край, прикреплено левой верхней точкой
     svg.style.zIndex = '4';
 
     svg.innerHTML = `
-        <rect x="20" y="10" width="260" height="40" rx="10" fill="#E8F1F5" stroke="#555" stroke-width="2"/>
-        <text x="30" y="30" fill="#333" font-size="12">Лёша: Тусим вечером, Дима будет. Приходи!</text>
+        <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
+        <rect x="30" y="50" width="240" height="400" rx="10" fill="#E8F1F5"/>
+        <text x="40" y="80" fill="#333" font-size="12">Лёша:</text>
+        <text x="70" y="100" fill="#333" font-size="14">Тусим вечером, Дима будет. Приходи!</text>
     `;
 
     document.getElementById('game-container').appendChild(svg);
     gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 }); // Появление сверху
 
-    return svg; // Возвращаем для управления
+    return svg; // Для управления
 }
 
 
