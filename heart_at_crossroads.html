@@ -531,43 +531,57 @@
     const correctPassword = "umbertoeco";
     const tempPassword = "999000";
 
-    // Функции хранения
+    // Функции хранения с проверкой CloudStorage
     const saveToStorage = async (key, value) => {
         const data = JSON.stringify(value);
         try {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram && Telegram.WebApp.CloudStorage && typeof Telegram.WebApp.CloudStorage.setItem === 'function') {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.setItem(key, data, (error, success) => {
-                        if (error) reject(error);
-                        else resolve(true);
+                        if (error) {
+                            console.error(`Ошибка CloudStorage.setItem: ${error}`);
+                            reject(error);
+                        } else {
+                            console.log(`Сохранено в CloudStorage: ${key}`);
+                            resolve(true);
+                        }
                     });
                 });
             } else {
+                console.log(`Сохранение в localStorage: ${key}`);
                 localStorage.setItem(key, data);
                 return true;
             }
         } catch (error) {
             console.error(`Ошибка сохранения: ${error}`);
-            throw error;
+            localStorage.setItem(key, data); // Запасной вариант
+            return true;
         }
     };
 
     const getFromStorage = async (key) => {
         try {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram && Telegram.WebApp.CloudStorage && typeof Telegram.WebApp.CloudStorage.getItem === 'function') {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.getItem(key, (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result ? JSON.parse(result) : null);
+                        if (error) {
+                            console.error(`Ошибка CloudStorage.getItem: ${error}`);
+                            reject(error);
+                        } else {
+                            console.log(`Получено из CloudStorage: ${key} = ${result}`);
+                            resolve(result ? JSON.parse(result) : null);
+                        }
                     });
                 });
             } else {
                 const item = localStorage.getItem(key);
+                console.log(`Получено из localStorage: ${key} = ${item}`);
                 return item ? JSON.parse(item) : null;
             }
         } catch (error) {
             console.error(`Ошибка получения данных: ${error}`);
-            throw error;
+            const item = localStorage.getItem(key); // Запасной вариант
+            return item ? JSON.parse(item) : null;
         }
     };
 
@@ -696,7 +710,7 @@
             })
             .catch(error => {
                 console.error('Ошибка загрузки сессии:', error);
-                showStartScreen();
+                showStartScreen(); // Продолжаем с начальным экраном даже при ошибке
             });
     });
 
@@ -851,350 +865,237 @@
             showStartScreen();
         }
     }
-        function updateDiamondsDisplay() {
-            document.getElementById('diamonds-count').textContent = stats.diamonds;
-        }
 
-        function showDebugMessage(message) {
-            let debugDiv = document.getElementById('debug-message');
-            if (!debugDiv) {
-                debugDiv = document.createElement('div');
-                debugDiv.id = 'debug-message';
-                document.body.appendChild(debugDiv);
-            }
-            debugDiv.textContent = message;
-            setTimeout(() => debugDiv.remove(), 5000);
-        }
+    function updateDiamondsDisplay() {
+        document.getElementById('diamonds-count').textContent = stats.diamonds;
+    }
 
-        function preloadAssets(chapterId) {
-            console.log('Начало preloadAssets для chapter:', chapterId);
-            const loadingStatus = document.createElement('div');
-            loadingStatus.id = 'loading-status';
-            loadingStatus.style.cssText = 'position:fixed;bottom:10px;left:10px;color:white;font-size:12px;z-index:11;';
-            document.body.appendChild(loadingStatus);
-            
-            const images = [
-                '/heart_at_crossroads/assets/backgrounds/start_screen.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
-                '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
-                '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
-                '/heart_at_crossroads/assets/ui/diamonds.png',
-                '/heart_at_crossroads/assets/ui/crown.png',
-                '/heart_at_crossroads/assets/ui/heart.png',
-                '/heart_at_crossroads/assets/ui/leaf.png'
-            ];
-            let loaded = 0;
-            
-            return Promise.all(images.map(src => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = src;
-                    img.onload = () => {
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        console.log(`Загружено: ${src}`);
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.warn(`Не удалось загрузить ${src}`);
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        resolve();
-                    };
-                });
-            })).finally(() => {
-                loadingStatus.remove();
+    function showDebugMessage(message) {
+        let debugDiv = document.getElementById('debug-message');
+        if (!debugDiv) {
+            debugDiv = document.createElement('div');
+            debugDiv.id = 'debug-message';
+            document.body.appendChild(debugDiv);
+        }
+        debugDiv.textContent = message;
+        setTimeout(() => debugDiv.remove(), 5000);
+    }
+
+    function preloadAssets(chapterId) {
+        console.log('Начало preloadAssets для chapter:', chapterId);
+        const loadingStatus = document.createElement('div');
+        loadingStatus.id = 'loading-status';
+        loadingStatus.style.cssText = 'position:fixed;bottom:10px;left:10px;color:white;font-size:12px;z-index:11;';
+        document.body.appendChild(loadingStatus);
+        
+        const images = [
+            '/heart_at_crossroads/assets/backgrounds/start_screen.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
+            '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
+            '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
+            '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
+            '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
+            '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
+            '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
+            '/heart_at_crossroads/assets/ui/diamonds.png',
+            '/heart_at_crossroads/assets/ui/crown.png',
+            '/heart_at_crossroads/assets/ui/heart.png',
+            '/heart_at_crossroads/assets/ui/leaf.png'
+        ];
+        let loaded = 0;
+        
+        return Promise.all(images.map(src => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => {
+                    loaded++;
+                    loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
+                    console.log(`Загружено: ${src}`);
+                    resolve();
+                };
+                img.onerror = () => {
+                    console.warn(`Не удалось загрузить ${src}`);
+                    loaded++;
+                    loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
+                    resolve();
+                };
             });
-        }
+        })).finally(() => {
+            loadingStatus.remove();
+        });
+    }
 
-        async function loadChapter(chapterId) {
-            console.log(`Загрузка главы ${chapterId}`);
-            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`;
-            try {
-                const response = await fetch(jsonPath, {
-                    headers: {
-                        'Content-Type': 'application/json; charset=UTF-8',
-                        'Accept': 'application/json'
+    async function loadChapter(chapterId) {
+        console.log(`Загрузка главы ${chapterId}`);
+        const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`;
+        try {
+            const response = await fetch(jsonPath, {
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
+            const text = await response.text();
+            const data = JSON.parse(text);
+            if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+                throw new Error('Некорректный формат JSON');
+            }
+            scriptData = data;
+            console.log(`Данные главы ${chapterId} успешно загружены`);
+        } catch (error) {
+            console.error('Ошибка загрузки главы:', error);
+            throw error;
+        }
+    }
+
+    function createChoiceButton(choice) {
+        const btn = document.createElement('button');
+        const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
+        btn.textContent = choice.cost && !hasCostInText 
+            ? `${choice.text[stats.language]} (${choice.cost} бриллиантов)` 
+            : choice.text[stats.language];
+        btn.className = 'choice-btn';
+        if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
+        if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
+        return btn;
+    }
+
+    function saveChoice(choiceId, effects, memoryTag) {
+        choices.push(choiceId);
+        if (effects) {
+            for (let key in effects) {
+                if (key === 'relationships') {
+                    for (let rel in effects[key]) {
+                        stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
                     }
-                });
-                if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
-                const text = await response.text();
-                const data = JSON.parse(text);
-                if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                    throw new Error('Некорректный формат JSON');
+                } else {
+                    stats[key] = (stats[key] || 0) + effects[key];
                 }
-                scriptData = data;
-                console.log(`Данные главы ${chapterId} успешно загружены`);
-            } catch (error) {
-                console.error('Ошибка загрузки главы:', error);
-                throw error;
             }
         }
+        if (memoryTag) {
+            stats.memories.push(memoryTag);
+            const notification = document.createElement('div');
+            notification.className = 'memory-notification';
+            notification.textContent = stats.language === "ru" ? "Вика запомнит ваш выбор" : "Vika will remember your choice";
+            document.getElementById('game-container').appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+        saveSession();
+    }
 
-        function createChoiceButton(choice) {
-            const btn = document.createElement('button');
-            const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
-            btn.textContent = choice.cost && !hasCostInText 
-                ? `${choice.text[stats.language]} (${choice.cost} бриллиантов)` 
-                : choice.text[stats.language];
-            btn.className = 'choice-btn';
-            if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
-            if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
-            return btn;
+    function showScene(sceneId) {
+        if (!scriptData || !scriptData.scenes) {
+            console.error('Данные сценария не загружены');
+            showDebugMessage("Ошибка: данные сценария не загружены.");
+            return;
         }
 
-        function saveChoice(choiceId, effects, memoryTag) {
-            choices.push(choiceId);
-            if (effects) {
-                for (let key in effects) {
-                    if (key === 'relationships') {
-                        for (let rel in effects[key]) {
-                            stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
-                        }
-                    } else {
-                        stats[key] = (stats[key] || 0) + effects[key];
-                    }
-                }
+        let scene = typeof sceneId === 'number' ? scriptData.scenes[sceneId] : scriptData.scenes.find(s => s.id === sceneId);
+        if (!scene) {
+            if (currentChapter >= 2) {
+                showChapterPlaceholder();
+                return;
             }
-            if (memoryTag) {
-                stats.memories.push(memoryTag);
-                const notification = document.createElement('div');
-                notification.className = 'memory-notification';
-                notification.textContent = stats.language === "ru" ? "Вика запомнит ваш выбор" : "Vika will remember your choice";
-                document.getElementById('game-container').appendChild(notification);
-                setTimeout(() => notification.remove(), 3000);
+            console.warn('Сцена не найдена. Конец главы.');
+            const isLastScene = scriptData.scenes.length - 1 === currentScene;
+            const isLastChapter = currentChapter === 1;
+            if (isLastScene && isLastChapter) {
+                stats.completionCount += 1;
+                saveSession();
+                alert(stats.language === "ru" 
+                    ? `Вы прошли игру! Это ваше ${stats.completionCount}-е прохождение.` 
+                    : `You completed the game! This is your ${stats.completionCount}th playthrough.`);
+                handleMenu(new Event('click'));
             }
-            saveSession();
+            return;
         }
 
-        function showScene(sceneId) {
-            if (!scriptData || !scriptData.scenes) {
-                console.error('Данные сценария не загружены');
-                showDebugMessage("Ошибка: данные сценария не загружены.");
-                return;
-            }
-
-            let scene = typeof sceneId === 'number' ? scriptData.scenes[sceneId] : scriptData.scenes.find(s => s.id === sceneId);
-            if (!scene) {
-                if (currentChapter >= 2) {
-                    showChapterPlaceholder();
-                    return;
-                }
-                console.warn('Сцена не найдена. Конец главы.');
-                const isLastScene = scriptData.scenes.length - 1 === currentScene;
-                const isLastChapter = currentChapter === 1;
-                if (isLastScene && isLastChapter) {
-                    stats.completionCount += 1;
-                    saveSession();
-                    alert(stats.language === "ru" 
-                        ? `Вы прошли игру! Это ваше ${stats.completionCount}-е прохождение.` 
-                        : `You completed the game! This is your ${stats.completionCount}th playthrough.`);
-                    handleMenu(new Event('click'));
-                }
-                return;
-            }
-
-            if (!checkSceneCondition(scene)) {
-                currentScene++;
-                showScene(currentScene);
-                return;
-            }
-
-            if (scene.choices && scene.choices.some(choice => choice.timer)) {
-                const timeoutMs = (scene.choices[0].timer || 10) * 1000;
-                showSceneWithTimer(scene, timeoutMs);
-                return;
-            }
-
-            const progressElement = document.getElementById('progress');
-            const totalScenes = scriptData.scenes.length;
-            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-            progressElement.style.width = `${progressPercent}%`;
-
-            const backgroundElement = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogueElement = document.getElementById('dialogue-text');
-            const dialogueBox = document.querySelector('.dialogue-box');
-
-            let displayText = scene.text[stats.language];
-            if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-                displayText = scene.second_playthrough_text[stats.language];
-            }
-
-            const newBackground = scene.background || 'none';
-            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
-
-            const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
-                currentBackground = newBackground;
-                charLeft.style.backgroundImage = 'none';
-                charRight.style.backgroundImage = 'none';
-                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-                if (scene.characterLeft) {
-                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterLeft;
-                    charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-                }
-                if (scene.characterRight) {
-                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterRight;
-                    charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
-                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-                }
-
-                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-                if (dialogueBox.touchHandler) {
-                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-                    dialogueBox.touchHandler = null;
-                }
-
-                document.getElementById('speaker-name').textContent = speakerName;
-                typeText(displayText, dialogueElement, () => {
-                    if (scene.id === 7) showMessengerOverlay();
-
-                    if (scene.choices && scene.choices.length > 0) {
-                        document.body.ontouchstart = null;
-                        document.body.onclick = null;
-                        scene.choices.forEach(choice => {
-                            const btn = createChoiceButton(choice);
-                            if (choice.condition && !checkCondition(choice.condition)) {
-                                btn.style.display = 'none';
-                            } else if (choice.cost && stats.diamonds < choice.cost) {
-                                btn.disabled = true;
-                            } else {
-                                const handleChoice = (e) => {
-                                    e.preventDefault();
-                                    if (choice.cost) stats.diamonds -= choice.cost;
-                                    updateDiamondsDisplay();
-                                    saveChoice(choice.id, choice.effects, choice.memoryTag);
-                                    if (choice.effects) showChoiceEffects(choice.effects);
-                                    if (choice.nextScene !== undefined) {
-                                        currentScene = choice.nextScene;
-                                        saveSession();
-                                        showScene(currentScene);
-                                    } else if (choice.nextChapter) {
-                                        currentChapter = choice.nextChapter;
-                                        currentScene = 0;
-                                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                                    }
-                                };
-                                btn.addEventListener('touchstart', handleChoice);
-                                btn.addEventListener('click', handleChoice);
-                            }
-                            dialogueBox.appendChild(btn);
-                        });
-                    } else if (scene.nextScene !== undefined) {
-                        dialogueBox.touchHandler = (e) => {
-                            e.preventDefault();
-                            if (!isTyping) {
-                                currentScene = scene.nextScene;
-                                saveSession();
-                                showScene(currentScene);
-                            }
-                        };
-                        dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-                        dialogueBox.addEventListener('click', dialogueBox.touchHandler);
-                    } else if (scene.nextChapter) {
-                        currentChapter = scene.nextChapter;
-                        currentScene = 0;
-                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                    }
-                });
-            };
-
-            if (shouldFade) {
-                fadeOut(() => {
-                    applyScene();
-                    fadeIn();
-                });
-            } else {
-                applyScene();
-            }
+        if (!checkSceneCondition(scene)) {
+            currentScene++;
+            showScene(currentScene);
+            return;
         }
 
-        function showSceneWithTimer(scene, timeoutMs = 5000) {
-            const progressElement = document.getElementById('progress');
-            const totalScenes = scriptData.scenes.length;
-            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-            progressElement.style.width = `${progressPercent}%`;
+        if (scene.choices && scene.choices.some(choice => choice.timer)) {
+            const timeoutMs = (scene.choices[0].timer || 10) * 1000;
+            showSceneWithTimer(scene, timeoutMs);
+            return;
+        }
 
-            const backgroundElement = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogueElement = document.getElementById('dialogue-text');
-            const dialogueBox = document.querySelector('.dialogue-box');
+        const progressElement = document.getElementById('progress');
+        const totalScenes = scriptData.scenes.length;
+        const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+        progressElement.style.width = `${progressPercent}%`;
 
-            let displayText = scene.text[stats.language];
-            if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-                displayText = scene.second_playthrough_text[stats.language];
+        const backgroundElement = document.getElementById('background');
+        const charLeft = document.getElementById('character-left');
+        const charRight = document.getElementById('character-right');
+        const dialogueElement = document.getElementById('dialogue-text');
+        const dialogueBox = document.querySelector('.dialogue-box');
+
+        let displayText = scene.text[stats.language];
+        if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+            displayText = scene.second_playthrough_text[stats.language];
+        }
+
+        const newBackground = scene.background || 'none';
+        const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+        const applyScene = () => {
+            backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
+            currentBackground = newBackground;
+            charLeft.style.backgroundImage = 'none';
+            charRight.style.backgroundImage = 'none';
+            charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+            charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+            const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+            if (scene.characterLeft) {
+                const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                    ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterLeft;
+                charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
+                charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+            }
+            if (scene.characterRight) {
+                const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                    ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterRight;
+                charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
+                charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
             }
 
-            const newBackground = scene.background || 'none';
-            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+            if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+            if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
-            const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
-                currentBackground = newBackground;
-                charLeft.style.backgroundImage = 'none';
-                charRight.style.backgroundImage = 'none';
-                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+            if (dialogueBox.touchHandler) {
+                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+                dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+                dialogueBox.touchHandler = null;
+            }
 
-                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-                if (scene.characterLeft) {
-                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterLeft;
-                    charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-                }
-                if (scene.characterRight) {
-                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterRight;
-                    charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
-                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-                }
+            document.getElementById('speaker-name').textContent = speakerName;
+            typeText(displayText, dialogueElement, () => {
+                if (scene.id === 7) showMessengerOverlay();
 
-                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-                if (dialogueBox.touchHandler) {
-                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-                    dialogueBox.touchHandler = null;
-                }
-
-                document.getElementById('speaker-name').textContent = speakerName;
-                typeText(displayText, dialogueElement, () => {
-                    dialogueBox.style.pointerEvents = 'none';
+                if (scene.choices && scene.choices.length > 0) {
+                    document.body.ontouchstart = null;
+                    document.body.onclick = null;
                     scene.choices.forEach(choice => {
                         const btn = createChoiceButton(choice);
                         if (choice.condition && !checkCondition(choice.condition)) {
@@ -1208,8 +1109,6 @@
                                 updateDiamondsDisplay();
                                 saveChoice(choice.id, choice.effects, choice.memoryTag);
                                 if (choice.effects) showChoiceEffects(choice.effects);
-                                clearTimeout(timer);
-                                dialogueBox.style.pointerEvents = 'auto';
                                 if (choice.nextScene !== undefined) {
                                     currentScene = choice.nextScene;
                                     saveSession();
@@ -1225,205 +1124,321 @@
                         }
                         dialogueBox.appendChild(btn);
                     });
-
-                    const timer = setTimeout(() => {
-                        dialogueBox.style.pointerEvents = 'auto';
-                        if (scene.nextScene !== undefined) {
+                } else if (scene.nextScene !== undefined) {
+                    dialogueBox.touchHandler = (e) => {
+                        e.preventDefault();
+                        if (!isTyping) {
                             currentScene = scene.nextScene;
                             saveSession();
                             showScene(currentScene);
-                        } else if (scene.nextChapter) {
-                            currentChapter = scene.nextChapter;
-                            currentScene = 0;
-                            loadChapter(currentChapter).then(() => showScene(currentScene));
                         }
-                    }, timeoutMs);
-                });
-            };
+                    };
+                    dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
+                    dialogueBox.addEventListener('click', dialogueBox.touchHandler);
+                } else if (scene.nextChapter) {
+                    currentChapter = scene.nextChapter;
+                    currentScene = 0;
+                    loadChapter(currentChapter).then(() => showScene(currentScene));
+                }
+            });
+        };
 
-            if (shouldFade) {
-                fadeOut(() => {
-                    applyScene();
-                    fadeIn();
-                });
-            } else {
+        if (shouldFade) {
+            fadeOut(() => {
                 applyScene();
+                fadeIn();
+            });
+        } else {
+            applyScene();
+        }
+    }
+
+    function showSceneWithTimer(scene, timeoutMs = 5000) {
+        const progressElement = document.getElementById('progress');
+        const totalScenes = scriptData.scenes.length;
+        const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+        progressElement.style.width = `${progressPercent}%`;
+
+        const backgroundElement = document.getElementById('background');
+        const charLeft = document.getElementById('character-left');
+        const charRight = document.getElementById('character-right');
+        const dialogueElement = document.getElementById('dialogue-text');
+        const dialogueBox = document.querySelector('.dialogue-box');
+
+        let displayText = scene.text[stats.language];
+        if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+            displayText = scene.second_playthrough_text[stats.language];
+        }
+
+        const newBackground = scene.background || 'none';
+        const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+        const applyScene = () => {
+            backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
+            currentBackground = newBackground;
+            charLeft.style.backgroundImage = 'none';
+            charRight.style.backgroundImage = 'none';
+            charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+            charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+            const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+            if (scene.characterLeft) {
+                const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                    ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterLeft;
+                charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
+                charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+            }
+            if (scene.characterRight) {
+                const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                    ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                    : scene.characterRight;
+                charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
+                charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+            }
+
+            if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+            if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+            if (dialogueBox.touchHandler) {
+                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+                dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+                dialogueBox.touchHandler = null;
+            }
+
+            document.getElementById('speaker-name').textContent = speakerName;
+            typeText(displayText, dialogueElement, () => {
+                dialogueBox.style.pointerEvents = 'none';
+                scene.choices.forEach(choice => {
+                    const btn = createChoiceButton(choice);
+                    if (choice.condition && !checkCondition(choice.condition)) {
+                        btn.style.display = 'none';
+                    } else if (choice.cost && stats.diamonds < choice.cost) {
+                        btn.disabled = true;
+                    } else {
+                        const handleChoice = (e) => {
+                            e.preventDefault();
+                            if (choice.cost) stats.diamonds -= choice.cost;
+                            updateDiamondsDisplay();
+                            saveChoice(choice.id, choice.effects, choice.memoryTag);
+                            if (choice.effects) showChoiceEffects(choice.effects);
+                            clearTimeout(timer);
+                            dialogueBox.style.pointerEvents = 'auto';
+                            if (choice.nextScene !== undefined) {
+                                currentScene = choice.nextScene;
+                                saveSession();
+                                showScene(currentScene);
+                            } else if (choice.nextChapter) {
+                                currentChapter = choice.nextChapter;
+                                currentScene = 0;
+                                loadChapter(currentChapter).then(() => showScene(currentScene));
+                            }
+                        };
+                        btn.addEventListener('touchstart', handleChoice);
+                        btn.addEventListener('click', handleChoice);
+                    }
+                    dialogueBox.appendChild(btn);
+                });
+
+                const timer = setTimeout(() => {
+                    dialogueBox.style.pointerEvents = 'auto';
+                    if (scene.nextScene !== undefined) {
+                        currentScene = scene.nextScene;
+                        saveSession();
+                        showScene(currentScene);
+                    } else if (scene.nextChapter) {
+                        currentChapter = scene.nextChapter;
+                        currentScene = 0;
+                        loadChapter(currentChapter).then(() => showScene(currentScene));
+                    }
+                }, timeoutMs);
+            });
+        };
+
+        if (shouldFade) {
+            fadeOut(() => {
+                applyScene();
+                fadeIn();
+            });
+        } else {
+            applyScene();
+        }
+    }
+
+    function showMessengerOverlay() {
+        const existingOverlay = document.getElementById('messenger-overlay');
+        if (existingOverlay) existingOverlay.remove();
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('id', 'messenger-overlay');
+        svg.setAttribute('width', '300');
+        svg.setAttribute('height', '500');
+        svg.setAttribute('viewBox', '0 0 300 500');
+        svg.style.position = 'absolute';
+        svg.style.top = '50%';
+        svg.style.left = '50%';
+        svg.style.transform = 'translate(-50%, -50%)';
+        svg.style.zIndex = '4';
+
+        svg.innerHTML = `
+            <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
+            <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
+            <rect x="30" y="50" width="240" height="400" fill="#E8F1F5"/>
+            <g class="messages">
+                <rect id="msg1" x="50" y="100" width="150" height="40" rx="10" fill="#DCF8C6"/>
+                <text id="text1" x="60" y="125" fill="#333" font-size="14">Привет!</text>
+                <rect id="msg2" x="100" y="160" width="130" height="40" rx="10" fill="#FFF"/>
+                <text id="text2" x="110" y="185" fill="#333" font-size="14">Тусим вечером?</text>
+                <rect id="msg3" x="50" y="220" width="160" height="40" rx="10" fill="#DCF8C6"/>
+                <text id="text3" x="60" y="245" fill="#333" font-size="14">Дима будет!</text>
+            </g>
+        `;
+
+        document.getElementById('game-container').appendChild(svg);
+
+        gsap.from("#msg1, #text1", { y: 20, opacity: 0, duration: 1, delay: 0.5 });
+        gsap.from("#msg2, #text2", { y: 20, opacity: 0, duration: 1, delay: 1 });
+        gsap.from("#msg3, #text3", { y: 20, opacity: 0, duration: 1, delay: 1.5 });
+
+        setTimeout(() => {
+            if (document.getElementById('messenger-overlay')) {
+                document.getElementById('messenger-overlay').remove();
+            }
+        }, 3000);
+    }
+
+    function showChoiceEffects(effects) {
+        const validStats = ['crown', 'heart', 'leaf', 'diamonds'];
+        for (let key in effects) {
+            if (validStats.includes(key)) {
+                const feedback = document.createElement('img');
+                feedback.className = 'choice-feedback';
+                feedback.src = `/heart_at_crossroads/assets/ui/${key}.png`;
+                feedback.onerror = () => console.warn(`Изображение для ${key} не найдено`);
+                document.getElementById('game-container').appendChild(feedback);
+                setTimeout(() => feedback.remove(), 3000);
             }
         }
+    }
 
-        function showMessengerOverlay() {
-            const existingOverlay = document.getElementById('messenger-overlay');
-            if (existingOverlay) existingOverlay.remove();
+    function showChapterPlaceholder() {
+        const existingPlaceholder = document.querySelector('.placeholder-message');
+        if (existingPlaceholder) existingPlaceholder.remove();
+        const placeholder = document.createElement('div');
+        placeholder.className = 'placeholder-message';
+        placeholder.textContent = stats.language === "ru" ? 
+            'Временная заглушка: эта глава в разработке. Перезапустите игру.' : 
+            'Temporary placeholder: this chapter is in development. Restart the game.';
+        document.getElementById('game-container').appendChild(placeholder);
+        document.getElementById('character-left').style.backgroundImage = 'none';
+        document.getElementById('character-right').style.backgroundImage = 'none';
+        document.getElementById('speaker-name').textContent = '';
+        document.getElementById('dialogue-text').textContent = '';
+        const restartHandler = (e) => {
+            e.preventDefault();
+            placeholder.remove();
+            currentChapter = 1;
+            currentScene = 0;
+            loadChapter(1).then(() => showScene(currentScene));
+        };
+        document.body.ontouchstart = restartHandler;
+        document.body.onclick = restartHandler;
+    }
 
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('id', 'messenger-overlay');
-            svg.setAttribute('width', '300');
-            svg.setAttribute('height', '500');
-            svg.setAttribute('viewBox', '0 0 300 500');
-            svg.style.position = 'absolute';
-            svg.style.top = '50%';
-            svg.style.left = '50%';
-            svg.style.transform = 'translate(-50%, -50%)';
-            svg.style.zIndex = '4';
+    function checkSceneCondition(scene) {
+        return !scene.condition || checkCondition(scene.condition);
+    }
 
-            svg.innerHTML = `
-                <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
-                <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
-                <rect x="30" y="50" width="240" height="400" fill="#E8F1F5"/>
-                <g class="messages">
-                    <rect id="msg1" x="50" y="100" width="150" height="40" rx="10" fill="#DCF8C6"/>
-                    <text id="text1" x="60" y="125" fill="#333" font-size="14">Привет!</text>
-                    <rect id="msg2" x="100" y="160" width="130" height="40" rx="10" fill="#FFF"/>
-                    <text id="text2" x="110" y="185" fill="#333" font-size="14">Тусим вечером?</text>
-                    <rect id="msg3" x="50" y="220" width="160" height="40" rx="10" fill="#DCF8C6"/>
-                    <text id="text3" x="60" y="245" fill="#333" font-size="14">Дима будет!</text>
-                </g>
-            `;
-
-            document.getElementById('game-container').appendChild(svg);
-
-            gsap.from("#msg1, #text1", { y: 20, opacity: 0, duration: 1, delay: 0.5 });
-            gsap.from("#msg2, #text2", { y: 20, opacity: 0, duration: 1, delay: 1 });
-            gsap.from("#msg3, #text3", { y: 20, opacity: 0, duration: 1, delay: 1.5 });
-
-            setTimeout(() => {
-                if (document.getElementById('messenger-overlay')) {
-                    document.getElementById('messenger-overlay').remove();
-                }
-            }, 3000);
-        }
-
-        function showChoiceEffects(effects) {
-            const validStats = ['crown', 'heart', 'leaf', 'diamonds'];
-            for (let key in effects) {
-                if (validStats.includes(key)) {
-                    const feedback = document.createElement('img');
-                    feedback.className = 'choice-feedback';
-                    feedback.src = `/heart_at_crossroads/assets/ui/${key}.png`;
-                    feedback.onerror = () => console.warn(`Изображение для ${key} не найдено`);
-                    document.getElementById('game-container').appendChild(feedback);
-                    setTimeout(() => feedback.remove(), 3000);
-                }
-            }
-        }
-
-        function showChapterPlaceholder() {
-            const existingPlaceholder = document.querySelector('.placeholder-message');
-            if (existingPlaceholder) existingPlaceholder.remove();
-            const placeholder = document.createElement('div');
-            placeholder.className = 'placeholder-message';
-            placeholder.textContent = stats.language === "ru" ? 
-                'Временная заглушка: эта глава в разработке. Перезапустите игру.' : 
-                'Temporary placeholder: this chapter is in development. Restart the game.';
-            document.getElementById('game-container').appendChild(placeholder);
-            document.getElementById('character-left').style.backgroundImage = 'none';
-            document.getElementById('character-right').style.backgroundImage = 'none';
-            document.getElementById('speaker-name').textContent = '';
-            document.getElementById('dialogue-text').textContent = '';
-            const restartHandler = (e) => {
-                e.preventDefault();
-                placeholder.remove();
-                currentChapter = 1;
-                currentScene = 0;
-                loadChapter(1).then(() => showScene(currentScene));
-            };
-            document.body.ontouchstart = restartHandler;
-            document.body.onclick = restartHandler;
-        }
-
-        function checkSceneCondition(scene) {
-            return !scene.condition || checkCondition(scene.condition);
-        }
-
-        function checkCondition(condition) {
-            for (let key in condition) {
-                const value = key.startsWith('relationships.') ? stats.relationships[key.split('.')[1]] || 0 : stats[key] || 0;
-                const cond = condition[key];
-                if (cond === "true") return value === true;
-                if (cond === "false") return value === false;
-                if (cond.startsWith('>=')) return value >= parseInt(cond.slice(2));
-                if (cond.startsWith('>')) return value > parseInt(cond.slice(1));
-                if (cond.startsWith('<=')) return value <= parseInt(cond.slice(2));
-                if (cond.startsWith('<')) return value < parseInt(cond.slice(1));
-                if (key === 'crown' && cond === '>heart+leaf') return value > (stats.heart + stats.leaf);
-                if (key === 'completionCount') {
-                    if (cond === 'first') return value === 0;
-                    if (cond === 'second') return value === 1;
-                    if (cond === 'third') return value === 2;
-                    return value === parseInt(cond);
-                }
+    function checkCondition(condition) {
+        for (let key in condition) {
+            const value = key.startsWith('relationships.') ? stats.relationships[key.split('.')[1]] || 0 : stats[key] || 0;
+            const cond = condition[key];
+            if (cond === "true") return value === true;
+            if (cond === "false") return value === false;
+            if (cond.startsWith('>=')) return value >= parseInt(cond.slice(2));
+            if (cond.startsWith('>')) return value > parseInt(cond.slice(1));
+            if (cond.startsWith('<=')) return value <= parseInt(cond.slice(2));
+            if (cond.startsWith('<')) return value < parseInt(cond.slice(1));
+            if (key === 'crown' && cond === '>heart+leaf') return value > (stats.heart + stats.leaf);
+            if (key === 'completionCount') {
+                if (cond === 'first') return value === 0;
+                if (cond === 'second') return value === 1;
+                if (cond === 'third') return value === 2;
                 return value === parseInt(cond);
             }
-            return true;
+            return value === parseInt(cond);
         }
+        return true;
+    }
 
-        function typeText(text, element, callback) {
-            element.textContent = '';
-            if (element.typeTimer) clearTimeout(element.typeTimer);
+    function typeText(text, element, callback) {
+        element.textContent = '';
+        if (element.typeTimer) clearTimeout(element.typeTimer);
 
-            isTyping = true;
-            let i = 0;
-            const speed = 50;
+        isTyping = true;
+        let i = 0;
+        const speed = 50;
 
-            function type() {
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    element.typeTimer = setTimeout(type, speed);
-                } else {
-                    isTyping = false;
-                    delete element.typeTimer;
-                    if (callback) callback();
-                }
+        function type() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                element.typeTimer = setTimeout(type, speed);
+            } else {
+                isTyping = false;
+                delete element.typeTimer;
+                if (callback) callback();
             }
-            type();
-
-            const dialogueBox = document.querySelector('.dialogue-box');
-            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
-            dialogueBox.skipHandler = (e) => {
-                e.preventDefault();
-                if (isTyping) {
-                    clearTimeout(element.typeTimer);
-                    element.textContent = text;
-                    isTyping = false;
-                    if (callback) callback();
-                }
-            };
-            dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-            dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
         }
+        type();
 
-        function fadeOut(callback) {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.add('fade-out');
-            charLeft.classList.add('fade-out');
-            charRight.classList.add('fade-out');
-            dialogue.classList.add('fade-out');
-            setTimeout(callback, 1000);
-        }
-
-        function fadeIn() {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.remove('fade-out');
-            charLeft.classList.remove('fade-out');
-            charRight.classList.remove('fade-out');
-            dialogue.classList.remove('fade-out');
-        }
-
-        function handleMenu(e) {
+        const dialogueBox = document.querySelector('.dialogue-box');
+        dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
+        dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
+        dialogueBox.skipHandler = (e) => {
             e.preventDefault();
-            stats.hasReturnedViaMenu = true;
-            resetGameState();
-            saveSession();
-            showStartScreen();
-        }
-    </script>
+            if (isTyping) {
+                clearTimeout(element.typeTimer);
+                element.textContent = text;
+                isTyping = false;
+                if (callback) callback();
+            }
+        };
+        dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
+        dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
+    }
+
+    function fadeOut(callback) {
+        const bg = document.getElementById('background');
+        const charLeft = document.getElementById('character-left');
+        const charRight = document.getElementById('character-right');
+        const dialogue = document.getElementById('dialogue-box');
+        bg.classList.add('fade-out');
+        charLeft.classList.add('fade-out');
+        charRight.classList.add('fade-out');
+        dialogue.classList.add('fade-out');
+        setTimeout(callback, 1000);
+    }
+
+    function fadeIn() {
+        const bg = document.getElementById('background');
+        const charLeft = document.getElementById('character-left');
+        const charRight = document.getElementById('character-right');
+        const dialogue = document.getElementById('dialogue-box');
+        bg.classList.remove('fade-out');
+        charLeft.classList.remove('fade-out');
+        charRight.classList.remove('fade-out');
+        dialogue.classList.remove('fade-out');
+    }
+
+    function handleMenu(e) {
+        e.preventDefault();
+        stats.hasReturnedViaMenu = true;
+        resetGameState();
+        saveSession();
+        showStartScreen();
+    }
+</script>
 </body>
 </html>
