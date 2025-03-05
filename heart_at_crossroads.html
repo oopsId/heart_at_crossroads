@@ -1360,7 +1360,7 @@
         let currentLine = "";
         fullText.split(" ").forEach(word => {
             if ((currentLine + word).length <= maxCharsPerLine) {
-                currentLine += (currentLine ? " " : Overscore" : "") + word;
+                currentLine += (currentLine ? " " : "") + word;
             } else if ((currentLine + word).length > maxCharsPerLine) {
                 lines.push(currentLine);
                 currentLine = word;
