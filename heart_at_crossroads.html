@@ -494,6 +494,21 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
     <script>
+        // Проверка окружения Telegram
+        const isTelegram = !!(window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe);
+        if (isTelegram) {
+            try {
+                Telegram.WebApp.ready();
+                console.log('Telegram Web App инициализирован');
+            } catch (error) {
+                console.error('Ошибка инициализации Telegram Web App:', error);
+                alert('Не удалось инициализировать Telegram Web App. Некоторые функции могут быть недоступны.');
+            }
+        } else {
+            console.log('Запуск вне Telegram (браузер)');
+        }
+
+        const userId = isTelegram ? Telegram.WebApp.initDataUnsafe.user?.id : null;
         let currentChapter = 1;
         let currentScene = 0;
         let choices = [];
@@ -516,47 +531,60 @@
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
-        const isTelegram = !!(window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe);
-        if (isTelegram) {
-            Telegram.WebApp.ready();
-            console.log('Запуск в Telegram');
-        } else {
-            console.log('Запуск в браузере');
-        }
-
-        const userId = isTelegram ? Telegram.WebApp.initDataUnsafe.user?.id : null;
-
-        const saveToStorage = (key, value) => {
-            localStorage.setItem(key, JSON.stringify(value));
-            return Promise.resolve(true);
-        };
-
-        const getFromStorage = (key) => {
-            const item = localStorage.getItem(key);
-            return Promise.resolve(item ? JSON.parse(item) : null);
-        };
-
-        const checkAuthorization = async () => {
-            const authorizedUsers = await getFromStorage('authorized_users') || [];
-            if (userId && authorizedUsers.includes(userId)) {
-                stats.isAuthorized = true;
-                startGame();
-            } else {
-                showPasswordScreen();
+        // Функции хранения данных
+        const saveToStorage = async (key, value) => {
+            const data = JSON.stringify(value);
+            try {
+                if (isTelegram && Telegram.WebApp.CloudStorage) {
+                    return new Promise((resolve, reject) => {
+                        Telegram.WebApp.CloudStorage.setItem(key, data, (error, success) => {
+                            if (error) {
+                                console.error(`Ошибка сохранения в CloudStorage: ${error}`);
+                                reject(error);
+                            } else {
+                                resolve(true);
+                            }
+                        });
+                    });
+                } else {
+                    localStorage.setItem(key, data);
+                    return true;
+                }
+            } catch (error) {
+                console.error(`Ошибка сохранения данных: ${error}`);
+                throw error;
             }
         };
 
-        function showDebugMessage(message) {
-            let debugDiv = document.getElementById('debug-message');
-            if (!debugDiv) {
-                debugDiv = document.createElement('div');
-                debugDiv.id = 'debug-message';
-                document.body.appendChild(debugDiv);
+        const getFromStorage = async (key) => {
+            try {
+                if (isTelegram && Telegram.WebApp.CloudStorage) {
+                    return new Promise((resolve, reject) => {
+                        Telegram.WebApp.CloudStorage.getItem(key, (error, result) => {
+                            if (error) {
+                                console.error(`Ошибка получения из CloudStorage: ${error}`);
+                                reject(error);
+                            } else {
+                                resolve(result ? JSON.parse(result) : null);
+                            }
+                        });
+                    });
+                } else {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                }
+            } catch (error) {
+                console.error(`Ошибка получения данных: ${error}`);
+                throw error;
             }
-            debugDiv.textContent = message;
-            setTimeout(() => debugDiv.remove(), 5000);
-        }
+        };
 
+        // Утилита для добавления слушателей событий
+        const addEventListeners = (element, events, handler) => {
+            events.forEach(event => element.addEventListener(event, handler));
+        };
+
+        // Обработка загрузки DOM
         document.addEventListener('DOMContentLoaded', () => {
             const startGameBtn = document.getElementById('start-game');
             const continueGameBtn = document.getElementById('continue-game');
@@ -567,116 +595,137 @@
             const galleryBtn = document.getElementById('gallery-btn');
             const languageBtn = document.getElementById('language-btn');
             const languageIcon = document.getElementById('language-icon');
-            const title = document.getElementById('title');
 
             updateLanguage(stats.language);
 
-            startGameBtn.addEventListener('touchstart', (e) => {
+            // Унифицированные обработчики
+            function handleStartGame(e) {
                 e.preventDefault();
-                console.log('Нажата кнопка "Начать игру" (touchstart)');
+                console.log('Нажата кнопка "Начать игру"');
                 checkTempPassword(() => startNewGame());
-            });
-            startGameBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Нажата кнопка "Начать игру" (click)');
-                checkTempPassword(() => startNewGame());
-            });
+            }
 
-            continueGameBtn.addEventListener('touchstart', (e) => {
+            function handleContinueGame(e) {
                 e.preventDefault();
-                console.log('Нажата кнопка "Продолжить" (touchstart)');
+                console.log('Нажата кнопка "Продолжить"');
                 checkTempPassword(() => loadSession(() => startGame()));
-            });
-            continueGameBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Нажата кнопка "Продолжить" (click)');
-                checkTempPassword(() => loadSession(() => startGame()));
-            });
+            }
 
-            showPasswordBtn.addEventListener('touchstart', (e) => {
+            function handleShowPassword(e) {
                 e.preventDefault();
                 document.getElementById('password-form').style.display = 'flex';
                 document.querySelector('.start-buttons').style.display = 'none';
-            });
-            showPasswordBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('password-form').style.display = 'flex';
-                document.querySelector('.start-buttons').style.display = 'none';
-            });
+            }
 
-            passwordSubmitBtn.addEventListener('touchstart', (e) => {
+            async function handlePasswordSubmit(e) {
                 e.preventDefault();
-                handlePasswordSubmit(e);
-            });
-            passwordSubmitBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                handlePasswordSubmit(e);
-            });
+                const inputPassword = document.getElementById('password-input').value;
+                try {
+                    if (inputPassword === tempPassword || inputPassword === correctPassword) {
+                        if (inputPassword === correctPassword) {
+                            const authorizedUsers = (await getFromStorage('authorized_users')) || [];
+                            if (userId && !authorizedUsers.includes(userId)) {
+                                authorizedUsers.push(userId);
+                                await saveToStorage('authorized_users', authorizedUsers);
+                            }
+                            stats.isAuthorized = true;
+                        }
+                        startNewGame();
+                    } else {
+                        alert(stats.language === "ru" ? 'Неверный пароль!' : 'Incorrect password!');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при обработке пароля:', error);
+                    alert(stats.language === "ru" ? 'Ошибка авторизации. Попробуйте снова.' : 'Authorization error. Please try again.');
+                }
+            }
 
-            menuBtn.addEventListener('touchstart', (e) => {
+            function handleMenu(e) {
                 e.preventDefault();
-                handleMenu(e);
-            });
-            menuBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleMenu(e);
-            });
+                stats.hasReturnedViaMenu = true;
+                resetGameState();
+                saveSession();
+                showStartScreen();
+            }
 
-            statsBtn.addEventListener('touchstart', (e) => {
+            function handleShowStats(e) {
                 e.preventDefault();
-                handleShowStats(e);
-            });
-            statsBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleShowStats(e);
-            });
+                const statsText = stats.language === "ru" ?
+                    `Короны: ${stats.crown}\nСердце: ${stats.heart}\nЛист: ${stats.leaf}\nБриллианты: ${stats.diamonds}\nОтношения:\nМарк: ${stats.relationships.mark}\nЛера: ${stats.relationships.lera}\nВика: ${stats.relationships.vika}\nСергей: ${stats.relationships.sergey}\nАнна: ${stats.relationships.anna}\nДима: ${stats.relationships.dima}\nЛёша: ${stats.relationships.lesha}` :
+                    `Crowns: ${stats.crown}\nHeart: ${stats.heart}\nLeaf: ${stats.leaf}\nDiamonds: ${stats.diamonds}\nRelationships:\nMark: ${stats.relationships.mark}\nLera: ${stats.relationships.lera}\nVika: ${stats.relationships.vika}\nSergey: ${stats.relationships.sergey}\nAnna: ${stats.relationships.anna}\nDima: ${stats.relationships.dima}\nLesha: ${stats.relationships.lesha}`;
+                alert(statsText);
+            }
 
-            galleryBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-            });
-            galleryBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-            });
-
-            languageBtn.addEventListener('touchstart', (e) => {
+            function handleLanguageSwitch(e) {
                 e.preventDefault();
                 stats.language = stats.language === "ru" ? "en" : "ru";
                 languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
                 updateLanguage(stats.language);
                 saveSession();
-            });
-            languageBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                stats.language = stats.language === "ru" ? "en" : "ru";
-                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
-                updateLanguage(stats.language);
-                saveSession();
-            });
+            }
 
+            // Привязка событий
+            addEventListeners(startGameBtn, ['click', 'touchstart'], handleStartGame);
+            addEventListeners(continueGameBtn, ['click', 'touchstart'], handleContinueGame);
+            addEventListeners(showPasswordBtn, ['click', 'touchstart'], handleShowPassword);
+            addEventListeners(passwordSubmitBtn, ['click', 'touchstart'], handlePasswordSubmit);
+            addEventListeners(menuBtn, ['click', 'touchstart'], handleMenu);
+            addEventListeners(statsBtn, ['click', 'touchstart'], handleShowStats);
+            addEventListeners(galleryBtn, ['click', 'touchstart'], (e) => e.preventDefault());
+            addEventListeners(languageBtn, ['click', 'touchstart'], handleLanguageSwitch);
+
+            // Кнопка "Назад" для формы пароля
             const backButton = document.createElement('button');
             backButton.id = 'back-button';
             backButton.textContent = stats.language === "ru" ? "Назад" : "Back";
-            backButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                document.getElementById('password-form').style.display = 'none';
-                document.querySelector('.start-buttons').style.display = 'flex';
-            });
-            backButton.addEventListener('click', (e) => {
+            addEventListeners(backButton, ['click', 'touchstart'], (e) => {
                 e.preventDefault();
                 document.getElementById('password-form').style.display = 'none';
                 document.querySelector('.start-buttons').style.display = 'flex';
             });
             document.getElementById('password-form').appendChild(backButton);
 
+            // Начальная проверка сессии
             getFromStorage('last_session')
                 .then(session => {
                     if (session) {
-                        document.getElementById('start-screen').style.display = 'flex';
+                        showStartScreen();
                     } else {
                         checkAuthorization();
                     }
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке последней сессии:', error);
+                    showStartScreen();
                 });
         });
+
+        // Вспомогательные функции
+        function showStartScreen() {
+            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('language-btn').style.display = 'block';
+            document.getElementById('game-container').style.display = 'none';
+        }
+
+        function resetGameState() {
+            currentChapter = 1;
+            currentScene = 0;
+            choices = [];
+            stats = {
+                crown: 0,
+                heart: 0,
+                leaf: 0,
+                diamonds: 10,
+                relationships: { mark: 0, lera: 0, vika: 0, sergey: 0, anna: 0, dima: 0, lesha: 0 },
+                appearance: "style1",
+                isAuthorized: stats.isAuthorized,
+                memories: [],
+                language: stats.language,
+                hasReturnedViaMenu: true,
+                completionCount: stats.completionCount
+            };
+            currentBackground = null;
+        }
 
         function updateLanguage(lang) {
             document.getElementById('start-game').textContent = document.getElementById('start-game').getAttribute(`data-${lang}`);
@@ -692,106 +741,92 @@
             title.className = lang === "ru" ? "ru" : "en";
         }
 
-        async function handlePasswordSubmit(e) {
-            const inputPassword = document.getElementById('password-input').value;
-            if (inputPassword === tempPassword) {
-                startNewGame();
-            } else if (inputPassword === correctPassword) {
+        async function checkAuthorization() {
+            try {
                 const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-                if (userId && !authorizedUsers.includes(userId)) {
-                    authorizedUsers.push(userId);
-                    await saveToStorage('authorized_users', authorizedUsers);
+                if (userId && authorizedUsers.includes(userId)) {
+                    stats.isAuthorized = true;
+                    startGame();
+                } else {
+                    showStartScreen();
                 }
-                stats.isAuthorized = true;
-                startNewGame();
-            } else {
-                alert('Неверный пароль!');
+            } catch (error) {
+                console.error('Ошибка проверки авторизации:', error);
+                showStartScreen();
             }
         }
 
-        function checkTempPassword(callback) {
-            getFromStorage('tempAccessGranted').then(granted => {
+        async function checkTempPassword(callback) {
+            try {
+                const granted = await getFromStorage('tempAccessGranted');
                 if (granted) {
                     callback();
                 } else {
-                    const input = prompt('Игра временно закрыта на доработку. Введите временный пароль:');
+                    const input = prompt(stats.language === "ru" ? 'Игра временно закрыта на доработку. Введите временный пароль:' : 'The game is temporarily closed for refinement. Enter temporary password:');
                     if (input === tempPassword || input === correctPassword) {
-                        saveToStorage('tempAccessGranted', true);
-                        if (input === correctPassword) {
-                            stats.isAuthorized = true;
-                        }
+                        await saveToStorage('tempAccessGranted', true);
+                        if (input === correctPassword) stats.isAuthorized = true;
                         callback();
                     } else {
-                        alert('Неверный временный пароль! Доступ к игре ограничен.');
+                        alert(stats.language === "ru" ? 'Неверный временный пароль! Доступ ограничен.' : 'Incorrect temporary password! Access restricted.');
                     }
                 }
-            });
+            } catch (error) {
+                console.error('Ошибка проверки временного пароля:', error);
+                alert(stats.language === "ru" ? 'Ошибка проверки доступа.' : 'Error checking access.');
+            }
         }
 
         function startNewGame() {
-            currentChapter = 1;
-            currentScene = 0;
-            choices = [];
-            stats = {
-                crown: 0,
-                heart: 0,
-                leaf: 0,
-                diamonds: 10,
-                relationships: { mark: 0, lera: 0, vika: 0, sergey: 0, anna: 0, dima: 0, lesha: 0 },
-                appearance: "style1",
-                isAuthorized: stats.isAuthorized,
-                memories: [],
-                language: stats.language || "ru",
-                hasReturnedViaMenu: false,
-                completionCount: stats.completionCount
-            };
-            currentBackground = null;
+            resetGameState();
             saveSession();
             console.log('Запуск новой игры');
             startGame();
         }
 
-        function createChoiceButton(choice) {
-            const btn = document.createElement('button');
-            const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
-            btn.textContent = choice.cost && !hasCostInText 
-                ? `${choice.text[stats.language]} (${choice.cost} бриллиантов)` 
-                : choice.text[stats.language];
-            btn.className = 'choice-btn';
-            if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
-            if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
-            return btn;
+        async function loadSession(callback) {
+            try {
+                const session = await getFromStorage('last_session');
+                if (session) {
+                    currentChapter = session.currentChapter;
+                    currentScene = session.currentScene;
+                    choices = session.choices;
+                    stats = { ...stats, ...session.stats };
+                }
+                if (callback) callback();
+            } catch (error) {
+                console.error('Ошибка загрузки сессии:', error);
+                alert(stats.language === "ru" ? 'Ошибка загрузки сохранённой игры.' : 'Error loading saved game.');
+            }
         }
 
-        function showPasswordScreen() {
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('language-btn').style.display = 'block';
+        async function saveSession() {
+            const session = { currentChapter, currentScene, choices, stats };
+            try {
+                await saveToStorage('last_session', session);
+                updateDiamondsDisplay();
+            } catch (error) {
+                console.error('Ошибка сохранения сессии:', error);
+            }
         }
 
         async function startGame() {
-            console.log('Начало функции startGame с параметрами:', { currentChapter, currentScene });
-            showDebugMessage('Инициализация игры...');
-            
-            document.getElementById('game-container').style.display = 'block';
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('language-btn').style.display = 'none';
-
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.id = 'loading-overlay';
-            loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10;display:flex;justify-content:center;align-items:center;color:#fff;';
-            loadingOverlay.innerHTML = '<span>Загрузка...</span>';
-            document.body.appendChild(loadingOverlay);
-
             try {
-                console.log('Запуск preloadAssets');
-                await preloadAssets(currentChapter);
-                console.log('Ассеты загружены');
-                showDebugMessage('Ассеты загружены');
+                console.log('Запуск игры...');
+                showDebugMessage('Инициализация игры...');
+                
+                document.getElementById('game-container').style.display = 'block';
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('language-btn').style.display = 'none';
 
-                console.log('Запуск loadChapter');
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loading-overlay';
+                loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:10;display:flex;justify-content:center;align-items:center;color:#fff;';
+                loadingOverlay.innerHTML = '<span>Загрузка...</span>';
+                document.body.appendChild(loadingOverlay);
+
+                await preloadAssets(currentChapter);
                 await loadChapter(currentChapter);
-                console.log('Глава загружена:', scriptData);
-                showDebugMessage('Глава загружена');
 
                 document.getElementById('background').style.display = 'block';
                 document.getElementById('character-left').style.display = 'block';
@@ -805,17 +840,29 @@
                 updateDiamondsDisplay();
 
                 loadingOverlay.remove();
-                console.log('Вызов showScene с currentScene:', currentScene);
                 showScene(currentScene);
             } catch (error) {
                 console.error('Ошибка в startGame:', error);
-                showDebugMessage('Ошибка: ' + error.message);
-                loadingOverlay.remove();
+                showDebugMessage(`Ошибка: ${error.message}`);
+                alert(stats.language === "ru" ? 'Ошибка запуска игры. Попробуйте снова.' : 'Error starting game. Please try again.');
+                document.getElementById('loading-overlay')?.remove();
+                showStartScreen();
             }
         }
 
         function updateDiamondsDisplay() {
             document.getElementById('diamonds-count').textContent = stats.diamonds;
+        }
+
+        function showDebugMessage(message) {
+            let debugDiv = document.getElementById('debug-message');
+            if (!debugDiv) {
+                debugDiv = document.createElement('div');
+                debugDiv.id = 'debug-message';
+                document.body.appendChild(debugDiv);
+            }
+            debugDiv.textContent = message;
+            setTimeout(() => debugDiv.remove(), 5000);
         }
 
         function preloadAssets(chapterId) {
@@ -874,53 +921,40 @@
             });
         }
 
-        async function loadSession(callback) {
-            const session = await getFromStorage('last_session');
-            if (session) {
-                currentChapter = session.currentChapter;
-                currentScene = session.currentScene;
-                choices = session.choices;
-                stats = {
-                    ...stats,
-                    ...session.stats
-                };
-            }
-            if (callback) callback();
-        }
-
-        async function saveSession() {
-            const session = { currentChapter, currentScene, choices, stats };
-            await saveToStorage('last_session', session);
-            updateDiamondsDisplay();
-        }
-
         async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
             const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`;
-            console.log(`Путь к JSON: ${jsonPath}`);
-            
-            return fetch(jsonPath, {
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
-                    return response.text();
-                })
-                .then(text => {
-                    const data = JSON.parse(text);
-                    if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                        throw new Error('Некорректный формат JSON');
+            try {
+                const response = await fetch(jsonPath, {
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Accept': 'application/json'
                     }
-                    scriptData = data;
-                    console.log(`Данные главы ${chapterId} успешно загружены`);
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки главы:', error);
-                    throw error;
                 });
+                if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
+                const text = await response.text();
+                const data = JSON.parse(text);
+                if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+                    throw new Error('Некорректный формат JSON');
+                }
+                scriptData = data;
+                console.log(`Данные главы ${chapterId} успешно загружены`);
+            } catch (error) {
+                console.error('Ошибка загрузки главы:', error);
+                throw error;
+            }
+        }
+
+        function createChoiceButton(choice) {
+            const btn = document.createElement('button');
+            const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
+            btn.textContent = choice.cost && !hasCostInText 
+                ? `${choice.text[stats.language]} (${choice.cost} бриллиантов)` 
+                : choice.text[stats.language];
+            btn.className = 'choice-btn';
+            if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
+            if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
+            return btn;
         }
 
         function saveChoice(choiceId, effects, memoryTag) {
@@ -948,27 +982,19 @@
         }
 
         function showScene(sceneId) {
-            console.log('Вызов showScene с sceneId:', sceneId);
             if (!scriptData || !scriptData.scenes) {
                 console.error('Данные сценария не загружены');
                 showDebugMessage("Ошибка: данные сценария не загружены.");
                 return;
             }
 
-            let scene;
-            if (typeof sceneId === 'number') {
-                scene = scriptData.scenes[sceneId];
-            } else {
-                scene = scriptData.scenes.find(s => s.id === sceneId);
-            }
-
+            let scene = typeof sceneId === 'number' ? scriptData.scenes[sceneId] : scriptData.scenes.find(s => s.id === sceneId);
             if (!scene) {
                 if (currentChapter >= 2) {
                     showChapterPlaceholder();
                     return;
                 }
                 console.warn('Сцена не найдена. Конец главы.');
-                showDebugMessage("Сцена не найдена. Конец главы.');
                 const isLastScene = scriptData.scenes.length - 1 === currentScene;
                 const isLastChapter = currentChapter === 1;
                 if (isLastScene && isLastChapter) {
@@ -1011,17 +1037,9 @@
             }
 
             const newBackground = scene.background || 'none';
-            const isLastScene = scene.id === scriptData.scenes.length - 1;
-            const shouldFade = currentBackground !== newBackground || isLastScene;
-
-            console.log('Применение сцены:', scene);
-
-            if (scene.sound || scene.music) {
-                console.log("[Заглушка: Звук " + (scene.sound || scene.music) + " временно отключён]");
-            }
+            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
 
             const applyScene = () => {
-                console.log('Установка фона:', newBackground);
                 backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
                 currentBackground = newBackground;
                 charLeft.style.backgroundImage = 'none';
@@ -1034,7 +1052,6 @@
                     const leftChar = scene.characterLeft.includes('${stats.appearance}') 
                         ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                         : scene.characterLeft;
-                    console.log('Установка левого персонажа:', leftChar);
                     charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
                     charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
                 }
@@ -1042,7 +1059,6 @@
                     const rightChar = scene.characterRight.includes('${stats.appearance}') 
                         ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
                         : scene.characterRight;
-                    console.log('Установка правого персонажа:', rightChar);
                     charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
                     charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
                 }
@@ -1057,15 +1073,9 @@
                     dialogueBox.touchHandler = null;
                 }
 
-                const particlesContainer = document.getElementById('particles');
-                particlesContainer.innerHTML = '';
-
                 document.getElementById('speaker-name').textContent = speakerName;
-                console.log('Установка текста:', displayText);
                 typeText(displayText, dialogueElement, () => {
-                    if (scene.id === 7) {
-                        showMessengerOverlay();
-                    }
+                    if (scene.id === 7) showMessengerOverlay();
 
                     if (scene.choices && scene.choices.length > 0) {
                         document.body.ontouchstart = null;
@@ -1079,26 +1089,18 @@
                             } else {
                                 const handleChoice = (e) => {
                                     e.preventDefault();
-                                    console.log('Выбор сделан:', choice.id, 'Переход на сцену:', choice.nextScene);
-                                    if (choice.cost) {
-                                        stats.diamonds -= choice.cost;
-                                        console.log('Потрачено бриллиантов:', choice.cost, 'Осталось:', stats.diamonds);
-                                    }
+                                    if (choice.cost) stats.diamonds -= choice.cost;
                                     updateDiamondsDisplay();
                                     saveChoice(choice.id, choice.effects, choice.memoryTag);
                                     if (choice.effects) showChoiceEffects(choice.effects);
                                     if (choice.nextScene !== undefined) {
                                         currentScene = choice.nextScene;
-                                        console.log('Переход на сцену:', currentScene);
                                         saveSession();
                                         showScene(currentScene);
                                     } else if (choice.nextChapter) {
                                         currentChapter = choice.nextChapter;
                                         currentScene = 0;
-                                        console.log('Переход на главу:', currentChapter);
                                         loadChapter(currentChapter).then(() => showScene(currentScene));
-                                    } else {
-                                        console.warn('Нет nextScene или nextChapter для выбора:', choice.id);
                                     }
                                 };
                                 btn.addEventListener('touchstart', handleChoice);
@@ -1136,8 +1138,6 @@
         }
 
         function showSceneWithTimer(scene, timeoutMs = 5000) {
-            console.log('Вызов showSceneWithTimer с scene:', scene.id, 'Таймер:', timeoutMs);
-
             const progressElement = document.getElementById('progress');
             const totalScenes = scriptData.scenes.length;
             const progressPercent = ((scene.id + 1) / totalScenes) * 100;
@@ -1155,15 +1155,9 @@
             }
 
             const newBackground = scene.background || 'none';
-            const isLastScene = scene.id === scriptData.scenes.length - 1;
-            const shouldFade = currentBackground !== newBackground || isLastScene;
-
-            if (scene.sound || scene.music) {
-                console.log("[Заглушка: Звук " + (scene.sound || scene.music) + " временно отключён]");
-            }
+            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
 
             const applyScene = () => {
-                console.log('Установка фона:', newBackground);
                 backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
                 currentBackground = newBackground;
                 charLeft.style.backgroundImage = 'none';
@@ -1176,7 +1170,6 @@
                     const leftChar = scene.characterLeft.includes('${stats.appearance}') 
                         ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                         : scene.characterLeft;
-                    console.log('Установка левого персонажа:', leftChar);
                     charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
                     charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
                 }
@@ -1184,7 +1177,6 @@
                     const rightChar = scene.characterRight.includes('${stats.appearance}') 
                         ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
                         : scene.characterRight;
-                    console.log('Установка правого персонажа:', rightChar);
                     charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
                     charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
                 }
@@ -1199,16 +1191,8 @@
                     dialogueBox.touchHandler = null;
                 }
 
-                const particlesContainer = document.getElementById('particles');
-                particlesContainer.innerHTML = '';
-
                 document.getElementById('speaker-name').textContent = speakerName;
-                console.log('Установка текста:', displayText);
                 typeText(displayText, dialogueElement, () => {
-                    if (scene.id === 7) {
-                        showMessengerOverlay();
-                    }
-
                     dialogueBox.style.pointerEvents = 'none';
                     scene.choices.forEach(choice => {
                         const btn = createChoiceButton(choice);
@@ -1219,11 +1203,7 @@
                         } else {
                             const handleChoice = (e) => {
                                 e.preventDefault();
-                                console.log('Выбор сделан:', choice.id, 'Переход на сцену:', choice.nextScene);
-                                if (choice.cost) {
-                                    stats.diamonds -= choice.cost;
-                                    console.log('Потрачено бриллиантов:', choice.cost, 'Осталось:', stats.diamonds);
-                                }
+                                if (choice.cost) stats.diamonds -= choice.cost;
                                 updateDiamondsDisplay();
                                 saveChoice(choice.id, choice.effects, choice.memoryTag);
                                 if (choice.effects) showChoiceEffects(choice.effects);
@@ -1246,7 +1226,6 @@
                     });
 
                     const timer = setTimeout(() => {
-                        console.log('Таймер истёк, переход к следующей сцене');
                         dialogueBox.style.pointerEvents = 'auto';
                         if (scene.nextScene !== undefined) {
                             currentScene = scene.nextScene;
@@ -1314,14 +1293,13 @@
         }
 
         function showChoiceEffects(effects) {
+            const validStats = ['crown', 'heart', 'leaf', 'diamonds'];
             for (let key in effects) {
-                if (key !== 'relationships') {
+                if (validStats.includes(key)) {
                     const feedback = document.createElement('img');
                     feedback.className = 'choice-feedback';
                     feedback.src = `/heart_at_crossroads/assets/ui/${key}.png`;
-                    feedback.onerror = () => {
-                        console.warn(`Изображение для ${key} не найдено`);
-                    };
+                    feedback.onerror = () => console.warn(`Изображение для ${key} не найдено`);
                     document.getElementById('game-container').appendChild(feedback);
                     setTimeout(() => feedback.remove(), 3000);
                 }
@@ -1333,7 +1311,9 @@
             if (existingPlaceholder) existingPlaceholder.remove();
             const placeholder = document.createElement('div');
             placeholder.className = 'placeholder-message';
-            placeholder.textContent = 'Временная заглушка: эта глава находится в разработке. Мы сейчас отлаживаем первую главу и сцены. Пожалуйста, перезапустите игру.';
+            placeholder.textContent = stats.language === "ru" ? 
+                'Временная заглушка: эта глава в разработке. Перезапустите игру.' : 
+                'Temporary placeholder: this chapter is in development. Restart the game.';
             document.getElementById('game-container').appendChild(placeholder);
             document.getElementById('character-left').style.backgroundImage = 'none';
             document.getElementById('character-right').style.backgroundImage = 'none';
@@ -1351,8 +1331,7 @@
         }
 
         function checkSceneCondition(scene) {
-            if (!scene.condition) return true;
-            return checkCondition(scene.condition);
+            return !scene.condition || checkCondition(scene.condition);
         }
 
         function checkCondition(condition) {
@@ -1379,9 +1358,7 @@
 
         function typeText(text, element, callback) {
             element.textContent = '';
-            if (element.typeTimer) {
-                clearTimeout(element.typeTimer);
-            }
+            if (element.typeTimer) clearTimeout(element.typeTimer);
 
             isTyping = true;
             let i = 0;
@@ -1442,33 +1419,9 @@
         function handleMenu(e) {
             e.preventDefault();
             stats.hasReturnedViaMenu = true;
-            currentChapter = 1;
-            currentScene = 0;
-            choices = [];
-            stats = {
-                crown: 0,
-                heart: 0,
-                leaf: 0,
-                diamonds: 10,
-                relationships: { mark: 0, lera: 0, vika: 0, sergey: 0, anna: 0, dima: 0, lesha: 0 },
-                appearance: "style1",
-                isAuthorized: stats.isAuthorized,
-                memories: [],
-                language: stats.language,
-                hasReturnedViaMenu: true,
-                completionCount: stats.completionCount
-            };
-            currentBackground = null;
-            const existingPlaceholder = document.querySelector('.placeholder-message');
-            if (existingPlaceholder) existingPlaceholder.remove();
+            resetGameState();
             saveSession();
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('language-btn').style.display = 'block';
-        }
-
-        function handleShowStats(e) {
-            e.preventDefault();
-            alert(`Короны: ${stats.crown}\nСердце: ${stats.heart}\nЛист: ${stats.leaf}\nБриллианты: ${stats.diamonds}\nОтношения:\nМарк: ${stats.relationships.mark}\nЛера: ${stats.relationships.lera}\nВика: ${stats.relationships.vika}\nСергей: ${stats.relationships.sergey}\nАнна: ${stats.relationships.anna}\nДима: ${stats.relationships.dima}\nЛёша: ${stats.relationships.lesha}`);
+            showStartScreen();
         }
     </script>
 </body>
