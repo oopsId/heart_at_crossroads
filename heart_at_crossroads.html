@@ -115,12 +115,12 @@
     right: 0;
     background: linear-gradient(to top, rgba(93, 64, 55, 0.8), rgba(93, 64, 55, 0.4));
     color: #F5F0E1;
-    padding: 40px 20px 20px;
+    padding: 2px 20px 20px; /* Уменьшен верхний отступ до 2px */
     text-align: center;
     z-index: 3; /* Градиент над смартфоном */
     transition: opacity 1s ease, bottom 0.3s ease;
     opacity: 1;
-    min-height: 150px;
+    min-height: 150px; /* Оставляем достаточно места для текста и кнопок */
     max-height: 50vh;
     overflow-y: auto;
     display: flex;
@@ -129,9 +129,30 @@
     box-sizing: border-box;
 }
 
-   #timer-countdown {
+#speaker-name {
+    margin: 0; /* Убираем лишние отступы */
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#dialogue-text {
+    margin: 5px 0; /* Небольшой отступ сверху от имени спикера */
+    font-size: 16px;
+}
+
+.choice-btn {
+    margin: 5px 10px; /* Отступы для кнопок */
+    padding: 10px 20px;
+    background: rgba(139, 69, 19, 0.8); /* Контрастный фон */
+    color: #F5F0E1;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#timer-countdown {
     position: absolute;
-    top: calc(100% - 20%); /* Нижняя граница цифр привязана к верхнему краю градиента */
+    top: 10%; /* Над градиентом */
     left: 50%;
     transform: translateX(-50%);
     font-size: 40px;
