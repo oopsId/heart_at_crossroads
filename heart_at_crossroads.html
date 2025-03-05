@@ -1557,7 +1557,7 @@
             delete element.typeTimer;
             console.log(`Завершена часть ${partIndex + 1} из ${parts.length}`);
 
-            // Удаляем старые обработчики
+            // Удаляем старые обработчики перед привязкой новых
             dialogueBox.removeEventListener('touchstart', dialogueBox.nextPartHandler);
             dialogueBox.removeEventListener('click', dialogueBox.nextPartHandler);
             dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
@@ -1578,8 +1578,22 @@
                 console.log('Привязываем nextPartHandler');
                 dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler);
                 dialogueBox.addEventListener('click', dialogueBox.nextPartHandler);
+                
+                // Обновляем обработчик пропуска для следующей части
+                dialogueBox.skipHandler = (e) => {
+                    e.preventDefault();
+                    if (isTyping) {
+                        console.log(`Пропуск части ${partIndex + 1}`);
+                        clearTimeout(element.typeTimer);
+                        element.textContent = parts[partIndex];
+                        isTyping = false;
+                        type();
+                    }
+                };
+                dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
+                dialogueBox.addEventListener('click', dialogueBox.skipHandler);
             } else {
-                // После последней части сразу вызываем callback и не привязываем обработчики
+                // После последней части сразу вызываем callback и очищаем обработчики
                 console.log('Все части отображены, вызываем callback');
                 if (callback) callback();
             }
@@ -1587,7 +1601,7 @@
     }
     type();
 
-    // Обработчик пропуска текущей части
+    // Начальный обработчик пропуска текущей части
     dialogueBox.skipHandler = (e) => {
         e.preventDefault();
         if (isTyping) {
@@ -1595,8 +1609,7 @@
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             isTyping = false;
-            // Вызываем type() только для проверки завершения
-            type();
+            type(); // Продолжаем логику после пропуска
         }
     };
     dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
