@@ -1526,7 +1526,7 @@
         return true;
     }
 
-    function typeText(text, element, callback) {
+   function typeText(text, element, callback) {
     element.textContent = '';
     if (element.typeTimer) clearTimeout(element.typeTimer);
 
@@ -1536,7 +1536,10 @@
 
     // Разбиваем текст по символу "||"
     const parts = text.split('||').map(part => part.trim());
+    console.log('Разделённый текст:', parts); // Проверяем части текста
     let partIndex = 0;
+
+    const dialogueBox = document.querySelector('.dialogue-box');
 
     function type() {
         if (i < parts[partIndex].length) {
@@ -1546,45 +1549,51 @@
         } else {
             isTyping = false;
             delete element.typeTimer;
+            console.log(`Завершена часть ${partIndex + 1} из ${parts.length}`);
 
-            const dialogueBox = document.querySelector('.dialogue-box');
-            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
+            // Удаляем старые обработчики
+            dialogueBox.removeEventListener('touchstart', dialogueBox.nextPartHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.nextPartHandler);
 
             if (partIndex < parts.length - 1) {
-                dialogueBox.skipHandler = (e) => {
+                // Ждём тап для следующей части
+                dialogueBox.nextPartHandler = (e) => {
                     e.preventDefault();
                     if (!isTyping) {
+                        console.log(`Тап для перехода к части ${partIndex + 2}`);
                         i = 0;
                         partIndex++;
                         element.textContent = '';
                         type();
                     }
                 };
-                dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-                dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
+                dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler, { once: true });
+                dialogueBox.addEventListener('click', dialogueBox.nextPartHandler, { once: true });
             } else if (callback) {
+                console.log('Все части отображены, вызываем callback');
                 callback();
             }
         }
     }
     type();
 
-    const dialogueBox = document.querySelector('.dialogue-box');
+    // Обработчик пропуска текущей части
     dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
     dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
     dialogueBox.skipHandler = (e) => {
         e.preventDefault();
         if (isTyping) {
+            console.log(`Пропуск части ${partIndex + 1}`);
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             isTyping = false;
-            if (partIndex === parts.length - 1 && callback) callback();
         }
     };
     dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
     dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
 }
+
+       
 
     function fadeOut(callback) {
         const bg = document.getElementById('background');
