@@ -362,7 +362,7 @@
             background: rgba(245, 240, 225, 0.7);
             color: #5D4037;
             font-size: 16px;
-gv            border: none;
+            border: none;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         #back-button {
@@ -513,7 +513,7 @@ gv            border: none;
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
-        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
+        const isTelegram = !!(window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe);
         if (isTelegram) {
             Telegram.WebApp.ready();
             console.log('Запуск в Telegram');
@@ -521,10 +521,10 @@ gv            border: none;
             console.log('Запуск в браузере');
         }
 
-        const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
+        const userId = isTelegram ? Telegram.WebApp.initDataUnsafe.user?.id : null;
 
         const saveToStorage = (key, value) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram) {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.setItem(
                         key,
@@ -540,7 +540,7 @@ gv            border: none;
         };
 
         const getFromStorage = (key) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram) {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.getItem(
                         key,
@@ -905,7 +905,7 @@ gv            border: none;
 
         async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
-            const jsonPath = `/assets/data/chapter${chapterId}.json`; // Исправленный путь
+            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`; // Исправленный путь
             console.log(`Путь к JSON: ${jsonPath}`);
             
             return fetch(jsonPath, {
