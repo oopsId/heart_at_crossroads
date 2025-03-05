@@ -1127,7 +1127,6 @@
         if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
         if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
-        // Очищаем существующие кнопки и обработчики
         document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
         if (dialogueBox.touchHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
@@ -1542,7 +1541,7 @@
     // Разбиваем текст по символу "||", убираем лишние пробелы и пустые части
     const parts = text.split('||')
         .map(part => part.trim())
-        .filter(part => part.length > 0); // Убираем пустые строки
+        .filter(part => part.length > 0);
     console.log('Разделённый текст:', parts);
     let partIndex = 0;
 
@@ -1580,6 +1579,7 @@
                 dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler);
                 dialogueBox.addEventListener('click', dialogueBox.nextPartHandler);
             } else {
+                // После последней части сразу вызываем callback
                 console.log('Все части отображены, вызываем callback');
                 if (callback) callback();
             }
