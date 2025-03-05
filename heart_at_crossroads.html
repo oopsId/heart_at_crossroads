@@ -1537,8 +1537,10 @@
     let i = 0;
     const speed = 50;
 
-    // Разбиваем текст по символу "||"
-    const parts = text.split('||').map(part => part.trim());
+    // Разбиваем текст по символу "||", убираем лишние пробелы и пустые части
+    const parts = text.split('||')
+        .map(part => part.trim())
+        .filter(part => part.length > 0); // Убираем пустые строки
     console.log('Разделённый текст:', parts);
     let partIndex = 0;
 
@@ -1560,24 +1562,25 @@
             dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
             dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
 
-            // Добавляем обработчик для следующей части или завершения
-            dialogueBox.nextPartHandler = (e) => {
-                e.preventDefault();
-                if (!isTyping) {
-                    if (partIndex < parts.length - 1) {
+            if (partIndex < parts.length - 1) {
+                // Ждём тап для следующей части
+                dialogueBox.nextPartHandler = (e) => {
+                    e.preventDefault();
+                    if (!isTyping) {
                         console.log(`Тап для перехода к части ${partIndex + 2}`);
                         i = 0;
                         partIndex++;
                         element.textContent = '';
                         type();
-                    } else {
-                        console.log('Все части отображены, вызываем callback');
-                        if (callback) callback();
                     }
-                }
-            };
-            dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler, { once: true });
-            dialogueBox.addEventListener('click', dialogueBox.nextPartHandler, { once: true });
+                };
+                console.log('Привязываем nextPartHandler');
+                dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler);
+                dialogueBox.addEventListener('click', dialogueBox.nextPartHandler);
+            } else {
+                console.log('Все части отображены, вызываем callback');
+                if (callback) callback();
+            }
         }
     }
     type();
@@ -1596,7 +1599,6 @@
     dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
     dialogueBox.addEventListener('click', dialogueBox.skipHandler);
 }
-
        
 
     function fadeOut(callback) {
