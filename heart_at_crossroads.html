@@ -1527,41 +1527,64 @@
     }
 
     function typeText(text, element, callback) {
-        element.textContent = '';
-        if (element.typeTimer) clearTimeout(element.typeTimer);
+    element.textContent = '';
+    if (element.typeTimer) clearTimeout(element.typeTimer);
 
-        isTyping = true;
-        let i = 0;
-        const speed = 50;
+    isTyping = true;
+    let i = 0;
+    const speed = 50;
 
-        function type() {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
-                element.typeTimer = setTimeout(type, speed);
-            } else {
-                isTyping = false;
-                delete element.typeTimer;
-                if (callback) callback();
+    // Разбиваем текст по символу "||"
+    const parts = text.split('||').map(part => part.trim());
+    let partIndex = 0;
+
+    function type() {
+        if (i < parts[partIndex].length) {
+            element.textContent += parts[partIndex].charAt(i);
+            i++;
+            element.typeTimer = setTimeout(type, speed);
+        } else {
+            isTyping = false;
+            delete element.typeTimer;
+
+            const dialogueBox = document.querySelector('.dialogue-box');
+            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
+
+            if (partIndex < parts.length - 1) {
+                dialogueBox.skipHandler = (e) => {
+                    e.preventDefault();
+                    if (!isTyping) {
+                        i = 0;
+                        partIndex++;
+                        element.textContent = '';
+                        type();
+                    }
+                };
+                dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
+                dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
+            } else if (callback) {
+                callback();
             }
         }
-        type();
-
-        const dialogueBox = document.querySelector('.dialogue-box');
-        dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-        dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
-        dialogueBox.skipHandler = (e) => {
-            e.preventDefault();
-            if (isTyping) {
-                clearTimeout(element.typeTimer);
-                element.textContent = text;
-                isTyping = false;
-                if (callback) callback();
-            }
-        };
-        dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-        dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
     }
+    type();
+
+    const dialogueBox = document.querySelector('.dialogue-box');
+    dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
+    dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
+    dialogueBox.skipHandler = (e) => {
+        e.preventDefault();
+        if (isTyping) {
+            clearTimeout(element.typeTimer);
+            element.textContent = parts[partIndex];
+            isTyping = false;
+            if (partIndex === parts.length - 1 && callback) callback();
+        }
+    };
+    dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
+    dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
+}
 
     function fadeOut(callback) {
         const bg = document.getElementById('background');
