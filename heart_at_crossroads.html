@@ -1579,7 +1579,7 @@
                 dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler);
                 dialogueBox.addEventListener('click', dialogueBox.nextPartHandler);
             } else {
-                // После последней части сразу вызываем callback
+                // После последней части сразу вызываем callback и не привязываем обработчики
                 console.log('Все части отображены, вызываем callback');
                 if (callback) callback();
             }
@@ -1595,7 +1595,8 @@
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             isTyping = false;
-            type(); // Продолжаем логику после пропуска
+            // Вызываем type() только для проверки завершения
+            type();
         }
     };
     dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
