@@ -1175,7 +1175,7 @@
         }
     }
 
-    function showSceneWithTimer(scene, timeoutMs = 10000) {
+       function showSceneWithTimer(scene, timeoutMs = 10000) {
     const progressElement = document.getElementById('progress');
     const totalScenes = scriptData.scenes.length;
     const progressPercent = ((scene.id + 1) / totalScenes) * 100;
@@ -1209,7 +1209,7 @@
                 ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                 : scene.characterLeft;
             charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-            charLeft.classListEmplace(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
         }
         if (scene.characterRight) {
             const rightChar = scene.characterRight.includes('${stats.appearance}') 
@@ -1229,10 +1229,14 @@
             dialogueBox.touchHandler = null;
         }
 
-        // Оверлей показываем для сцен 7 и 21
+        // Логирование перед вызовом оверлея
+        console.log(`Попытка показать оверлей для сцены ${scene.id}`);
         let overlay = null;
         if (scene.id === 7 || scene.id === 21) {
             overlay = showMessengerOverlay(scene.id);
+            if (!overlay) console.error(`Оверлей не создан для сцены ${scene.id}`);
+        } else {
+            console.log(`Оверлей не нужен для сцены ${scene.id}`);
         }
 
         document.getElementById('speaker-name').textContent = speakerName;
@@ -1319,8 +1323,9 @@
         applyScene();
     }
 }
-       
+      
       function showMessengerOverlay(sceneId) {
+    console.log(`Создание оверлея для сцены ${sceneId}`);
     const existingOverlay = document.getElementById('messenger-overlay');
     if (existingOverlay) existingOverlay.remove();
 
@@ -1330,13 +1335,12 @@
     svg.setAttribute('height', '500');
     svg.setAttribute('viewBox', '0 0 300 500');
     svg.style.position = 'absolute';
-    svg.style.top = '0'; // Левый верхний угол
+    svg.style.top = '0';
     svg.style.left = '0';
     svg.style.zIndex = '4';
 
     let avatarSrc, senderName, messages;
     if (sceneId === 7) {
-        // Сцена 7: Лёша
         avatarSrc = "/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png";
         senderName = "Лёша";
         messages = [
@@ -1345,14 +1349,14 @@
             { id: "msg3", x: 50, y: 240, width: 90, textX: 60, textY: 265, text: stats.language === "ru" ? "Приходи" : "Be there" }
         ];
     } else if (sceneId === 21) {
-        // Сцена 21: Марк
-        avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png"; // Предполагаемый путь
+        avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png";
         senderName = "Марк";
         messages = [
             { id: "msg1", x: 50, y: 120, width: 180, textX: 60, textY: 145, text: stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost" }
         ];
     } else {
-        return null; // Не показываем оверлей для других сцен
+        console.warn(`Оверлей не предусмотрен для сцены ${sceneId}`);
+        return null;
     }
 
     svg.innerHTML = `
@@ -1369,7 +1373,7 @@
         <clipPath id="avatarClip">
             <circle cx="60" cy="75" r="15"/>
         </clipPath>
-        <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)"/>
+        <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${avatarSrc}')"/>
         <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
         <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
         
@@ -1388,9 +1392,11 @@
         </g>
     `;
 
+    console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
     document.getElementById('game-container').appendChild(svg);
 
     // Анимация появления
+    console.log(`Запуск анимации для сцены ${sceneId}`);
     gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
     messages.forEach((msg, idx) => {
         gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
@@ -1411,7 +1417,7 @@
         }
     });
 
-    return svg; // Для управления
+    return svg;
 }
 
     function showChoiceEffects(effects) {
