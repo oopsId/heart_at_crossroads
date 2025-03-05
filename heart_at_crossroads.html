@@ -1042,7 +1042,7 @@
         saveSession();
     }
 
-   function showScene(sceneId) {
+             function showScene(sceneId) {
     if (!scriptData || !scriptData.scenes) {
         console.error('Данные сценария не загружены');
         showDebugMessage("Ошибка: данные сценария не загружены.");
@@ -1136,11 +1136,9 @@
 
         document.getElementById('speaker-name').textContent = speakerName;
 
-        // Вызываем typeText с правильным callback
         typeText(displayText, dialogueElement, () => {
             console.log('Все части текста отображены');
-            if (scene.id === 7) showMessengerOverlay(); // Оставляем для сцены 7
-
+            // Логика после завершения текста
             if (scene.choices && scene.choices.length > 0) {
                 document.body.ontouchstart = null;
                 document.body.onclick = null;
@@ -1539,7 +1537,7 @@
 
     // Разбиваем текст по символу "||"
     const parts = text.split('||').map(part => part.trim());
-    console.log('Разделённый текст:', parts); // Проверяем части текста
+    console.log('Разделённый текст:', parts);
     let partIndex = 0;
 
     const dialogueBox = document.querySelector('.dialogue-box');
@@ -1557,9 +1555,11 @@
             // Удаляем старые обработчики
             dialogueBox.removeEventListener('touchstart', dialogueBox.nextPartHandler);
             dialogueBox.removeEventListener('click', dialogueBox.nextPartHandler);
+            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
 
             if (partIndex < parts.length - 1) {
-                // Ждём тап для следующей части
+                // Добавляем обработчик для следующей части
                 dialogueBox.nextPartHandler = (e) => {
                     e.preventDefault();
                     if (!isTyping) {
@@ -1581,8 +1581,6 @@
     type();
 
     // Обработчик пропуска текущей части
-    dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-    dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
     dialogueBox.skipHandler = (e) => {
         e.preventDefault();
         if (isTyping) {
@@ -1590,6 +1588,7 @@
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             isTyping = false;
+            type(); // Продолжаем логику после пропуска
         }
     };
     dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
