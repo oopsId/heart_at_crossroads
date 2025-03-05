@@ -108,7 +108,7 @@
             filter: brightness(1);
             z-index: 2;
         }
-        .dialogue-box {
+          .dialogue-box {
     position: absolute;
     bottom: 20%;
     left: 0;
@@ -117,7 +117,7 @@
     color: #F5F0E1;
     padding: 40px 20px 20px;
     text-align: center;
-    z-index: 3;
+    z-index: 3; /* Градиент над смартфоном */
     transition: opacity 1s ease, bottom 0.3s ease;
     opacity: 1;
     min-height: 150px;
@@ -131,24 +131,24 @@
 
 #timer-countdown {
     position: absolute;
-    bottom: calc(20% + 150px); /* Над верхним краем градиента */
+    top: calc(100% - 20%); /* Нижняя граница цифр на верхнем краю градиента */
     left: 50%;
     transform: translateX(-50%);
-    font-size: 40px; /* Удобный большой размер */
-    color: #ff4444; /* Алое */
+    font-size: 40px;
+    color: #ff4444;
     font-weight: bold;
-    z-index: 5;
+    z-index: 5; /* Цифры над всем */
 }
 
 @keyframes flash {
     0% { filter: brightness(1); }
     50% { filter: brightness(1.5); }
     100% { filter: brightness(1); }
-  }
+}
 
-   .flash-svg {
+.flash-svg {
     animation: flash 0.5s ease;
-   }
+}
         #speaker-name {
             font-weight: bold;
             font-size: 18px;
@@ -984,16 +984,18 @@
     }
 
     function createChoiceButton(choice) {
-        const btn = document.createElement('button');
-        const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
-        btn.textContent = choice.cost && !hasCostInText 
-            ? `${choice.text[stats.language]} (${choice.cost} бриллиантов)` 
-            : choice.text[stats.language];
-        btn.className = 'choice-btn';
-        if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
-        if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
-        return btn;
-    }
+    const btn = document.createElement('button');
+    const hasCostInText = choice.text[stats.language].includes(`${choice.cost}`);
+    // Убираем "(10 сек)" из текста кнопки
+    let buttonText = choice.text[stats.language].replace(" (10 сек)", "").replace(" (10 sec)", "");
+    btn.textContent = choice.cost && !hasCostInText 
+        ? `${buttonText} (${choice.cost} бриллиантов)` 
+        : buttonText;
+    btn.className = 'choice-btn';
+    if (choice.text[stats.language].length > 30) btn.style.fontSize = '12px';
+    if (choice.text[stats.language].length > 60) btn.style.minHeight = '64px';
+    return btn;
+}
 
     function saveChoice(choiceId, effects, memoryTag) {
         choices.push(choiceId);
@@ -1331,13 +1333,13 @@
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'messenger-overlay');
-    svg.setAttribute('width', '300');
-    svg.setAttribute('height', '500');
+    svg.setAttribute('width', '240'); // Уменьшено на 20% с 300
+    svg.setAttribute('height', '400'); // Уменьшено на 20% с 500
     svg.setAttribute('viewBox', '0 0 300 500');
     svg.style.position = 'absolute';
     svg.style.top = '0';
     svg.style.left = '0';
-    svg.style.zIndex = '4';
+    svg.style.zIndex = '2'; // За градиентом
 
     let avatarSrc, senderName, messages;
     if (sceneId === 7) {
@@ -1351,9 +1353,29 @@
     } else if (sceneId === 21) {
         avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png";
         senderName = "Марк";
-        messages = [
-            { id: "msg1", x: 50, y: 120, width: 180, textX: 60, textY: 145, text: stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost" }
-        ];
+        const fullText = stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost";
+        // Разбиваем текст на строки по ~15 символов
+        const maxCharsPerLine = 15;
+        const lines = [];
+        let currentLine = "";
+        fullText.split(" ").forEach(word => {
+            if ((currentLine + word).length <= maxCharsPerLine) {
+                currentLine += (currentLine ? " " : Overscore" : "") + word;
+            } else if ((currentLine + word).length > maxCharsPerLine) {
+                lines.push(currentLine);
+                currentLine = word;
+            }
+            });
+        if (currentLine) lines.push(currentLine);
+        messages = lines.map((line, idx) => ({
+            id: `msg${idx + 1}`,
+            x: 50,
+            y: 120 + idx * 40,
+            width: 180,
+            textX: 60,
+            textY: 145 + idx * 40,
+            text: line
+        }));
     } else {
         console.warn(`Оверлей не предусмотрен для сцены ${sceneId}`);
         return null;
@@ -1383,7 +1405,7 @@
         <!-- Сообщения -->
         <g class="messages">
             ${messages.map((msg, idx) => `
-                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="40" rx="10" fill="#E1F5C4"/>
+                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
                 <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
             `).join('')}
             <!-- Пустое ответное сообщение -->
