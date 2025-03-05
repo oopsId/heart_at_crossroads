@@ -904,33 +904,33 @@
         }
 
         async function loadChapter(chapterId) {
-            console.log(`Загрузка главы ${chapterId}`);
-            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`; // Исправленный путь
-            console.log(`Путь к JSON: ${jsonPath}`);
-            
-            return fetch(jsonPath, {
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
-                    return response.text();
-                })
-                .then(text => {
-                    const data = JSON.parse(text);
-                    if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                        throw new Error('Некорректный формат JSON');
-                    }
-                    scriptData = data;
-                    console.log(`Данные главы ${chapterId} успешно загружены`);
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки главы:', error);
-                    throw error;
-                });
+    console.log(`Загрузка главы ${chapterId}`);
+    const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`; // Исправленный путь
+    console.log(`Путь к JSON: ${jsonPath}`);
+    
+    return fetch(jsonPath, {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json'
         }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
+            return response.text();
+        })
+        .then(text => {
+            const data = JSON.parse(text);
+            if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+                throw new Error('Некорректный формат JSON');
+            }
+            scriptData = data;
+            console.log(`Данные главы ${chapterId} успешно загружены`);
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки главы:', error);
+            throw error;
+        });
+}
 
         function saveChoice(choiceId, effects, memoryTag) {
             choices.push(choiceId);
