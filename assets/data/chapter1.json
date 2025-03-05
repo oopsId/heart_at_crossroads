@@ -362,7 +362,7 @@
             background: rgba(245, 240, 225, 0.7);
             color: #5D4037;
             font-size: 16px;
-            border: none;
+gv            border: none;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         #back-button {
@@ -905,7 +905,7 @@
 
         async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
-            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`; // Исправленный путь
+            const jsonPath = `/assets/data/chapter${chapterId}.json`; // Исправленный путь
             console.log(`Путь к JSON: ${jsonPath}`);
             
             return fetch(jsonPath, {
