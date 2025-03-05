@@ -516,13 +516,12 @@
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
-        // Проверка Telegram WebApp
-        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
+        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe ? true : false;
         if (isTelegram) {
             Telegram.WebApp.ready();
-            console.log('Запуск в Telegram WebApp');
+            console.log('Запуск в Telegram Web App');
         } else {
-            console.log('Запуск вне Telegram, используется браузерный режим');
+            console.log('Запуск в браузере (Telegram Web App не инициализирован)');
         }
 
         const userId = isTelegram ? Telegram.WebApp.initDataUnsafe.user?.id : null;
@@ -538,14 +537,11 @@
                             resolve(true);
                         },
                         (error) => {
-                            console.error(`Ошибка сохранения в Telegram CloudStorage: ${error}`);
-                            reject(error);
+                            console.error(`Ошибка сохранения в Telegram CloudStorage: ${error}, переход на localStorage`);
+                            localStorage.setItem(key, JSON.stringify(value));
+                            resolve(true);
                         }
                     );
-                }).catch((error) => {
-                    console.warn('Ошибка Telegram CloudStorage, переход на localStorage');
-                    localStorage.setItem(key, JSON.stringify(value));
-                    return Promise.resolve(true);
                 });
             } else {
                 localStorage.setItem(key, JSON.stringify(value));
@@ -561,18 +557,15 @@
                         key,
                         (error, value) => {
                             if (error) {
-                                console.error(`Ошибка загрузки из Telegram CloudStorage: ${error}`);
-                                reject(error);
+                                console.error(`Ошибка загрузки из Telegram CloudStorage: ${error}, проверка localStorage`);
+                                const item = localStorage.getItem(key);
+                                resolve(item ? JSON.parse(item) : null);
                             } else {
                                 console.log(`Загружено из Telegram CloudStorage: ${key}`, value);
                                 resolve(value ? JSON.parse(value) : null);
                             }
                         }
                     );
-                }).catch((error) => {
-                    console.warn('Ошибка Telegram CloudStorage, переход на localStorage');
-                    const item = localStorage.getItem(key);
-                    return Promise.resolve(item ? JSON.parse(item) : null);
                 });
             } else {
                 const item = localStorage.getItem(key);
@@ -594,6 +587,7 @@
                 }
             } catch (error) {
                 console.error('Ошибка проверки авторизации:', error);
+                showDebugMessage('Ошибка авторизации, используем стартовый экран');
                 showPasswordScreen();
             }
         };
@@ -643,28 +637,35 @@
                 document.querySelector('.start-buttons').style.display = 'none';
             }
 
-            function handlePasswordSubmit(e) {
+            function handlePasswordSubmitEvent(e) {
                 e.preventDefault();
                 console.log('Нажата кнопка "Войти"');
-                const inputPassword = document.getElementById('password-input').value;
-                if (inputPassword === tempPassword || inputPassword === correctPassword) {
-                    if (inputPassword === correctPassword && userId) {
-                        getFromStorage('authorized_users')
-                            .then(authorizedUsers => {
-                                authorizedUsers = authorizedUsers || [];
-                                if (!authorizedUsers.includes(userId)) {
-                                    authorizedUsers.push(userId);
-                                    saveToStorage('authorized_users', authorizedUsers);
-                                }
-                                stats.isAuthorized = true;
-                                startNewGame();
-                            });
-                    } else {
-                        startNewGame();
-                    }
-                } else {
-                    alert('Неверный пароль!');
-                }
+                handlePasswordSubmit(e);
+            }
+
+            function handleMenuEvent(e) {
+                e.preventDefault();
+                handleMenu(e);
+            }
+
+            function handleStatsEvent(e) {
+                e.preventDefault();
+                handleShowStats(e);
+            }
+
+            function handleLanguageChange(e) {
+                e.preventDefault();
+                stats.language = stats.language === "ru" ? "en" : "ru";
+                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
+                updateLanguage(stats.language);
+                saveSession();
+            }
+
+            function handleBackButton(e) {
+                e.preventDefault();
+                console.log('Нажата кнопка "Назад"');
+                document.getElementById('password-form').style.display = 'none';
+                document.querySelector('.start-buttons').style.display = 'flex';
             }
 
             startGameBtn.addEventListener('click', handleStartGame);
@@ -676,48 +677,26 @@
             showPasswordBtn.addEventListener('click', handleShowPassword);
             showPasswordBtn.addEventListener('touchstart', handleShowPassword);
 
-            passwordSubmitBtn.addEventListener('click', handlePasswordSubmit);
-            passwordSubmitBtn.addEventListener('touchstart', handlePasswordSubmit);
+            passwordSubmitBtn.addEventListener('click', handlePasswordSubmitEvent);
+            passwordSubmitBtn.addEventListener('touchstart', handlePasswordSubmitEvent);
 
-            menuBtn.addEventListener('touchstart', handleMenu);
-            menuBtn.addEventListener('click', handleMenu);
+            menuBtn.addEventListener('click', handleMenuEvent);
+            menuBtn.addEventListener('touchstart', handleMenuEvent);
 
-            statsBtn.addEventListener('touchstart', handleShowStats);
-            statsBtn.addEventListener('click', handleShowStats);
+            statsBtn.addEventListener('click', handleStatsEvent);
+            statsBtn.addEventListener('touchstart', handleStatsEvent);
 
-            galleryBtn.addEventListener('touchstart', (e) => e.preventDefault());
             galleryBtn.addEventListener('click', (e) => e.preventDefault());
+            galleryBtn.addEventListener('touchstart', (e) => e.preventDefault());
 
-            languageBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                stats.language = stats.language === "ru" ? "en" : "ru";
-                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
-                updateLanguage(stats.language);
-                saveSession();
-            });
-            languageBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                stats.language = stats.language === "ru" ? "en" : "ru";
-                languageIcon.textContent = stats.language === "ru" ? "🇷🇺" : "🇬🇧";
-                updateLanguage(stats.language);
-                saveSession();
-            });
+            languageBtn.addEventListener('click', handleLanguageChange);
+            languageBtn.addEventListener('touchstart', handleLanguageChange);
 
             const backButton = document.createElement('button');
             backButton.id = 'back-button';
             backButton.textContent = stats.language === "ru" ? "Назад" : "Back";
-            backButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                console.log('Нажата кнопка "Назад"');
-                document.getElementById('password-form').style.display = 'none';
-                document.querySelector('.start-buttons').style.display = 'flex';
-            });
-            backButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Нажата кнопка "Назад"');
-                document.getElementById('password-form').style.display = 'none';
-                document.querySelector('.start-buttons').style.display = 'flex';
-            });
+            backButton.addEventListener('click', handleBackButton);
+            backButton.addEventListener('touchstart', handleBackButton);
             document.getElementById('password-form').appendChild(backButton);
 
             console.log('Проверка последней сессии');
@@ -732,8 +711,9 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Ошибка при загрузке сессии:', error);
-                    showPasswordScreen();
+                    console.error('Ошибка при проверке сессии:', error);
+                    showDebugMessage('Ошибка загрузки сессии, используем стартовый экран');
+                    document.getElementById('start-screen').style.display = 'flex';
                 });
         });
 
@@ -751,6 +731,25 @@
             title.className = lang === "ru" ? "ru" : "en";
         }
 
+        async function handlePasswordSubmit(e) {
+            const inputPassword = document.getElementById('password-input').value;
+            if (inputPassword === tempPassword) {
+                console.log('Временный пароль принят');
+                startNewGame();
+            } else if (inputPassword === correctPassword) {
+                console.log('Корректный пароль введён');
+                const authorizedUsers = (await getFromStorage('authorized_users')) || [];
+                if (userId && !authorizedUsers.includes(userId)) {
+                    authorizedUsers.push(userId);
+                    await saveToStorage('authorized_users', authorizedUsers);
+                }
+                stats.isAuthorized = true;
+                startNewGame();
+            } else {
+                alert('Неверный пароль!');
+            }
+        }
+
         function checkTempPassword(callback) {
             getFromStorage('tempAccessGranted')
                 .then(granted => {
@@ -760,20 +759,20 @@
                     } else {
                         const input = prompt('Игра временно закрыта на доработку. Введите временный пароль:');
                         if (input === tempPassword || input === correctPassword) {
-                            saveToStorage('tempAccessGranted', true)
-                                .then(() => {
-                                    if (input === correctPassword) stats.isAuthorized = true;
-                                    callback();
-                                })
-                                .catch(error => console.error('Ошибка сохранения tempAccessGranted:', error));
+                            saveToStorage('tempAccessGranted', true);
+                            if (input === correctPassword) {
+                                stats.isAuthorized = true;
+                            }
+                            console.log('Временный пароль принят');
+                            callback();
                         } else {
                             alert('Неверный временный пароль! Доступ к игре ограничен.');
                         }
                     }
                 })
                 .catch(error => {
-                    console.error('Ошибка проверки tempAccessGranted:', error);
-                    alert('Ошибка доступа, попробуйте позже.');
+                    console.error('Ошибка проверки временного доступа:', error);
+                    alert('Ошибка доступа, попробуйте снова');
                 });
         }
 
@@ -795,12 +794,9 @@
                 completionCount: stats.completionCount
             };
             currentBackground = null;
-            saveSession()
-                .then(() => {
-                    console.log('Запуск новой игры');
-                    startGame();
-                })
-                .catch(error => console.error('Ошибка сохранения новой сессии:', error));
+            saveSession();
+            console.log('Запуск новой игры');
+            startGame();
         }
 
         function createChoiceButton(choice) {
@@ -816,9 +812,11 @@
         }
 
         function showPasswordScreen() {
+            console.log('Показываем стартовый экран');
             document.getElementById('start-screen').style.display = 'flex';
             document.getElementById('language-btn').style.display = 'block';
         }
+
 
         async function startGame() {
             console.log('Начало функции startGame с параметрами:', { currentChapter, currentScene });
