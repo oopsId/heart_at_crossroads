@@ -1229,8 +1229,11 @@
             dialogueBox.touchHandler = null;
         }
 
-        // Оверлей появляется сразу
-        const overlay = showMessengerOverlay();
+        // Оверлей показываем только для сцены с ID 7
+        let overlay = null;
+        if (scene.id === 7) {
+            overlay = showMessengerOverlay();
+        }
 
         document.getElementById('speaker-name').textContent = speakerName;
         console.log('Установка текста с таймером:', displayText);
@@ -1270,11 +1273,9 @@
                 dialogueBox.appendChild(btn);
             });
 
-            // Таймер из JSON (10 секунд)
             const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
             let timeLeft = timerDuration / 1000;
 
-            // Обратный отсчёт
             const countdownElement = document.createElement('div');
             countdownElement.id = 'timer-countdown';
             countdownElement.textContent = timeLeft;
@@ -1318,7 +1319,6 @@
         applyScene();
     }
 }
-
        
        function showMessengerOverlay() {
     const existingOverlay = document.getElementById('messenger-overlay');
