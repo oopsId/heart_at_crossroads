@@ -1042,7 +1042,7 @@
         saveSession();
     }
 
-             function showScene(sceneId) {
+                   function showScene(sceneId) {
     if (!scriptData || !scriptData.scenes) {
         console.error('Данные сценария не загружены');
         showDebugMessage("Ошибка: данные сценария не загружены.");
@@ -1137,9 +1137,9 @@
         document.getElementById('speaker-name').textContent = speakerName;
 
         typeText(displayText, dialogueElement, () => {
-            console.log('Все части текста отображены');
-            // Логика после завершения текста
+            console.log('Все части текста отображены для сцены', scene.id);
             if (scene.choices && scene.choices.length > 0) {
+                console.log('Отображаем кнопки выбора');
                 document.body.ontouchstart = null;
                 document.body.onclick = null;
                 scene.choices.forEach(choice => {
@@ -1151,6 +1151,7 @@
                     } else {
                         const handleChoice = (e) => {
                             e.preventDefault();
+                            console.log('Выбор сделан:', choice.id);
                             if (choice.cost) stats.diamonds -= choice.cost;
                             updateDiamondsDisplay();
                             saveChoice(choice.id, choice.effects, choice.memoryTag);
@@ -1171,6 +1172,7 @@
                     dialogueBox.appendChild(btn);
                 });
             } else if (scene.nextScene !== undefined) {
+                console.log('Ожидаем тап для перехода к следующей сцене');
                 dialogueBox.touchHandler = (e) => {
                     e.preventDefault();
                     if (!isTyping) {
@@ -1527,7 +1529,7 @@
         return true;
     }
 
-   function typeText(text, element, callback) {
+        function typeText(text, element, callback) {
     element.textContent = '';
     if (element.typeTimer) clearTimeout(element.typeTimer);
 
@@ -1558,24 +1560,24 @@
             dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
             dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
 
-            if (partIndex < parts.length - 1) {
-                // Добавляем обработчик для следующей части
-                dialogueBox.nextPartHandler = (e) => {
-                    e.preventDefault();
-                    if (!isTyping) {
+            // Добавляем обработчик для следующей части или завершения
+            dialogueBox.nextPartHandler = (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    if (partIndex < parts.length - 1) {
                         console.log(`Тап для перехода к части ${partIndex + 2}`);
                         i = 0;
                         partIndex++;
                         element.textContent = '';
                         type();
+                    } else {
+                        console.log('Все части отображены, вызываем callback');
+                        if (callback) callback();
                     }
-                };
-                dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler, { once: true });
-                dialogueBox.addEventListener('click', dialogueBox.nextPartHandler, { once: true });
-            } else if (callback) {
-                console.log('Все части отображены, вызываем callback');
-                callback();
-            }
+                }
+            };
+            dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler, { once: true });
+            dialogueBox.addEventListener('click', dialogueBox.nextPartHandler, { once: true });
         }
     }
     type();
@@ -1591,8 +1593,8 @@
             type(); // Продолжаем логику после пропуска
         }
     };
-    dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-    dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
+    dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
+    dialogueBox.addEventListener('click', dialogueBox.skipHandler);
 }
 
        
