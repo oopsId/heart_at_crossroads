@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Сердце на перекрёстке</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
     <style>
         @font-face {
             font-family: 'LobsterTwo';
@@ -493,6 +492,7 @@
         <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
     <script>
         let currentChapter = 1;
         let currentScene = 0;
@@ -968,7 +968,7 @@
                     return;
                 }
                 console.warn('Сцена не найдена. Конец главы.');
-                showDebugMessage("Сцена не найдена. Конец главы.");
+                showDebugMessage("Сцена не найдена. Конец главы.');
                 const isLastScene = scriptData.scenes.length - 1 === currentScene;
                 const isLastChapter = currentChapter === 1;
                 if (isLastScene && isLastChapter) {
@@ -1063,6 +1063,10 @@
                 document.getElementById('speaker-name').textContent = speakerName;
                 console.log('Установка текста:', displayText);
                 typeText(displayText, dialogueElement, () => {
+                    if (scene.id === 7) {
+                        showMessengerOverlay();
+                    }
+
                     if (scene.choices && scene.choices.length > 0) {
                         document.body.ontouchstart = null;
                         document.body.onclick = null;
@@ -1280,7 +1284,7 @@
             svg.style.top = '50%';
             svg.style.left = '50%';
             svg.style.transform = 'translate(-50%, -50%)';
-            svg.style.zIndex = '5';
+            svg.style.zIndex = '4';
 
             svg.innerHTML = `
                 <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
@@ -1288,11 +1292,11 @@
                 <rect x="30" y="50" width="240" height="400" fill="#E8F1F5"/>
                 <g class="messages">
                     <rect id="msg1" x="50" y="100" width="150" height="40" rx="10" fill="#DCF8C6"/>
-                    <text id="text1" x="60" y="125" fill="#333" font-size="14">Тусим вечером</text>
+                    <text id="text1" x="60" y="125" fill="#333" font-size="14">Привет!</text>
                     <rect id="msg2" x="100" y="160" width="130" height="40" rx="10" fill="#FFF"/>
-                    <text id="text2" x="110" y="185" fill="#333" font-size="14">Дима будет</text>
+                    <text id="text2" x="110" y="185" fill="#333" font-size="14">Тусим вечером?</text>
                     <rect id="msg3" x="50" y="220" width="160" height="40" rx="10" fill="#DCF8C6"/>
-                    <text id="text3" x="60" y="245" fill="#333" font-size="14">Приходи!</text>
+                    <text id="text3" x="60" y="245" fill="#333" font-size="14">Дима будет!</text>
                 </g>
             `;
 
@@ -1303,7 +1307,9 @@
             gsap.from("#msg3, #text3", { y: 20, opacity: 0, duration: 1, delay: 1.5 });
 
             setTimeout(() => {
-                svg.remove();
+                if (document.getElementById('messenger-overlay')) {
+                    document.getElementById('messenger-overlay').remove();
+                }
             }, 3000);
         }
 
@@ -1460,4 +1466,10 @@
             document.getElementById('language-btn').style.display = 'block';
         }
 
-        function handleShowStats
+        function handleShowStats(e) {
+            e.preventDefault();
+            alert(`Короны: ${stats.crown}\nСердце: ${stats.heart}\nЛист: ${stats.leaf}\nБриллианты: ${stats.diamonds}\nОтношения:\nМарк: ${stats.relationships.mark}\nЛера: ${stats.relationships.lera}\nВика: ${stats.relationships.vika}\nСергей: ${stats.relationships.sergey}\nАнна: ${stats.relationships.anna}\nДима: ${stats.relationships.dima}\nЛёша: ${stats.relationships.lesha}`);
+        }
+    </script>
+</body>
+</html>
