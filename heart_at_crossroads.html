@@ -1209,7 +1209,7 @@
                 ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                 : scene.characterLeft;
             charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+            charLeft.classListEmplace(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
         }
         if (scene.characterRight) {
             const rightChar = scene.characterRight.includes('${stats.appearance}') 
@@ -1229,10 +1229,10 @@
             dialogueBox.touchHandler = null;
         }
 
-        // Оверлей показываем только для сцены с ID 7
+        // Оверлей показываем для сцен 7 и 21
         let overlay = null;
-        if (scene.id === 7) {
-            overlay = showMessengerOverlay();
+        if (scene.id === 7 || scene.id === 21) {
+            overlay = showMessengerOverlay(scene.id);
         }
 
         document.getElementById('speaker-name').textContent = speakerName;
@@ -1320,7 +1320,7 @@
     }
 }
        
-      function showMessengerOverlay() {
+      function showMessengerOverlay(sceneId) {
     const existingOverlay = document.getElementById('messenger-overlay');
     if (existingOverlay) existingOverlay.remove();
 
@@ -1333,6 +1333,27 @@
     svg.style.top = '0'; // Левый верхний угол
     svg.style.left = '0';
     svg.style.zIndex = '4';
+
+    let avatarSrc, senderName, messages;
+    if (sceneId === 7) {
+        // Сцена 7: Лёша
+        avatarSrc = "/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png";
+        senderName = "Лёша";
+        messages = [
+            { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: stats.language === "ru" ? "Тусим вечером" : "Party tonight" },
+            { id: "msg2", x: 50, y: 180, width: 100, textX: 60, textY: 205, text: stats.language === "ru" ? "Дима будет" : "Dima’s coming" },
+            { id: "msg3", x: 50, y: 240, width: 90, textX: 60, textY: 265, text: stats.language === "ru" ? "Приходи" : "Be there" }
+        ];
+    } else if (sceneId === 21) {
+        // Сцена 21: Марк
+        avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png"; // Предполагаемый путь
+        senderName = "Марк";
+        messages = [
+            { id: "msg1", x: 50, y: 120, width: 180, textX: 60, textY: 145, text: stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost" }
+        ];
+    } else {
+        return null; // Не показываем оверлей для других сцен
+    }
 
     svg.innerHTML = `
         <!-- Корпус смартфона -->
@@ -1348,30 +1369,22 @@
         <clipPath id="avatarClip">
             <circle cx="60" cy="75" r="15"/>
         </clipPath>
-        <image xlink:href="/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)"/>
+        <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)"/>
         <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
-        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">Лёша</text>
+        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
         
         <!-- Разделительная линия -->
         <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
         
         <!-- Сообщения -->
         <g class="messages">
-            <!-- Сообщение 1 -->
-            <rect id="msg1" x="50" y="120" width="160" height="40" rx="10" fill="#E1F5C4"/>
-            <text id="text1" x="60" y="145" fill="#000" font-size="14" font-family="Arial, sans-serif">Тусим вечером</text>
-            
-            <!-- Сообщение 2 -->
-            <rect id="msg2" x="50" y="180" width="100" height="40" rx="10" fill="#E1F5C4"/>
-            <text id="text2" x="60" y="205" fill="#000" font-size="14" font-family="Arial, sans-serif">Дима будет</text>
-            
-            <!-- Сообщение 3 -->
-            <rect id="msg3" x="50" y="240" width="90" height="40" rx="10" fill="#E1F5C4"/>
-            <text id="text3" x="60" y="265" fill="#000" font-size="14" font-family="Arial, sans-serif">Приходи</text>
-            
+            ${messages.map((msg, idx) => `
+                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="40" rx="10" fill="#E1F5C4"/>
+                <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
+            `).join('')}
             <!-- Пустое ответное сообщение -->
-            <rect id="msg4" x="120" y="300" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
-            <text id="text4" x="130" y="325" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
+            <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
+            <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
         </g>
     `;
 
@@ -1379,19 +1392,19 @@
 
     // Анимация появления
     gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
-    gsap.from("#msg1, #text1", { y: 20, opacity: 0, duration: 1, delay: 0.5 });
-    gsap.from("#msg2, #text2", { y: 20, opacity: 0, duration: 1, delay: 1 });
-    gsap.from("#msg3, #text3", { y: 20, opacity: 0, duration: 1, delay: 1.5 });
-    gsap.from("#msg4", { y: 20, opacity: 0, duration: 1, delay: 2 });
-    gsap.to("#text4", { 
+    messages.forEach((msg, idx) => {
+        gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
+    });
+    gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
+    gsap.to(`#text${messages.length + 1}`, { 
         opacity: 1, 
         duration: 0, 
-        delay: 2.5, 
+        delay: 0.5 + messages.length * 0.5 + 0.5, 
         onStart: function() {
             let text = "...";
             let index = 0;
             let interval = setInterval(() => {
-                document.getElementById("text4").textContent = text.slice(0, index);
+                document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
                 index++;
                 if (index > text.length) clearInterval(interval);
             }, 100);
