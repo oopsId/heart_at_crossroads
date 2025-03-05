@@ -1177,7 +1177,7 @@
         }
     }
 
-       function showSceneWithTimer(scene, timeoutMs = 10000) {
+               function showSceneWithTimer(scene, timeoutMs = 10000) {
     const progressElement = document.getElementById('progress');
     const totalScenes = scriptData.scenes.length;
     const progressPercent = ((scene.id + 1) / totalScenes) * 100;
@@ -1211,7 +1211,7 @@
                 ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
                 : scene.characterLeft;
             charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker'); // Исправлено
         }
         if (scene.characterRight) {
             const rightChar = scene.characterRight.includes('${stats.appearance}') 
@@ -1231,7 +1231,6 @@
             dialogueBox.touchHandler = null;
         }
 
-        // Логирование перед вызовом оверлея
         console.log(`Попытка показать оверлей для сцены ${scene.id}`);
         let overlay = null;
         if (scene.id === 7 || scene.id === 21) {
@@ -1326,15 +1325,15 @@
     }
 }
       
-      function showMessengerOverlay(sceneId) {
+         function showMessengerOverlay(sceneId) {
     console.log(`Создание оверлея для сцены ${sceneId}`);
     const existingOverlay = document.getElementById('messenger-overlay');
     if (existingOverlay) existingOverlay.remove();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'messenger-overlay');
-    svg.setAttribute('width', '240'); // Уменьшено на 20% с 300
-    svg.setAttribute('height', '400'); // Уменьшено на 20% с 500
+    svg.setAttribute('width', '240'); // Уменьшено на 20%
+    svg.setAttribute('height', '400'); // Уменьшено на 20%
     svg.setAttribute('viewBox', '0 0 300 500');
     svg.style.position = 'absolute';
     svg.style.top = '0';
@@ -1360,12 +1359,12 @@
         let currentLine = "";
         fullText.split(" ").forEach(word => {
             if ((currentLine + word).length <= maxCharsPerLine) {
-                currentLine += (currentLine ? " " : "") + word;
-            } else if ((currentLine + word).length > maxCharsPerLine) {
+                currentLine += (currentLine ? " " : "") + word; // Исправлено
+            } else {
                 lines.push(currentLine);
                 currentLine = word;
             }
-            });
+        });
         if (currentLine) lines.push(currentLine);
         messages = lines.map((line, idx) => ({
             id: `msg${idx + 1}`,
