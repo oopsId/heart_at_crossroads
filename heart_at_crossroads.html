@@ -1042,161 +1042,164 @@
         saveSession();
     }
 
-    function showScene(sceneId) {
-        if (!scriptData || !scriptData.scenes) {
-            console.error('Данные сценария не загружены');
-            showDebugMessage("Ошибка: данные сценария не загружены.");
-            return;
-        }
-
-        let scene = typeof sceneId === 'number' ? scriptData.scenes[sceneId] : scriptData.scenes.find(s => s.id === sceneId);
-        if (!scene) {
-            if (currentChapter >= 2) {
-                showChapterPlaceholder();
-                return;
-            }
-            console.warn('Сцена не найдена. Конец главы.');
-            const isLastScene = scriptData.scenes.length - 1 === currentScene;
-            const isLastChapter = currentChapter === 1;
-            if (isLastScene && isLastChapter) {
-                stats.completionCount += 1;
-                saveSession();
-                alert(stats.language === "ru" 
-                    ? `Вы прошли игру! Это ваше ${stats.completionCount}-е прохождение.` 
-                    : `You completed the game! This is your ${stats.completionCount}th playthrough.`);
-                handleMenu(new Event('click'));
-            }
-            return;
-        }
-
-        if (!checkSceneCondition(scene)) {
-            currentScene++;
-            showScene(currentScene);
-            return;
-        }
-
-        if (scene.choices && scene.choices.some(choice => choice.timer)) {
-            const timeoutMs = (scene.choices[0].timer || 10) * 1000;
-            showSceneWithTimer(scene, timeoutMs);
-            return;
-        }
-
-        const progressElement = document.getElementById('progress');
-        const totalScenes = scriptData.scenes.length;
-        const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-        progressElement.style.width = `${progressPercent}%`;
-
-        const backgroundElement = document.getElementById('background');
-        const charLeft = document.getElementById('character-left');
-        const charRight = document.getElementById('character-right');
-        const dialogueElement = document.getElementById('dialogue-text');
-        const dialogueBox = document.querySelector('.dialogue-box');
-
-        let displayText = scene.text[stats.language];
-        if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-            displayText = scene.second_playthrough_text[stats.language];
-        }
-
-        const newBackground = scene.background || 'none';
-        const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
-
-        const applyScene = () => {
-            backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
-            currentBackground = newBackground;
-            charLeft.style.backgroundImage = 'none';
-            charRight.style.backgroundImage = 'none';
-            charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-            charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-            const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-            if (scene.characterLeft) {
-                const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                    ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                    : scene.characterLeft;
-                charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-                charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-            }
-            if (scene.characterRight) {
-                const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                    ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                    : scene.characterRight;
-                charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
-                charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-            }
-
-            if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-            if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-            document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-            if (dialogueBox.touchHandler) {
-                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-                dialogueBox.touchHandler = null;
-            }
-
-            document.getElementById('speaker-name').textContent = speakerName;
-            typeText(displayText, dialogueElement, () => {
-                if (scene.id === 7) showMessengerOverlay();
-
-                if (scene.choices && scene.choices.length > 0) {
-                    document.body.ontouchstart = null;
-                    document.body.onclick = null;
-                    scene.choices.forEach(choice => {
-                        const btn = createChoiceButton(choice);
-                        if (choice.condition && !checkCondition(choice.condition)) {
-                            btn.style.display = 'none';
-                        } else if (choice.cost && stats.diamonds < choice.cost) {
-                            btn.disabled = true;
-                        } else {
-                            const handleChoice = (e) => {
-                                e.preventDefault();
-                                if (choice.cost) stats.diamonds -= choice.cost;
-                                updateDiamondsDisplay();
-                                saveChoice(choice.id, choice.effects, choice.memoryTag);
-                                if (choice.effects) showChoiceEffects(choice.effects);
-                                if (choice.nextScene !== undefined) {
-                                    currentScene = choice.nextScene;
-                                    saveSession();
-                                    showScene(currentScene);
-                                } else if (choice.nextChapter) {
-                                    currentChapter = choice.nextChapter;
-                                    currentScene = 0;
-                                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                                }
-                            };
-                            btn.addEventListener('touchstart', handleChoice);
-                            btn.addEventListener('click', handleChoice);
-                        }
-                        dialogueBox.appendChild(btn);
-                    });
-                } else if (scene.nextScene !== undefined) {
-                    dialogueBox.touchHandler = (e) => {
-                        e.preventDefault();
-                        if (!isTyping) {
-                            currentScene = scene.nextScene;
-                            saveSession();
-                            showScene(currentScene);
-                        }
-                    };
-                    dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.addEventListener('click', dialogueBox.touchHandler);
-                } else if (scene.nextChapter) {
-                    currentChapter = scene.nextChapter;
-                    currentScene = 0;
-                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                }
-            });
-        };
-
-        if (shouldFade) {
-            fadeOut(() => {
-                applyScene();
-                fadeIn();
-            });
-        } else {
-            applyScene();
-        }
+   function showScene(sceneId) {
+    if (!scriptData || !scriptData.scenes) {
+        console.error('Данные сценария не загружены');
+        showDebugMessage("Ошибка: данные сценария не загружены.");
+        return;
     }
+
+    let scene = typeof sceneId === 'number' ? scriptData.scenes[sceneId] : scriptData.scenes.find(s => s.id === sceneId);
+    if (!scene) {
+        if (currentChapter >= 2) {
+            showChapterPlaceholder();
+            return;
+        }
+        console.warn('Сцена не найдена. Конец главы.');
+        const isLastScene = scriptData.scenes.length - 1 === currentScene;
+        const isLastChapter = currentChapter === 1;
+        if (isLastScene && isLastChapter) {
+            stats.completionCount += 1;
+            saveSession();
+            alert(stats.language === "ru" 
+                ? `Вы прошли игру! Это ваше ${stats.completionCount}-е прохождение.` 
+                : `You completed the game! This is your ${stats.completionCount}th playthrough.`);
+            handleMenu(new Event('click'));
+        }
+        return;
+    }
+
+    if (!checkSceneCondition(scene)) {
+        currentScene++;
+        showScene(currentScene);
+        return;
+    }
+
+    if (scene.choices && scene.choices.some(choice => choice.timer)) {
+        const timeoutMs = (scene.choices[0].timer || 10) * 1000;
+        showSceneWithTimer(scene, timeoutMs);
+        return;
+    }
+
+    const progressElement = document.getElementById('progress');
+    const totalScenes = scriptData.scenes.length;
+    const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+    progressElement.style.width = `${progressPercent}%`;
+
+    const backgroundElement = document.getElementById('background');
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    const dialogueElement = document.getElementById('dialogue-text');
+    const dialogueBox = document.querySelector('.dialogue-box');
+
+    let displayText = scene.text[stats.language];
+    if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+        displayText = scene.second_playthrough_text[stats.language];
+    }
+
+    const newBackground = scene.background || 'none';
+    const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+    const applyScene = () => {
+        backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
+        currentBackground = newBackground;
+        charLeft.style.backgroundImage = 'none';
+        charRight.style.backgroundImage = 'none';
+        charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+        charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+        const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+        if (scene.characterLeft) {
+            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                : scene.characterLeft;
+            charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
+            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+        }
+        if (scene.characterRight) {
+            const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                : scene.characterRight;
+            charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
+            charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+        }
+
+        if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+        if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+        if (dialogueBox.touchHandler) {
+            dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+            dialogueBox.touchHandler = null;
+        }
+
+        document.getElementById('speaker-name').textContent = speakerName;
+
+        // Вызываем typeText с правильным callback
+        typeText(displayText, dialogueElement, () => {
+            console.log('Все части текста отображены');
+            if (scene.id === 7) showMessengerOverlay(); // Оставляем для сцены 7
+
+            if (scene.choices && scene.choices.length > 0) {
+                document.body.ontouchstart = null;
+                document.body.onclick = null;
+                scene.choices.forEach(choice => {
+                    const btn = createChoiceButton(choice);
+                    if (choice.condition && !checkCondition(choice.condition)) {
+                        btn.style.display = 'none';
+                    } else if (choice.cost && stats.diamonds < choice.cost) {
+                        btn.disabled = true;
+                    } else {
+                        const handleChoice = (e) => {
+                            e.preventDefault();
+                            if (choice.cost) stats.diamonds -= choice.cost;
+                            updateDiamondsDisplay();
+                            saveChoice(choice.id, choice.effects, choice.memoryTag);
+                            if (choice.effects) showChoiceEffects(choice.effects);
+                            if (choice.nextScene !== undefined) {
+                                currentScene = choice.nextScene;
+                                saveSession();
+                                showScene(currentScene);
+                            } else if (choice.nextChapter) {
+                                currentChapter = choice.nextChapter;
+                                currentScene = 0;
+                                loadChapter(currentChapter).then(() => showScene(currentScene));
+                            }
+                        };
+                        btn.addEventListener('touchstart', handleChoice);
+                        btn.addEventListener('click', handleChoice);
+                    }
+                    dialogueBox.appendChild(btn);
+                });
+            } else if (scene.nextScene !== undefined) {
+                dialogueBox.touchHandler = (e) => {
+                    e.preventDefault();
+                    if (!isTyping) {
+                        currentScene = scene.nextScene;
+                        saveSession();
+                        showScene(currentScene);
+                    }
+                };
+                dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
+                dialogueBox.addEventListener('click', dialogueBox.touchHandler);
+            } else if (scene.nextChapter) {
+                currentChapter = scene.nextChapter;
+                currentScene = 0;
+                loadChapter(currentChapter).then(() => showScene(currentScene));
+            }
+        });
+    };
+
+    if (shouldFade) {
+        fadeOut(() => {
+            applyScene();
+            fadeIn();
+        });
+    } else {
+        applyScene();
+    }
+}
 
                function showSceneWithTimer(scene, timeoutMs = 10000) {
     const progressElement = document.getElementById('progress');
