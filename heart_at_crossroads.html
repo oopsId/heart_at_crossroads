@@ -513,7 +513,7 @@
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
-        const isTelegram = window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe;
+        const isTelegram = !!(window.Telegram && window.Telegram.WebApp && Telegram.WebApp.initDataUnsafe);
         if (isTelegram) {
             Telegram.WebApp.ready();
             console.log('Запуск в Telegram');
@@ -521,10 +521,10 @@
             console.log('Запуск в браузере');
         }
 
-        const userId = isTelegram && Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null;
+        const userId = isTelegram ? Telegram.WebApp.initDataUnsafe.user?.id : null;
 
         const saveToStorage = (key, value) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram) {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.setItem(
                         key,
@@ -540,7 +540,7 @@
         };
 
         const getFromStorage = (key) => {
-            if (isTelegram && Telegram.WebApp.CloudStorage) {
+            if (isTelegram) {
                 return new Promise((resolve, reject) => {
                     Telegram.WebApp.CloudStorage.getItem(
                         key,
@@ -588,7 +588,6 @@
 
             updateLanguage(stats.language);
 
-            // Дополняем touchstart событием click
             startGameBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 console.log('Нажата кнопка "Начать игру" (touchstart)');
@@ -904,9 +903,12 @@
             updateDiamondsDisplay();
         }
 
-        function loadChapter(chapterId) {
+        async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
-            return fetch(`/heart_at_crossroads/data/chapter${chapterId}.json`, {
+            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`; // Исправленный путь
+            console.log(`Путь к JSON: ${jsonPath}`);
+            
+            return fetch(jsonPath, {
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8',
                     'Accept': 'application/json'
@@ -1039,7 +1041,7 @@
                 document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
                 if (dialogueBox.touchHandler) {
                     dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler); // Удаляем старый click
+                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
                     dialogueBox.touchHandler = null;
                 }
 
@@ -1051,7 +1053,7 @@
                 typeText(scene.text[stats.language], dialogueElement, () => {
                     if (scene.choices && scene.choices.length > 0) {
                         document.body.ontouchstart = null;
-                        document.body.onclick = null; // Очищаем для кликов
+                        document.body.onclick = null;
                         scene.choices.forEach(choice => {
                             const btn = createChoiceButton(choice);
                             if (choice.condition && !checkCondition(choice.condition)) {
@@ -1098,7 +1100,7 @@
                             }
                         };
                         dialogueBox.addEventListener('touchstart', dialogueBox.touchHandler);
-                        dialogueBox.addEventListener('click', dialogueBox.touchHandler); // Добавляем click
+                        dialogueBox.addEventListener('click', dialogueBox.touchHandler);
                         dialogueBox.style.bottom = '0';
                     } else if (scene.nextChapter) {
                         currentChapter = scene.nextChapter;
@@ -1153,7 +1155,7 @@
                 loadChapter(1).then(() => showScene(currentScene));
             };
             document.body.ontouchstart = restartHandler;
-            document.body.onclick = restartHandler; // Добавляем click
+            document.body.onclick = restartHandler;
         }
 
         function checkSceneCondition(scene) {
@@ -1198,7 +1200,7 @@
 
             const dialogueBox = document.querySelector('.dialogue-box');
             dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.skipHandler); // Удаляем старый click
+            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
             dialogueBox.skipHandler = (e) => {
                 e.preventDefault();
                 if (isTyping) {
@@ -1209,7 +1211,7 @@
                 }
             };
             dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler, { once: true });
-            dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true }); // Добавляем click
+            dialogueBox.addEventListener('click', dialogueBox.skipHandler, { once: true });
         }
 
         function fadeOut(callback) {
