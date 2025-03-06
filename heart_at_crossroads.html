@@ -481,6 +481,17 @@
             text-align: center;
             max-width: 80%;
         }
+         
+    .phone-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 240px;
+    height: 400px;
+    pointer-events: none;
+    }
     </style>
 </head>
 <body>
@@ -1784,6 +1795,94 @@ function showEpilogue(epilogueText) {
                 }
             }
         }
+
+       function createDefaultOverlay(sceneId) {
+    console.log(`Создание дефолтного оверлея для сцены ${sceneId}`);
+    const existingOverlay = document.getElementById(`phone-overlay-${sceneId}`);
+    if (existingOverlay) existingOverlay.remove();
+
+    // Проверяем на специфические сцены с мессенджером
+    if (sceneId === 7 || sceneId === 21) {
+        return showMessengerOverlay(sceneId);
+    }
+
+    // Создаем общий телефонный оверлей для других сцен
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', `phone-overlay-${sceneId}`);
+    svg.setAttribute('width', '240');
+    svg.setAttribute('height', '400');
+    svg.setAttribute('viewBox', '0 0 300 500');
+    svg.className = 'phone-overlay'; // Используем класс для стилей
+
+    // Используем аватарку по умолчанию
+    const defaultAvatarSrc = "/heart_at_crossroads/assets/characters/anna/anna_messenger_ava.png";
+    const senderName = stats.language === "ru" ? "Новое сообщение" : "New message";
+
+    // Создаем базовое сообщение
+    const defaultText = stats.language === "ru" ? "Проверь сообщения" : "Check your messages";
+    const messages = [
+        { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: defaultText }
+    ];
+
+    svg.innerHTML = `
+        <!-- Корпус смартфона -->
+        <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
+        
+        <!-- Экран смартфона с фоновым изображением -->
+        <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
+        <image xlink:href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
+        
+        <!-- Заголовок с именем пользователя и аватаркой -->
+        <rect x="30" y="50" width="240" height="50" fill="#fff"/>
+        <!-- Аватарка с подгрузкой изображения -->
+        <clipPath id="avatarClip">
+            <circle cx="60" cy="75" r="15"/>
+        </clipPath>
+        <image xlink:href="${defaultAvatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${defaultAvatarSrc}'); showErrorMessage(stats.language === 'ru' ? 'Аватарка не найдена' : 'Avatar not found');"/>
+        <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
+        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
+        
+        <!-- Разделительная линия -->
+        <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
+        
+        <!-- Сообщения -->
+        <g class="messages">
+            ${messages.map((msg, idx) => `
+                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
+                <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
+            `).join('')}
+            <!-- Пустое ответное сообщение -->
+            <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
+            <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
+        </g>
+    `;
+
+    console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
+    document.getElementById('game-container').appendChild(svg);
+    
+    // Анимации как в showMessengerOverlay
+    gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
+    messages.forEach((msg, idx) => {
+        gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
+    });
+    gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
+    gsap.to(`#text${messages.length + 1}`, { 
+        opacity: 1, 
+        duration: 0, 
+        delay: 0.5 + messages.length * 0.5 + 0.5, 
+        onStart: function() {
+            let text = "...";
+            let index = 0;
+            let interval = setInterval(() => {
+                document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
+                index++;
+                if (index > text.length) clearInterval(interval);
+            }, 100);
+        }
+    });
+    
+    return svg;
+}      
 
         function showChapterPlaceholder() {
             const existingPlaceholder = document.querySelector('.placeholder-message');
