@@ -806,16 +806,16 @@
 
             // Инициализация
             getFromStorage('last_session')
-                .then(session => {
-                    console.log('Сессия загружена:', session);
-                    if (session) showStartScreen();
-                    else checkAuthorization();
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки сессии:', error);
-                    showStartScreen();
-                });
+           .then(session => {
+            console.log('Сессия загружена:', session);
+            if (session) showStartScreen();
+            else checkAuthorization();
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки сессии:', error);
+            showStartScreen();
         });
+});
 
         // Остальные функции остаются без изменений
         function showStartScreen() {
