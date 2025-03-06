@@ -449,6 +449,36 @@
             padding: 20px;
             border-radius: 10px;
             z-index: 100;
+         }
+            #timer-countdown {
+            position: absolute;
+            bottom: calc(20% + 50px); /* Чуть выше .dialogue-box */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: #ff4444;
+            font-weight: bold;
+            z-index: 4; /* Ниже кнопок */
+        }
+           @keyframes flash {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+            100% { filter: brightness(1); }
+           }
+        .flash-svg { animation: flash 0.5s ease; }
+        .error-message {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 10;
+            font-size: 14px;
+            text-align: center;
+            max-width: 80%;
         }
     </style>
 </head>
@@ -533,6 +563,38 @@
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
+
+
+        function playSound(sound) {
+        if (sound) {
+        const audio = new Audio(`/heart_at_crossroads/assets/sounds/${sound}`);
+        audio.play()
+        .catch(error => {
+        console.error(`Ошибка воспроизведения звука ${sound}:`, error);
+        showErrorMessage(stats.language === "ru" ? `Звук ${sound} не найден` : `Sound ${sound} not found`);
+        });
+        }
+        }
+
+        function playMusic(music) {
+        if (music) {
+        if (window.currentMusic) window.currentMusic.pause();
+        window.currentMusic = new Audio(`/heart_at_crossroads/assets/sounds/${music}`);
+        window.currentMusic.loop = true;
+        window.currentMusic.play()
+        .catch(error => {
+        console.error(`Ошибка воспроизведения музыки ${music}:`, error);
+        showErrorMessage(stats.language === "ru" ? `Музыка ${music} не найдена` : `Music ${music} not found`);
+        });
+        }
+        }
+        function showErrorMessage(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        document.body.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 3000);
+        }
         // Улучшенные функции хранения
         function saveToStorage(key, value) {
             return new Promise((resolve, reject) => {
@@ -899,61 +961,190 @@
             setTimeout(() => debugDiv.remove(), 5000);
         }
 
-        function preloadAssets(chapterId) {
-            console.log('Начало preloadAssets для chapter:', chapterId);
-            const loadingStatus = document.createElement('div');
-            loadingStatus.id = 'loading-status';
-            loadingStatus.style.cssText = 'position:fixed;bottom:10px;left:10px;color:white;font-size:12px;z-index:11;';
-            document.body.appendChild(loadingStatus);
-            
-            const images = [
-                '/heart_at_crossroads/assets/backgrounds/start_screen.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
-                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
-                '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
-                '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
-                '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
-                '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
-                '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
-                '/heart_at_crossroads/assets/ui/diamonds.png',
-                '/heart_at_crossroads/assets/ui/crown.png',
-                '/heart_at_crossroads/assets/ui/heart.png',
-                '/heart_at_crossroads/assets/ui/leaf.png'
-            ];
-            let loaded = 0;
-            
-            return Promise.all(images.map(src => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = src;
-                    img.onload = () => {
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        console.log(`Загружено: ${src}`);
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.warn(`Не удалось загрузить ${src}`);
-                        loaded++;
-                        loadingStatus.textContent = `Загрузка: ${loaded}/${images.length}`;
-                        resolve();
-                    };
-                });
-            })).finally(() => {
-                loadingStatus.remove();
+         /**
+ * Предварительно загружает необходимые для главы изображения
+ * @param {string} chapterId - Идентификатор главы
+ * @param {Object} options - Дополнительные параметры
+ * @param {string} options.language - Язык интерфейса ('ru' или 'en')
+ * @returns {Promise} Промис, который разрешается когда все изображения загружены
+ */
+async function preloadAssets(chapterId, options = {}) {
+    console.log(`Начало загрузки ресурсов для главы: ${chapterId}`);
+    
+    // Определяем язык (русский по умолчанию если не указан)
+    const language = options.language || 'ru';
+    const texts = {
+        loading: language === 'ru' ? 'Загрузка' : 'Loading',
+        imageNotFound: language === 'ru' ? 'Изображение не найдено' : 'Image not found',
+        loadError: language === 'ru' ? 'Не удалось загрузить' : 'Failed to load'
+    };
+    
+    // Создаем индикатор загрузки
+    const loadingStatus = document.createElement('div');
+    loadingStatus.id = 'loading-status';
+    loadingStatus.style.cssText = 'position: fixed; bottom: 10px; left: 10px; color: white; font-size: 12px; z-index: 11; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 3px;';
+    document.body.appendChild(loadingStatus);
+    
+    // Список изображений для загрузки
+    const images = [
+        '/heart_at_crossroads/assets/backgrounds/start_screen.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
+        '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_angry_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1_summer.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style3.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_smile_style1_summer.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_smile_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_smile_style2_summer.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_surprised_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1_summer.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style2.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_worry_style1.png',
+        '/heart_at_crossroads/assets/characters/anna/anna_worry_style2.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/dima/dima_worry_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/lesha/lyosha_worry_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/mark/mark_worry_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/sergey/sergey_worry_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_happy_style1_summer.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_sad_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_sad_style1_summer.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_surprised_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_thoughtful_style1.png',
+        '/heart_at_crossroads/assets/characters/vika/vika_worry_style1.png'
+    ];
+    
+    // Переменные для отслеживания прогресса
+    let loaded = 0;
+    const totalImages = images.length;
+    const failedImages = [];
+    
+    // Обновление статуса загрузки
+    const updateStatus = () => {
+        const percentage = Math.floor((loaded / totalImages) * 100);
+        loadingStatus.textContent = `${texts.loading}: ${loaded}/${totalImages} (${percentage}%)`;
+    };
+    
+    // Функция для отображения ошибки загрузки
+    const showErrorMessage = (message) => {
+        const errorElement = document.createElement('div');
+        errorElement.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px;';
+        errorElement.textContent = message;
+        document.body.appendChild(errorElement);
+        
+        setTimeout(() => {
+            errorElement.style.opacity = '0';
+            errorElement.style.transition = 'opacity 0.5s';
+            setTimeout(() => errorElement.remove(), 500);
+        }, 3000);
+    };
+    
+    // Отображаем начальный статус
+    updateStatus();
+    
+    try {
+        // Создаем промисы для загрузки всех изображений
+        const promises = images.map(src => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                
+                img.onload = () => {
+                    loaded++;
+                    updateStatus();
+                    console.log(`✅ ${texts.loading}: ${src}`);
+                    resolve(true);
+                };
+                
+                img.onerror = () => {
+                    loaded++;
+                    failedImages.push(src.split('/').pop());
+                    updateStatus();
+                    console.warn(`❌ ${texts.loadError}: ${src}`);
+                    resolve(false);
+                };
+                
+                img.src = src;
             });
+        });
+        
+        // Загружаем все изображения параллельно
+        const results = await Promise.all(promises);
+        
+        // Подсчитываем успешно загруженные изображения
+        const successCount = results.filter(success => success).length;
+        console.log(`✅ ${texts.loading}: ${successCount}/${totalImages} успешно загружены`);
+        
+        // Показываем сообщения об ошибках, если есть
+        if (failedImages.length > 0) {
+            failedImages.slice(0, 3).forEach(img => {
+                showErrorMessage(`${texts.imageNotFound}: ${img}`);
+            });
+            
+            if (failedImages.length > 3) {
+                showErrorMessage(`${texts.imageNotFound}: ${failedImages.length - 3} more...`);
+            }
         }
+        
+        return { 
+            success: successCount, 
+            failed: failedImages.length, 
+            failedImages 
+        };
+    } catch (error) {
+        console.error('Ошибка при загрузке изображений:', error);
+        throw error;
+    } finally {
+        // Убираем индикатор загрузки при завершении
+        loadingStatus.style.opacity = '0';
+        loadingStatus.style.transition = 'opacity 0.5s';
+        setTimeout(() => loadingStatus.remove(), 500);
+    }
+}
 
         async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
