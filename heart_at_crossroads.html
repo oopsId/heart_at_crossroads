@@ -1537,107 +1537,89 @@
     let i = 0;
     const speed = 50;
     
-    // Split text by "||", trim and filter empty parts
+    // Разбиваем текст по "||"
     const parts = text.split('||')
         .map(part => part.trim())
         .filter(part => part.length > 0);
     
-    console.log('Разделённый текст:', parts);
+    console.log('Частей текста:', parts.length);
     let partIndex = 0;
     const dialogueBox = document.querySelector('.dialogue-box');
     
-    // Clean up any existing handlers first
-    if (dialogueBox.nextPartHandler) {
-        dialogueBox.removeEventListener('touchstart', dialogueBox.nextPartHandler);
-        dialogueBox.removeEventListener('click', dialogueBox.nextPartHandler);
-    }
-    if (dialogueBox.skipHandler) {
-        dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-        dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
+    // Очищаем старые обработчики
+    function clearHandlers() {
+        dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
+        dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
+        dialogueBox.tapHandler = null;
     }
     
+    clearHandlers();
+    
     function type() {
-        // CRITICAL CHECK: Make sure partIndex is valid
+        // Проверка валидности индекса
         if (partIndex >= parts.length) {
-            console.error(`Invalid partIndex: ${partIndex}, parts length: ${parts.length}`);
+            console.error(`Некорректный индекс: ${partIndex}, всего частей: ${parts.length}`);
             isTyping = false;
             if (callback) callback();
             return;
         }
         
         if (i < parts[partIndex].length) {
+            // Печатаем по символу
             element.textContent += parts[partIndex].charAt(i);
             i++;
             element.typeTimer = setTimeout(type, speed);
         } else {
+            // Текущая часть завершена
             isTyping = false;
-            delete element.typeTimer;
             console.log(`Завершена часть ${partIndex + 1} из ${parts.length}`);
             
-            // Удаляем старые обработчики перед привязкой новых
-            dialogueBox.removeEventListener('touchstart', dialogueBox.nextPartHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.nextPartHandler);
-            dialogueBox.removeEventListener('touchstart', dialogueBox.skipHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.skipHandler);
-            
-            if (partIndex < parts.length - 1) {
-                // Ждём тап для следующей части
-                dialogueBox.nextPartHandler = (e) => {
-                    e.preventDefault();
-                    // CRITICAL: Add validation before incrementing partIndex
-                    if (!isTyping && partIndex < parts.length - 1) {
-                        console.log(`Тап для перехода к части ${partIndex + 2}`);
-                        i = 0;
-                        partIndex++;
-                        element.textContent = '';
-                        type();
-                    }
-                };
-                
-                console.log('Привязываем nextPartHandler');
-                dialogueBox.addEventListener('touchstart', dialogueBox.nextPartHandler);
-                dialogueBox.addEventListener('click', dialogueBox.nextPartHandler);
-                
-                // Обновляем обработчик пропуска для следующей части
-                dialogueBox.skipHandler = (e) => {
-                    e.preventDefault();
-                    if (isTyping) {
-                        console.log(`Пропуск части ${partIndex + 1}`);
-                        clearTimeout(element.typeTimer);
-                        element.textContent = parts[partIndex];
-                        isTyping = false;
-                        type();
-                    }
-                };
-                dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
-                dialogueBox.addEventListener('click', dialogueBox.skipHandler);
-            } else {
-                // CRITICAL: Make sure to fully clean up handlers after the last part
-                dialogueBox.nextPartHandler = null;
-                dialogueBox.skipHandler = null;
-                
-                // После последней части сразу вызываем callback и очищаем обработчики
-                console.log('Все части отображены, вызываем callback');
-                if (callback) callback();
-            }
+            // Подготовка к следующему тапу
+            setupTapHandler();
         }
     }
     
-    type();
+    // Единый обработчик тапов
+    function setupTapHandler() {
+        clearHandlers();
+        
+        dialogueBox.tapHandler = (e) => {
+            e.preventDefault();
+            
+            if (isTyping) {
+                // Первый тап - пропуск анимации текущей части
+                console.log(`Пропуск анимации части ${partIndex + 1}`);
+                clearTimeout(element.typeTimer);
+                element.textContent = parts[partIndex];
+                isTyping = false;
+                
+                // Не переходим автоматически дальше
+            } else {
+                // Второй тап - переход к следующей части/сцене
+                if (partIndex < parts.length - 1) {
+                    // Переход к следующей части текста
+                    console.log(`Переход к части ${partIndex + 2}`);
+                    i = 0;
+                    partIndex++;
+                    element.textContent = '';
+                    isTyping = true;
+                    type();
+                } else {
+                    // Последняя часть, переход к следующей сцене
+                    console.log('Все части показаны, вызываем callback');
+                    clearHandlers();
+                    if (callback) callback();
+                }
+            }
+        };
+        
+        dialogueBox.addEventListener('touchstart', dialogueBox.tapHandler);
+        dialogueBox.addEventListener('click', dialogueBox.tapHandler);
+    }
     
-    // Начальный обработчик пропуска текущей части
-    dialogueBox.skipHandler = (e) => {
-        e.preventDefault();
-        if (isTyping) {
-            console.log(`Пропуск части ${partIndex + 1}`);
-            clearTimeout(element.typeTimer);
-            element.textContent = parts[partIndex];
-            isTyping = false;
-            type(); // Продолжаем логику после пропуска
-        }
-    };
-    dialogueBox.addEventListener('touchstart', dialogueBox.skipHandler);
-    dialogueBox.addEventListener('click', dialogueBox.skipHandler);
+    // Начинаем печатать и устанавливаем начальный обработчик
+    type();
+    setupTapHandler();
 }
        
 
