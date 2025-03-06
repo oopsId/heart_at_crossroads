@@ -1396,8 +1396,8 @@ async function preloadAssets(chapterId, options = {}) {
     const applyScene = async () => {
         const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
         if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-        console.warn(`Фон ${newBackground}.png не найден`);
-       showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+         console.warn(`Фон ${newBackground}.png не найден`);
+         showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
         }
         backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
         currentBackground = newBackground;
