@@ -1535,6 +1535,31 @@ async function preloadAssets(chapterId, options = {}) {
     }
 }
 
+
+
+function showGallery() {
+    const galleryDiv = document.createElement('div');
+    galleryDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;';
+    stats.memories.forEach(memory => {
+        const img = document.createElement('img');
+        img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
+        img.style.cssText = 'display: block; margin: 20px auto; max-width: 80%;';
+        img.onerror = () => {
+            console.warn(`Воспоминание ${memory}.png не найдено`);
+            showErrorMessage(stats.language === "ru" ? `Воспоминание ${memory} не найдено` : `Memory ${memory} not found`);
+        };
+        galleryDiv.appendChild(img);
+    });
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
+    closeBtn.style.cssText = 'position: fixed; top: 10px; right: 10px;';
+    closeBtn.onclick = () => galleryDiv.remove();
+    galleryDiv.appendChild(closeBtn);
+    document.body.appendChild(galleryDiv);
+}
+
+
+
         function showMessengerOverlay(sceneId) {
             console.log(`Создание оверлея для сцены ${sceneId}`);
             const existingOverlay = document.getElementById('messenger-overlay');
