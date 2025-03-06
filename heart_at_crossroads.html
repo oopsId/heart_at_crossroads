@@ -1558,6 +1558,97 @@ function showGallery() {
     document.body.appendChild(galleryDiv);
 }
 
+async function loadFinals(endingId) {
+    const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
+    const finalsData = await response.json();
+    const ending = finalsData.endings.find(e => e.id === endingId);
+    if (ending && checkRequirements(ending.requirements)) {
+        showEnding(ending);
+    } else {
+        console.warn('Концовка не найдена или требования не выполнены');
+        showStartScreen();
+    }
+}
+
+function checkRequirements(requirements) {
+    if (!requirements) return true;
+    for (let key in requirements) {
+        const value = stats[key] || stats.relationships[key.split('.')[1]] || 0;
+        const req = requirements[key];
+        if (req.startsWith('>')) {
+            const compareValue = req.includes('+') ? 
+                (stats[req.split('+')[0].slice(1)] + stats[req.split('+')[1]]) : 
+                parseInt(req.slice(1));
+            return value > compareValue;
+        }
+        return value >= parseInt(req);
+    }
+    return true;
+}
+
+function showEnding(ending) {
+    const scene = ending.scenes[0];
+    const backgroundElement = document.getElementById('background');
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    const dialogueElement = document.getElementById('dialogue-text');
+    const speakerName = document.getElementById('speaker-name');
+
+    const bgUrl = `/heart_at_crossroads/assets/backgrounds/${scene.background}.png`;
+    checkAssetExists(bgUrl).then(exists => {
+        if (!exists) {
+            console.warn(`Фон ${scene.background}.png не найден`);
+            showErrorMessage(stats.language === "ru" ? `Фон ${scene.background} не найден` : `Background ${scene.background} not found`);
+        }
+        backgroundElement.style.backgroundImage = `url('${bgUrl}')`;
+    });
+
+    if (scene.characterLeft) {
+        const leftCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterLeft.split('_')[0]}/${scene.characterLeft}.png`;
+        checkAssetExists(leftCharUrl).then(exists => {
+            if (!exists) {
+                console.warn(`Персонаж ${scene.characterLeft}.png не найден`);
+                showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterLeft} не найден` : `Character ${scene.characterLeft} not found`);
+            }
+            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+        });
+    } else charLeft.style.backgroundImage = 'none';
+
+    if (scene.characterRight) {
+        const rightCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterRight.split('_')[0]}/${scene.characterRight}.png`;
+        checkAssetExists(rightCharUrl).then(exists => {
+            if (!exists) {
+                console.warn(`Персонаж ${scene.characterRight}.png не найден`);
+                showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterRight} не найден` : `Character ${scene.characterRight} not found`);
+            }
+            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+        });
+    } else charRight.style.backgroundImage = 'none';
+
+    speakerName.textContent = scene.speaker[stats.language];
+    typeText(stats.completionCount >= 1 && scene.second_playthrough_text ? 
+        scene.second_playthrough_text[stats.language] : scene.text[stats.language], 
+        dialogueElement, () => {
+            showEpilogue(ending.epilogue[stats.language]);
+        });
+
+    if (scene.sound) playSound(scene.sound);
+    if (scene.music) playMusic(scene.music);
+}
+
+function showEpilogue(epilogueText) {
+    const epilogueDiv = document.createElement('div');
+    epilogueDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10;';
+    epilogueDiv.textContent = epilogueText;
+    document.body.appendChild(epilogueDiv);
+    setTimeout(() => {
+        epilogueDiv.remove();
+        stats.completionCount++;
+        saveSession();
+        showStartScreen();
+    }, 5000);
+}
+
 
 
         function showMessengerOverlay(sceneId) {
