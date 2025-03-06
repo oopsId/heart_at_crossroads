@@ -1247,18 +1247,22 @@ async function preloadAssets(chapterId, options = {}) {
     const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
 
     const applyScene = async () => {
+        // Добавляем логику установки фона
         const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
         if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
             console.warn(`Фон ${newBackground}.png не найден`);
             showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
         }
-        backgroundElement.style.backgroundImage = bgUrl;
+        backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
+        currentBackground = newBackground; // Обновляем текущий фон
 
+        // Очистка персонажей (если нужно)
         charLeft.style.backgroundImage = 'none';
         charRight.style.backgroundImage = 'none';
         charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
         charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
 
+        // Установка персонажей (если они есть в сцене)
         const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
         if (scene.characterLeft) {
             const leftChar = scene.characterLeft.includes('${stats.appearance}') 
@@ -1285,29 +1289,17 @@ async function preloadAssets(chapterId, options = {}) {
             charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
         }
 
-        if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-        if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+        // Установка имени спикера
+        document.getElementById('speaker-name').textContent = speakerName;
 
-        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-        if (dialogueBox.touchHandler) {
-            dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-            dialogueBox.touchHandler = null;
-        }
-
-        // SVG-смартфон для сцен с упоминанием телефона
+        // Добавляем оверлей (если есть упоминание телефона)
         let overlay = null;
         const textLower = displayText.toLowerCase();
         if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
             textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-            overlay = createDefaultOverlay(scene.id);
+            const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+            overlay = createDefaultOverlay(sceneId, sceneData);
         }
-
-        document.getElementById('speaker-name').textContent = speakerName;
-
-        // Звуки и музыка
-        if (scene.sound) playSound(scene.sound);
-        if (scene.music) playMusic(scene.music);
 
         typeText(displayText, dialogueElement, () => {
             dialogueBox.style.pointerEvents = 'auto';
@@ -1355,6 +1347,14 @@ async function preloadAssets(chapterId, options = {}) {
                 dialogueBox.touchHandler = handleNext;
                 dialogueBox.addEventListener('touchstart', handleNext);
                 dialogueBox.addEventListener('click', handleNext);
+            } else if (scene.id === scriptData.scenes.length - 1) {
+                currentChapter++;
+                currentScene = 0;
+                if (currentChapter <= 10) {
+                    loadChapter(currentChapter).then(() => showScene(currentScene));
+                } else {
+                    showStartScreen();
+                }
             }
         });
     };
@@ -1396,10 +1396,10 @@ async function preloadAssets(chapterId, options = {}) {
     const applyScene = async () => {
         const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
         if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-            console.warn(`Фон ${newBackground}.png не найден`);
-            showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+        console.warn(`Фон ${newBackground}.png не найден`);
+       showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
         }
-        backgroundElement.style.backgroundImage = bgUrl;
+        backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
         currentBackground = newBackground;
 
         charLeft.style.backgroundImage = 'none';
@@ -1458,86 +1458,93 @@ async function preloadAssets(chapterId, options = {}) {
         if (scene.music) playMusic(scene.music);
 
         typeText(displayText, dialogueElement, () => {
-            dialogueBox.style.pointerEvents = 'auto';
-            scene.choices.forEach(choice => {
-                const btn = createChoiceButton(choice);
-                if (choice.condition && !checkCondition(choice.condition)) {
-                    btn.style.display = 'none';
-                } else if (choice.cost && stats.diamonds < choice.cost) {
-                    btn.disabled = true;
-                } else {
-                    const handleChoice = (e) => {
-                        e.preventDefault();
-                        if (choice.cost) stats.diamonds -= choice.cost;
-                        updateDiamondsDisplay();
-                        saveChoice(choice.id, choice.effects, choice.memoryTag);
-                        if (choice.effects) showChoiceEffects(choice.effects);
-                        clearInterval(countdownInterval);
-                        clearTimeout(timer);
-                        if (overlay) overlay.remove();
-                        document.getElementById('timer-countdown')?.remove();
-                        if (tickSound) tickSound.pause();
-                        if (choice.nextScene !== undefined) {
-                            currentScene = choice.nextScene;
-                            saveSession();
-                            showScene(currentScene);
-                        } else if (choice.nextChapter) {
-                            currentChapter = choice.nextChapter;
-                            currentScene = 0;
-                            loadChapter(currentChapter).then(() => showScene(currentScene));
-                        }
-                    };
-                    btn.addEventListener('touchstart', handleChoice);
-                    btn.addEventListener('click', handleChoice);
-                }
-                dialogueBox.appendChild(btn);
-            });
-
-            const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
-            let timeLeft = timerDuration / 1000;
-
-            const countdownElement = document.createElement('div');
-            countdownElement.id = 'timer-countdown';
-            countdownElement.textContent = timeLeft;
-            document.getElementById('game-container').appendChild(countdownElement);
-
-            const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
-            tickSound.loop = false;
-            tickSound.play().catch(err => {
-                console.warn('Ошибка воспроизведения sfx_tick:', err);
-                showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
-            });
-
-            const countdownInterval = setInterval(() => {
-                timeLeft--;
-                countdownElement.textContent = timeLeft;
-                if (overlay) {
-                    overlay.classList.add('flash-svg');
-                    setTimeout(() => overlay.classList.remove('flash-svg'), 500);
-                }
-                if ('vibrate' in navigator) navigator.vibrate(200);
-                if (timeLeft <= 0) {
+        dialogueBox.style.pointerEvents = 'auto';
+        scene.choices.forEach(choice => {
+            const btn = createChoiceButton(choice);
+            if (choice.condition && !checkCondition(choice.condition)) {
+                btn.style.display = 'none';
+            } else if (choice.cost && stats.diamonds < choice.cost) {
+                btn.disabled = true;
+            } else {
+                const handleChoice = (e) => {
+                    e.preventDefault();
+                    if (choice.cost) stats.diamonds -= choice.cost;
+                    updateDiamondsDisplay();
+                    saveChoice(choice.id, choice.effects, choice.memoryTag);
+                    if (choice.effects) showChoiceEffects(choice.effects);
                     clearInterval(countdownInterval);
-                    tickSound.pause();
-                }
-            }, 1000);
-
-            const timer = setTimeout(() => {
-                const defaultChoice = scene.choices.find(c => c.id === 'ignore');
-                clearInterval(countdownInterval);
-                if (overlay) overlay.remove();
-                document.getElementById('timer-countdown')?.remove();
-                tickSound.pause();
-                if (defaultChoice && defaultChoice.nextScene !== undefined) {
-                    currentScene = defaultChoice.nextScene;
-                    saveSession();
-                    showScene(currentScene);
-                } else {
-                    console.warn('Нет сцены по умолчанию для таймера!');
-                }
-            }, timerDuration);
+                    clearTimeout(timer);
+                    if (overlay) overlay.remove();
+                    document.getElementById('timer-countdown')?.remove();
+                    if (tickSound) tickSound.pause();
+                    if (choice.nextScene !== undefined) {
+                        currentScene = choice.nextScene;
+                        saveSession();
+                        showScene(currentScene);
+                    } else if (choice.nextChapter) {
+                        currentChapter = choice.nextChapter;
+                        currentScene = 0;
+                        loadChapter(currentChapter).then(() => showScene(currentScene));
+                    }
+                };
+                btn.addEventListener('touchstart', handleChoice);
+                btn.addEventListener('click', handleChoice);
+            }
+            dialogueBox.appendChild(btn);
         });
-    };
+
+        const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
+        let timeLeft = timerDuration / 1000;
+
+        const countdownElement = document.createElement('div');
+        countdownElement.id = 'timer-countdown';
+        countdownElement.textContent = timeLeft;
+        document.getElementById('game-container').appendChild(countdownElement);
+
+        const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
+        tickSound.loop = false;
+        tickSound.play().catch(err => {
+            console.warn('Ошибка воспроизведения sfx_tick:', err);
+            showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
+        });
+
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            if (overlay) {
+                overlay.classList.add('flash-svg');
+                setTimeout(() => overlay.classList.remove('flash-svg'), 500);
+            }
+            if ('vibrate' in navigator) navigator.vibrate(200);
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                tickSound.pause();
+            }
+        }, 1000);
+
+        const timer = setTimeout(() => {
+            const defaultChoice = scene.choices.find(c => c.id === 'ignore');
+            clearInterval(countdownInterval);
+            if (overlay) overlay.remove();
+            document.getElementById('timer-countdown')?.remove();
+            tickSound.pause();
+            if (defaultChoice && defaultChoice.nextScene !== undefined) {
+                currentScene = defaultChoice.nextScene;
+                saveSession();
+                showScene(currentScene);
+            } else if (scene.id === scriptData.scenes.length - 1) { // Добавляем переход на следующую главу
+                currentChapter++;
+                currentScene = 0;
+                if (currentChapter <= 10) {
+                    loadChapter(currentChapter).then(() => showScene(currentScene));
+                } else {
+                    showStartScreen();
+                }
+            } else {
+                console.warn('Нет сцены по умолчанию для таймера!');
+            }
+        }, timerDuration);
+    });
 
     if (shouldFade) {
         fadeOut(() => {
