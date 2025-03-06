@@ -1611,7 +1611,7 @@ function checkRequirements(requirements) {
     return true;
 }
 
- function showEnding(ending) {
+           function showEnding(ending) {
     const scene = ending.scenes[0];
     const backgroundElement = document.getElementById('background');
     const charLeft = document.getElementById('character-left');
@@ -1659,7 +1659,7 @@ function checkRequirements(requirements) {
 
     if (scene.sound) playSound(scene.sound);
     if (scene.music) playMusic(scene.music);
-} // Добавлена закрывающая скобка
+} // Здесь должна быть закрывающая скобка
 
 function showEpilogue(epilogueText) {
     const epilogueDiv = document.createElement('div');
