@@ -961,6 +961,12 @@
             setTimeout(() => debugDiv.remove(), 5000);
         }
 
+
+    function checkAssetExists(url) {
+    return fetch(url, { method: 'HEAD' })
+        .then(res => res.ok)
+        .catch(() => false);
+                                   }
          /**
  * Предварительно загружает необходимые для главы изображения
  * @param {string} chapterId - Идентификатор главы
