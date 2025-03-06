@@ -1356,152 +1356,184 @@ async function preloadAssets(chapterId, options = {}) {
 }
 
             function showSceneWithTimer(scene, timeoutMs = 10000) {
-            const progressElement = document.getElementById('progress');
-            const totalScenes = scriptData.scenes.length;
-            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-            progressElement.style.width = `${progressPercent}%`;
+    const progressElement = document.getElementById('progress');
+    const totalScenes = scriptData.scenes.length;
+    const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+    progressElement.style.width = `${progressPercent}%`;
 
-            const backgroundElement = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogueElement = document.getElementById('dialogue-text');
-            const dialogueBox = document.querySelector('.dialogue-box');
+    const backgroundElement = document.getElementById('background');
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    const dialogueElement = document.getElementById('dialogue-text');
+    const dialogueBox = document.querySelector('.dialogue-box');
 
-            let displayText = scene.text[stats.language];
-            if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-                displayText = scene.second_playthrough_text[stats.language];
+    let displayText = scene.text[stats.language];
+    if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+        displayText = scene.second_playthrough_text[stats.language];
+    }
+
+    const newBackground = scene.background || 'none';
+    const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+    const applyScene = async () => {
+        const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
+        if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
+            console.warn(`Фон ${newBackground}.png не найден`);
+            showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+        }
+        backgroundElement.style.backgroundImage = bgUrl;
+        currentBackground = newBackground;
+
+        charLeft.style.backgroundImage = 'none';
+        charRight.style.backgroundImage = 'none';
+        charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+        charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+        const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+        if (scene.characterLeft) {
+            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                : scene.characterLeft;
+            const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
+            if (!(await checkAssetExists(leftCharUrl))) {
+                console.warn(`Персонаж ${leftChar}.png не найден`);
+                showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
             }
+            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+        }
+        if (scene.characterRight) {
+            const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                : scene.characterRight;
+            const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
+            if (!(await checkAssetExists(rightCharUrl))) {
+                console.warn(`Персонаж ${rightChar}.png не найден`);
+                showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
+            }
+            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+            charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+        }
 
-            const newBackground = scene.background || 'none';
-            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+        if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+        if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
 
-            const applyScene = () => {
-                backgroundElement.style.backgroundImage = newBackground === 'none' ? 'none' : `url('/heart_at_crossroads/assets/backgrounds/${newBackground}.png')`;
-                currentBackground = newBackground;
-                charLeft.style.backgroundImage = 'none';
-                charRight.style.backgroundImage = 'none';
-                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+        if (dialogueBox.touchHandler) {
+            dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+            dialogueBox.touchHandler = null;
+        }
 
-                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-                if (scene.characterLeft) {
-                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterLeft;
-                    charLeft.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png')`;
-                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-                }
-                if (scene.characterRight) {
-                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                        : scene.characterRight;
-                    charRight.style.backgroundImage = `url('/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png')`;
-                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-                }
+        // SVG-смартфон для сцен с упоминанием телефона
+        let overlay = null;
+        const textLower = displayText.toLowerCase();
+        if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
+            textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
+            overlay = createDefaultOverlay(scene.id);
+        }
 
-                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+        document.getElementById('speaker-name').textContent = speakerName;
 
-                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-                if (dialogueBox.touchHandler) {
-                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-                    dialogueBox.touchHandler = null;
-                }
+        // Звуки и музыка
+        if (scene.sound) playSound(scene.sound);
+        if (scene.music) playMusic(scene.music);
 
-                console.log(`Попытка показать оверлей для сцены ${scene.id}`);
-                let overlay = null;
-                if (scene.id === 7 || scene.id === 21) {
-                    overlay = showMessengerOverlay(scene.id);
-                    if (!overlay) console.error(`Оверлей не создан для сцены ${scene.id}`);
+        typeText(displayText, dialogueElement, () => {
+            dialogueBox.style.pointerEvents = 'auto';
+            scene.choices.forEach(choice => {
+                const btn = createChoiceButton(choice);
+                if (choice.condition && !checkCondition(choice.condition)) {
+                    btn.style.display = 'none';
+                } else if (choice.cost && stats.diamonds < choice.cost) {
+                    btn.disabled = true;
                 } else {
-                    console.log(`Оверлей не нужен для сцены ${scene.id}`);
-                }
-
-                document.getElementById('speaker-name').textContent = speakerName;
-                console.log('Установка текста с таймером:', displayText);
-                typeText(displayText, dialogueElement, () => {
-                    dialogueBox.style.pointerEvents = 'auto';
-                    scene.choices.forEach(choice => {
-                        const btn = createChoiceButton(choice);
-                        if (choice.condition && !checkCondition(choice.condition)) {
-                            btn.style.display = 'none';
-                        } else if (choice.cost && stats.diamonds < choice.cost) {
-                            btn.disabled = true;
-                        } else {
-                            const handleChoice = (e) => {
-                                e.preventDefault();
-                                console.log('Выбор сделан:', choice.id);
-                                if (choice.cost) stats.diamonds -= choice.cost;
-                                updateDiamondsDisplay();
-                                saveChoice(choice.id, choice.effects, choice.memoryTag);
-                                if (choice.effects) showChoiceEffects(choice.effects);
-                                clearInterval(countdownInterval);
-                                clearTimeout(timer);
-                                if (overlay) overlay.remove();
-                                document.getElementById('timer-countdown')?.remove();
-                                if (choice.nextScene !== undefined) {
-                                    currentScene = choice.nextScene;
-                                    saveSession();
-                                    showScene(currentScene);
-                                } else if (choice.nextChapter) {
-                                    currentChapter = choice.nextChapter;
-                                    currentScene = 0;
-                                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                                }
-                            };
-                            btn.addEventListener('touchstart', handleChoice);
-                            btn.addEventListener('click', handleChoice);
-                        }
-                        dialogueBox.appendChild(btn);
-                    });
-
-                    const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
-                    let timeLeft = timerDuration / 1000;
-
-                    const countdownElement = document.createElement('div');
-                    countdownElement.id = 'timer-countdown';
-                    countdownElement.textContent = timeLeft;
-                    document.getElementById('game-container').appendChild(countdownElement);
-
-                    const countdownInterval = setInterval(() => {
-                        timeLeft--;
-                        countdownElement.textContent = timeLeft;
-                        if (overlay) {
-                            overlay.classList.add('flash-svg');
-                            setTimeout(() => overlay.classList.remove('flash-svg'), 500);
-                        }
-                        if (timeLeft <= 0) {
-                            clearInterval(countdownInterval);
-                        }
-                    }, 1000);
-
-                    const timer = setTimeout(() => {
-                        console.log('Таймер истёк, переход к "игнорировать"');
-                        const defaultChoice = scene.choices.find(c => c.id === 'ignore');
+                    const handleChoice = (e) => {
+                        e.preventDefault();
+                        if (choice.cost) stats.diamonds -= choice.cost;
+                        updateDiamondsDisplay();
+                        saveChoice(choice.id, choice.effects, choice.memoryTag);
+                        if (choice.effects) showChoiceEffects(choice.effects);
                         clearInterval(countdownInterval);
+                        clearTimeout(timer);
                         if (overlay) overlay.remove();
                         document.getElementById('timer-countdown')?.remove();
-                        if (defaultChoice && defaultChoice.nextScene !== undefined) {
-                            currentScene = defaultChoice.nextScene;
+                        if (tickSound) tickSound.pause();
+                        if (choice.nextScene !== undefined) {
+                            currentScene = choice.nextScene;
                             saveSession();
                             showScene(currentScene);
-                        } else {
-                            console.warn('Нет сцены по умолчанию для таймера!');
+                        } else if (choice.nextChapter) {
+                            currentChapter = choice.nextChapter;
+                            currentScene = 0;
+                            loadChapter(currentChapter).then(() => showScene(currentScene));
                         }
-                    }, timerDuration);
-                });
-            };
+                    };
+                    btn.addEventListener('touchstart', handleChoice);
+                    btn.addEventListener('click', handleChoice);
+                }
+                dialogueBox.appendChild(btn);
+            });
 
-            if (shouldFade) {
-                fadeOut(() => {
-                    applyScene();
-                    fadeIn();
-                });
-            } else {
-                applyScene();
-            }
-        }
+            const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
+            let timeLeft = timerDuration / 1000;
+
+            const countdownElement = document.createElement('div');
+            countdownElement.id = 'timer-countdown';
+            countdownElement.textContent = timeLeft;
+            document.getElementById('game-container').appendChild(countdownElement);
+
+            const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
+            tickSound.loop = false;
+            tickSound.play().catch(err => {
+                console.warn('Ошибка воспроизведения sfx_tick:', err);
+                showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
+            });
+
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+                if (overlay) {
+                    overlay.classList.add('flash-svg');
+                    setTimeout(() => overlay.classList.remove('flash-svg'), 500);
+                }
+                if ('vibrate' in navigator) navigator.vibrate(200);
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    tickSound.pause();
+                }
+            }, 1000);
+
+            const timer = setTimeout(() => {
+                const defaultChoice = scene.choices.find(c => c.id === 'ignore');
+                clearInterval(countdownInterval);
+                if (overlay) overlay.remove();
+                document.getElementById('timer-countdown')?.remove();
+                tickSound.pause();
+                if (defaultChoice && defaultChoice.nextScene !== undefined) {
+                    currentScene = defaultChoice.nextScene;
+                    saveSession();
+                    showScene(currentScene);
+                } else {
+                    console.warn('Нет сцены по умолчанию для таймера!');
+                }
+            }, timerDuration);
+        });
+    };
+
+    if (shouldFade) {
+        fadeOut(() => {
+            applyScene();
+            fadeIn();
+        });
+    } else {
+        applyScene();
+    }
+
+    if (scene.leadsToEnding) {
+        loadFinals(scene.leadsToEnding);
+    }
+}
 
         function showMessengerOverlay(sceneId) {
             console.log(`Создание оверлея для сцены ${sceneId}`);
