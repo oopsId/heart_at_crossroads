@@ -732,28 +732,28 @@
             }
 
             async function handlePasswordSubmit(e) {
-                e.preventDefault();
-                console.log('handlePasswordSubmit вызван');
-                const inputPassword = document.getElementById('password-input').value;
-                try {
-                    if (inputPassword === tempPassword || inputPassword === correctPassword) {
-                        if (inputPassword === correctPassword) {
-                            const authorizedUsers = (await getFromStorage('authorized_users')) || [];
-                            if (userId && !authorizedUsers.includes(userId)) {
-                                authorizedUsers.push(userId);
-                                await saveToStorage('authorized_users', authorizedUsers);
-                            }
-                            stats.isAuthorized = true;
-                        }
-                        startNewGame();
-                    } else {
-                        alert(stats.language === "ru" ? 'Неверный пароль!' : 'Incorrect password!');
-                    }
-                } catch (error) {
-                    console.error('Ошибка обработки пароля:', error);
-                    alert(stats.language === "ru" ? 'Ошибка авторизации.' : 'Authorization error.');
+    e.preventDefault();
+    console.log('handlePasswordSubmit вызван');
+    const inputPassword = document.getElementById('password-input').value;
+    try {
+        if (inputPassword === tempPassword || inputPassword === correctPassword) {
+            if (inputPassword === correctPassword) {
+                let authorizedUsers = JSON.parse(await getFromStorage('authorized_users') || '[]'); // Парсим в массив
+                if (userId && !authorizedUsers.includes(userId)) {
+                    authorizedUsers.push(userId);
+                    await saveToStorage('authorized_users', JSON.stringify(authorizedUsers)); // Сохраняем как строку
                 }
+                stats.isAuthorized = true;
             }
+            startNewGame();
+        } else {
+            alert(stats.language === "ru" ? 'Неверный пароль!' : 'Incorrect password!');
+        }
+    } catch (error) {
+        console.error('Ошибка обработки пароля:', error);
+        alert(stats.language === "ru" ? 'Ошибка авторизации.' : 'Authorization error.');
+    }
+}
 
             function handleMenu(e) {
                 e.preventDefault();
@@ -1611,7 +1611,7 @@ function checkRequirements(requirements) {
     return true;
 }
 
-function showEnding(ending) {
+ function showEnding(ending) {
     const scene = ending.scenes[0];
     const backgroundElement = document.getElementById('background');
     const charLeft = document.getElementById('character-left');
@@ -1659,7 +1659,7 @@ function showEnding(ending) {
 
     if (scene.sound) playSound(scene.sound);
     if (scene.music) playMusic(scene.music);
-}
+} // Добавлена закрывающая скобка
 
 function showEpilogue(epilogueText) {
     const epilogueDiv = document.createElement('div');
