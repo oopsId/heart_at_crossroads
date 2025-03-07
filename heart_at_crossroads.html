@@ -1532,7 +1532,7 @@ function handleChapterEnd(scene) {
     }
 }
 
-           async function showScene(sceneId) {
+                async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes[sceneId];
     if (!scene) {
@@ -1557,13 +1557,14 @@ function handleChapterEnd(scene) {
         console.log('[applyScene] Применяем сцену');
         currentBackground = await setupBackground(newBackground, stats.language);
         await setupCharacters(scene, stats.language, stats);
-        const overlay = createOverlayIfNeeded(sceneId, displayText);
+        const overlay = createOverlayIfNeeded(sceneId, displayText); // Теперь вызывает showMessengerOverlay
         clearDialogueHandlers(dialogueBox);
         dialogueBox.style.pointerEvents = 'none';
 
         console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
             console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
+            dialogueBox.style.pointerEvents = 'auto'; // Включаем клики после текста
             handleChoices(scene, dialogueBox, overlay);
             handleNextScene(scene, dialogueBox, overlay);
             handleChapterEnd(scene);
