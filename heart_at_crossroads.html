@@ -1883,7 +1883,6 @@ function typeText(text, element, callback) {
     function type() {
         console.log(`[${callId}] type(): partIndex=${partIndex}, i=${i}, parts.length=${parts.length}`);
         if (partIndex >= parts.length) {
-            console.error(`[${callId}] Ошибка индекса: ${partIndex}, частей: ${parts.length}`);
             isTyping = false;
             console.log(`[${callId}] isTyping сброшен в false (все части готовы)`);
             clearHandlers();
@@ -1914,6 +1913,14 @@ function typeText(text, element, callback) {
                 } else {
                     console.log(`[${callId}] Callback не передан`);
                 }
+            } else {
+                // Переход к следующей части
+                console.log(`[${callId}] Переход к части ${partIndex + 2}`);
+                partIndex++;
+                i = 0;
+                element.textContent = '';
+                isTyping = true;
+                type();
             }
         }
     }
@@ -1938,6 +1945,13 @@ function typeText(text, element, callback) {
                 } else {
                     console.log(`[${callId}] Callback не передан после пропуска`);
                 }
+            } else {
+                console.log(`[${callId}] Переход к части ${partIndex + 2} после пропуска`);
+                partIndex++;
+                i = 0;
+                element.textContent = '';
+                isTyping = true;
+                type();
             }
         } else if (partIndex < parts.length - 1) {
             console.log(`[${callId}] Переход к части ${partIndex + 2}`);
@@ -1966,6 +1980,7 @@ function typeText(text, element, callback) {
         dialogueBox.addEventListener('touchstart', handleTap, { passive: false });
         dialogueBox.addEventListener('click', handleTap);
         console.log(`[${callId}] Обработчик тапов установлен`);
+        dialogueBox.style.pointerEvents = 'auto'; // Убедимся, что элемент кликабелен
     } else {
         console.error(`[${callId}] Не удалось установить обработчик тапов: dialogueBox отсутствует`);
     }
@@ -1973,6 +1988,8 @@ function typeText(text, element, callback) {
     type();
 }
 
+
+        
 function fadeOut(callback) {
     const elements = [
         document.getElementById('background'),
