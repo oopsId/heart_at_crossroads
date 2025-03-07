@@ -1742,17 +1742,16 @@ function checkCondition(condition) {
 }
 
 function typeText(text, element, callback) {
-    if (isTyping) return; // Не начинаем, если уже печатаем
+    if (isTyping) return; // Защита от повторных вызовов
     isTyping = true;
-    element.textContent = ''; // Очищаем текст
-    if (element.typeTimer) clearTimeout(element.typeTimer); // Очищаем старый таймер
-    const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0); // Делим и убираем пустое
+    element.textContent = '';
+    if (element.typeTimer) clearTimeout(element.typeTimer); // Очистка старого таймера
+    const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0);
     let partIndex = 0;
     let i = 0;
     const speed = 50;
     const dialogueBox = document.querySelector('.dialogue-box');
 
-    // Очистка обработчиков
     function clearHandlers() {
         if (dialogueBox.tapHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
@@ -1762,7 +1761,6 @@ function typeText(text, element, callback) {
     }
     clearHandlers();
 
-    // Печать текста
     function type() {
         if (partIndex >= parts.length) {
             isTyping = false;
@@ -1775,11 +1773,10 @@ function typeText(text, element, callback) {
             i++;
             element.typeTimer = setTimeout(type, speed);
         } else {
-            isTyping = false;
+            isTyping = false; // Часть завершена, ждём тап
         }
     }
 
-    // Обработка тапов
     function handleTap(e) {
         e.preventDefault();
         if (isTyping) {
@@ -1800,12 +1797,10 @@ function typeText(text, element, callback) {
         }
     }
 
-    // Установка обработчика
     dialogueBox.tapHandler = handleTap;
     dialogueBox.addEventListener('touchstart', handleTap);
     dialogueBox.addEventListener('click', handleTap);
 
-    // Старт
     type();
 }
 
