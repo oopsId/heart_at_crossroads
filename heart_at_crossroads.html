@@ -449,24 +449,24 @@
             padding: 20px;
             border-radius: 10px;
             z-index: 100;
-         }
-            #timer-countdown {
+        }
+        #timer-countdown {
             position: absolute;
-            bottom: calc(20% + 50px); /* Чуть выше .dialogue-box */
+            bottom: calc(20% + 50px);
             left: 50%;
             transform: translateX(-50%);
             font-size: 40px;
             color: #ff4444;
             font-weight: bold;
-            z-index: 4; /* Ниже кнопок */
+            z-index: 4;
         }
-           @keyframes flash {
+        @keyframes flash {
             0% { filter: brightness(1); }
             50% { filter: brightness(1.5); }
             100% { filter: brightness(1); }
-           }
+        }
         .flash-svg { animation: flash 0.5s ease; }
-        .choice-btn { z-index: 5; } /* Самый высокий приоритет */
+        .choice-btn { z-index: 5; }
         .error-message {
             position: fixed;
             top: 20%;
@@ -481,17 +481,16 @@
             text-align: center;
             max-width: 80%;
         }
-         
-    .phone-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    width: 240px;
-    height: 400px;
-    pointer-events: none;
-    }
+        .phone-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 240px;
+            height: 400px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -575,38 +574,38 @@
         const correctPassword = "umbertoeco";
         const tempPassword = "999000";
 
-
-
         function playSound(sound) {
-        if (sound) {
-        const audio = new Audio(`/heart_at_crossroads/assets/sounds/${sound}`);
-        audio.play()
-        .catch(error => {
-        console.error(`Ошибка воспроизведения звука ${sound}:`, error);
-        showErrorMessage(stats.language === "ru" ? `Звук ${sound} не найден` : `Sound ${sound} not found`);
-        });
-        }
+            if (sound) {
+                const audio = new Audio(`/heart_at_crossroads/assets/sounds/${sound}`);
+                audio.play()
+                    .catch(error => {
+                        console.error(`Ошибка воспроизведения звука ${sound}:`, error);
+                        showErrorMessage(stats.language === "ru" ? `Звук ${sound} не найден` : `Sound ${sound} not found`);
+                    });
+            }
         }
 
         function playMusic(music) {
-        if (music) {
-        if (window.currentMusic) window.currentMusic.pause();
-        window.currentMusic = new Audio(`/heart_at_crossroads/assets/sounds/${music}`);
-        window.currentMusic.loop = true;
-        window.currentMusic.play()
-        .catch(error => {
-        console.error(`Ошибка воспроизведения музыки ${music}:`, error);
-        showErrorMessage(stats.language === "ru" ? `Музыка ${music} не найдена` : `Music ${music} not found`);
-        });
+            if (music) {
+                if (window.currentMusic) window.currentMusic.pause();
+                window.currentMusic = new Audio(`/heart_at_crossroads/assets/sounds/${music}`);
+                window.currentMusic.loop = true;
+                window.currentMusic.play()
+                    .catch(error => {
+                        console.error(`Ошибка воспроизведения музыки ${music}:`, error);
+                        showErrorMessage(stats.language === "ru" ? `Музыка ${music} не найдена` : `Music ${music} not found`);
+                    });
+            }
         }
-        }
+
         function showErrorMessage(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        errorDiv.textContent = message;
-        document.body.appendChild(errorDiv);
-        setTimeout(() => errorDiv.remove(), 3000);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 3000);
         }
+
         // Улучшенные функции хранения
         function saveToStorage(key, value) {
             return new Promise((resolve, reject) => {
@@ -677,7 +676,6 @@
                 stats,
                 choices
             });
-            
             saveToStorage('gameSession', sessionData)
                 .then(() => {
                     console.log('Сессия успешно сохранена');
@@ -732,28 +730,28 @@
             }
 
             async function handlePasswordSubmit(e) {
-    e.preventDefault();
-    console.log('handlePasswordSubmit вызван');
-    const inputPassword = document.getElementById('password-input').value;
-    try {
-        if (inputPassword === tempPassword || inputPassword === correctPassword) {
-            if (inputPassword === correctPassword) {
-                let authorizedUsers = JSON.parse(await getFromStorage('authorized_users') || '[]'); // Парсим в массив
-                if (userId && !authorizedUsers.includes(userId)) {
-                    authorizedUsers.push(userId);
-                    await saveToStorage('authorized_users', JSON.stringify(authorizedUsers)); // Сохраняем как строку
+                e.preventDefault();
+                console.log('handlePasswordSubmit вызван');
+                const inputPassword = document.getElementById('password-input').value;
+                try {
+                    if (inputPassword === tempPassword || inputPassword === correctPassword) {
+                        if (inputPassword === correctPassword) {
+                            let authorizedUsers = JSON.parse(await getFromStorage('authorized_users') || '[]');
+                            if (userId && !authorizedUsers.includes(userId)) {
+                                authorizedUsers.push(userId);
+                                await saveToStorage('authorized_users', JSON.stringify(authorizedUsers));
+                            }
+                            stats.isAuthorized = true;
+                        }
+                        startNewGame();
+                    } else {
+                        alert(stats.language === "ru" ? 'Неверный пароль!' : 'Incorrect password!');
+                    }
+                } catch (error) {
+                    console.error('Ошибка обработки пароля:', error);
+                    alert(stats.language === "ru" ? 'Ошибка авторизации.' : 'Authorization error.');
                 }
-                stats.isAuthorized = true;
             }
-            startNewGame();
-        } else {
-            alert(stats.language === "ru" ? 'Неверный пароль!' : 'Incorrect password!');
-        }
-    } catch (error) {
-        console.error('Ошибка обработки пароля:', error);
-        alert(stats.language === "ru" ? 'Ошибка авторизации.' : 'Authorization error.');
-    }
-}
 
             function handleMenu(e) {
                 e.preventDefault();
@@ -806,18 +804,18 @@
 
             // Инициализация
             getFromStorage('last_session')
-           .then(session => {
-            console.log('Сессия загружена:', session);
-            if (session) showStartScreen();
-            else checkAuthorization();
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки сессии:', error);
-            showStartScreen();
+                .then(session => {
+                    console.log('Сессия загружена:', session);
+                    if (session) showStartScreen();
+                    else checkAuthorization();
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки сессии:', error);
+                    showStartScreen();
+                });
         });
-});
 
-        // Остальные функции остаются без изменений
+        // Остальные функции
         function showStartScreen() {
             console.log('showStartScreen вызван');
             document.getElementById('start-screen').style.display = 'flex';
@@ -973,196 +971,160 @@
             setTimeout(() => debugDiv.remove(), 5000);
         }
 
+        function checkAssetExists(url) {
+            return fetch(url, { method: 'HEAD' })
+                .then(res => res.ok)
+                .catch(() => false);
+        }
 
-    function checkAssetExists(url) {
-    return fetch(url, { method: 'HEAD' })
-        .then(res => res.ok)
-        .catch(() => false);
-                                   }
-         /**
- * Предварительно загружает необходимые для главы изображения
- * @param {string} chapterId - Идентификатор главы
- * @param {Object} options - Дополнительные параметры
- * @param {string} options.language - Язык интерфейса ('ru' или 'en')
- * @returns {Promise} Промис, который разрешается когда все изображения загружены
- */
-async function preloadAssets(chapterId, options = {}) {
-    console.log(`Начало загрузки ресурсов для главы: ${chapterId}`);
-    
-    // Определяем язык (русский по умолчанию если не указан)
-    const language = options.language || 'ru';
-    const texts = {
-        loading: language === 'ru' ? 'Загрузка' : 'Loading',
-        imageNotFound: language === 'ru' ? 'Изображение не найдено' : 'Image not found',
-        loadError: language === 'ru' ? 'Не удалось загрузить' : 'Failed to load'
-    };
-    
-    // Создаем индикатор загрузки
-    const loadingStatus = document.createElement('div');
-    loadingStatus.id = 'loading-status';
-    loadingStatus.style.cssText = 'position: fixed; bottom: 10px; left: 10px; color: white; font-size: 12px; z-index: 11; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 3px;';
-    document.body.appendChild(loadingStatus);
-    
-    // Список изображений для загрузки
-    const images = [
-        '/heart_at_crossroads/assets/backgrounds/start_screen.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
-        '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_angry_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1_summer.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_neutral_style3.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_smile_style1_summer.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_smile_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_smile_style2_summer.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_surprised_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1_summer.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style2.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_worry_style1.png',
-        '/heart_at_crossroads/assets/characters/anna/anna_worry_style2.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/dima/dima_worry_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/lesha/lyosha_worry_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/mark/mark_worry_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/sergey/sergey_worry_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_happy_style1_summer.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_sad_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_sad_style1_summer.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_surprised_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_thoughtful_style1.png',
-        '/heart_at_crossroads/assets/characters/vika/vika_worry_style1.png'
-    ];
-    
-    // Переменные для отслеживания прогресса
-    let loaded = 0;
-    const totalImages = images.length;
-    const failedImages = [];
-    
-    // Обновление статуса загрузки
-    const updateStatus = () => {
-        const percentage = Math.floor((loaded / totalImages) * 100);
-        loadingStatus.textContent = `${texts.loading}: ${loaded}/${totalImages} (${percentage}%)`;
-    };
-    
-    // Функция для отображения ошибки загрузки
-    const showErrorMessage = (message) => {
-        const errorElement = document.createElement('div');
-        errorElement.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px;';
-        errorElement.textContent = message;
-        document.body.appendChild(errorElement);
-        
-        setTimeout(() => {
-            errorElement.style.opacity = '0';
-            errorElement.style.transition = 'opacity 0.5s';
-            setTimeout(() => errorElement.remove(), 500);
-        }, 3000);
-    };
-    
-    // Отображаем начальный статус
-    updateStatus();
-    
-    try {
-        // Создаем промисы для загрузки всех изображений
-        const promises = images.map(src => {
-            return new Promise((resolve) => {
-                const img = new Image();
-                
-                img.onload = () => {
-                    loaded++;
-                    updateStatus();
-                    console.log(`✅ ${texts.loading}: ${src}`);
-                    resolve(true);
+        async function preloadAssets(chapterId, options = {}) {
+            console.log(`Начало загрузки ресурсов для главы: ${chapterId}`);
+            const language = options.language || 'ru';
+            const texts = {
+                loading: language === 'ru' ? 'Загрузка' : 'Loading',
+                imageNotFound: language === 'ru' ? 'Изображение не найдено' : 'Image not found',
+                loadError: language === 'ru' ? 'Не удалось загрузить' : 'Failed to load'
+            };
+            const loadingStatus = document.createElement('div');
+            loadingStatus.id = 'loading-status';
+            loadingStatus.style.cssText = 'position: fixed; bottom: 10px; left: 10px; color: white; font-size: 12px; z-index: 11; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 3px;';
+            document.body.appendChild(loadingStatus);
+            const images = [
+                '/heart_at_crossroads/assets/backgrounds/start_screen.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_apartment_morning.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_coffee_shop.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_street_day_trash.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_street_dusk_end.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_street_night.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_day.png',
+                '/heart_at_crossroads/assets/backgrounds/bg_webstudio_night.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_angry_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_happy_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style1_summer.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_neutral_style3.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_sad_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_smile_style1_summer.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_smile_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_smile_style2_summer.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_surprised_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style1_summer.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_thoughtful_style2.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_worry_style1.png',
+                '/heart_at_crossroads/assets/characters/anna/anna_worry_style2.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/dima/dima_worry_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/lesha/lyosha_worry_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/mark/mark_worry_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/sergey/sergey_worry_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_confident_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_happy_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_happy_style1_summer.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_neutral_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_sad_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_sad_style1_summer.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_smile_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_surprised_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_thoughtful_style1.png',
+                '/heart_at_crossroads/assets/characters/vika/vika_worry_style1.png'
+            ];
+            let loaded = 0;
+            const totalImages = images.length;
+            const failedImages = [];
+            const updateStatus = () => {
+                const percentage = Math.floor((loaded / totalImages) * 100);
+                loadingStatus.textContent = `${texts.loading}: ${loaded}/${totalImages} (${percentage}%)`;
+            };
+            const showErrorMessage = (message) => {
+                const errorElement = document.createElement('div');
+                errorElement.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px;';
+                errorElement.textContent = message;
+                document.body.appendChild(errorElement);
+                setTimeout(() => {
+                    errorElement.style.opacity = '0';
+                    errorElement.style.transition = 'opacity 0.5s';
+                    setTimeout(() => errorElement.remove(), 500);
+                }, 3000);
+            };
+            updateStatus();
+            try {
+                const promises = images.map(src => {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            loaded++;
+                            updateStatus();
+                            console.log(`✅ ${texts.loading}: ${src}`);
+                            resolve(true);
+                        };
+                        img.onerror = () => {
+                            loaded++;
+                            failedImages.push(src.split('/').pop());
+                            updateStatus();
+                            console.warn(`❌ ${texts.loadError}: ${src}`);
+                            resolve(false);
+                        };
+                        img.src = src;
+                    });
+                });
+                const results = await Promise.all(promises);
+                const successCount = results.filter(success => success).length;
+                console.log(`✅ ${texts.loading}: ${successCount}/${totalImages} успешно загружены`);
+                if (failedImages.length > 0) {
+                    failedImages.slice(0, 3).forEach(img => {
+                        showErrorMessage(`${texts.imageNotFound}: ${img}`);
+                    });
+                    if (failedImages.length > 3) {
+                        showErrorMessage(`${texts.imageNotFound}: ${failedImages.length - 3} more...`);
+                    }
+                }
+                return { 
+                    success: successCount, 
+                    failed: failedImages.length, 
+                    failedImages 
                 };
-                
-                img.onerror = () => {
-                    loaded++;
-                    failedImages.push(src.split('/').pop());
-                    updateStatus();
-                    console.warn(`❌ ${texts.loadError}: ${src}`);
-                    resolve(false);
-                };
-                
-                img.src = src;
-            });
-        });
-        
-        // Загружаем все изображения параллельно
-        const results = await Promise.all(promises);
-        
-        // Подсчитываем успешно загруженные изображения
-        const successCount = results.filter(success => success).length;
-        console.log(`✅ ${texts.loading}: ${successCount}/${totalImages} успешно загружены`);
-        
-        // Показываем сообщения об ошибках, если есть
-        if (failedImages.length > 0) {
-            failedImages.slice(0, 3).forEach(img => {
-                showErrorMessage(`${texts.imageNotFound}: ${img}`);
-            });
-            
-            if (failedImages.length > 3) {
-                showErrorMessage(`${texts.imageNotFound}: ${failedImages.length - 3} more...`);
+            } catch (error) {
+                console.error('Ошибка при загрузке изображений:', error);
+                throw error;
+            } finally {
+                loadingStatus.style.opacity = '0';
+                loadingStatus.style.transition = 'opacity 0.5s';
+                setTimeout(() => loadingStatus.remove(), 500);
             }
         }
-        
-        return { 
-            success: successCount, 
-            failed: failedImages.length, 
-            failedImages 
-        };
-    } catch (error) {
-        console.error('Ошибка при загрузке изображений:', error);
-        throw error;
-    } finally {
-        // Убираем индикатор загрузки при завершении
-        loadingStatus.style.opacity = '0';
-        loadingStatus.style.transition = 'opacity 0.5s';
-        setTimeout(() => loadingStatus.remove(), 500);
-    }
-}
 
         async function loadChapter(chapterId) {
             console.log(`Загрузка главы ${chapterId}`);
@@ -1225,88 +1187,233 @@ async function preloadAssets(chapterId, options = {}) {
             saveSession();
         }
 
-            function showScene(sceneId) {
-    const scene = scriptData.scenes[sceneId];
-    const progressElement = document.getElementById('progress');
-    const totalScenes = scriptData.scenes.length;
-    const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-    progressElement.style.width = `${progressPercent}%`;
+        function showScene(sceneId) {
+            const scene = scriptData.scenes[sceneId];
+            const progressElement = document.getElementById('progress');
+            const totalScenes = scriptData.scenes.length;
+            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+            progressElement.style.width = `${progressPercent}%`;
 
-    const backgroundElement = document.getElementById('background');
-    const charLeft = document.getElementById('character-left');
-    const charRight = document.getElementById('character-right');
-    const dialogueElement = document.getElementById('dialogue-text');
-    const dialogueBox = document.querySelector('.dialogue-box');
+            const backgroundElement = document.getElementById('background');
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            const dialogueElement = document.getElementById('dialogue-text');
+            const dialogueBox = document.querySelector('.dialogue-box');
 
-    let displayText = scene.text[stats.language];
-    if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-        displayText = scene.second_playthrough_text[stats.language];
-    }
-
-    const newBackground = scene.background || 'none';
-    const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
-
-    const applyScene = async () => {
-        // Добавляем логику установки фона
-        const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
-        if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-            console.warn(`Фон ${newBackground}.png не найден`);
-            showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
-        }
-        backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
-        currentBackground = newBackground; // Обновляем текущий фон
-
-        // Очистка персонажей (если нужно)
-        charLeft.style.backgroundImage = 'none';
-        charRight.style.backgroundImage = 'none';
-        charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-        charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-        // Установка персонажей (если они есть в сцене)
-        const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-        if (scene.characterLeft) {
-            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                : scene.characterLeft;
-            const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
-            if (!(await checkAssetExists(leftCharUrl))) {
-                console.warn(`Персонаж ${leftChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
+            let displayText = scene.text[stats.language];
+            if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+                displayText = scene.second_playthrough_text[stats.language];
             }
-            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
-            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-        }
-        if (scene.characterRight) {
-            const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                : scene.characterRight;
-            const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
-            if (!(await checkAssetExists(rightCharUrl))) {
-                console.warn(`Персонаж ${rightChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
+
+            const newBackground = scene.background || 'none';
+            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+            const applyScene = async () => {
+                const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
+                if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
+                    console.warn(`Фон ${newBackground}.png не найден`);
+                    showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+                }
+                backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
+                currentBackground = newBackground;
+
+                charLeft.style.backgroundImage = 'none';
+                charRight.style.backgroundImage = 'none';
+                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+                if (scene.characterLeft) {
+                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterLeft;
+                    const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
+                    if (!(await checkAssetExists(leftCharUrl))) {
+                        console.warn(`Персонаж ${leftChar}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
+                    }
+                    charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+                }
+                if (scene.characterRight) {
+                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterRight;
+                    const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
+                    if (!(await checkAssetExists(rightCharUrl))) {
+                        console.warn(`Персонаж ${rightChar}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
+                    }
+                    charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+                }
+
+                document.getElementById('speaker-name').textContent = speakerName;
+
+                let overlay = null;
+                const textLower = displayText.toLowerCase();
+                if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
+                    textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
+                    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+                    overlay = createDefaultOverlay(sceneId, sceneData);
+                }
+
+                typeText(displayText, dialogueElement, () => {
+                    dialogueBox.style.pointerEvents = 'auto';
+                    if (scene.choices && scene.choices.length > 0) {
+                        if (scene.choices.some(c => c.timer)) {
+                            showSceneWithTimer(scene);
+                        } else {
+                            scene.choices.forEach(choice => {
+                                const btn = createChoiceButton(choice);
+                                if (choice.condition && !checkCondition(choice.condition)) {
+                                    btn.style.display = 'none';
+                                } else if (choice.cost && stats.diamonds < choice.cost) {
+                                    btn.disabled = true;
+                                } else {
+                                    const handleChoice = (e) => {
+                                        e.preventDefault();
+                                        if (choice.cost) stats.diamonds -= choice.cost;
+                                        updateDiamondsDisplay();
+                                        saveChoice(choice.id, choice.effects, choice.memoryTag);
+                                        if (choice.effects) showChoiceEffects(choice.effects);
+                                        if (overlay) overlay.remove();
+                                        if (choice.nextScene !== undefined) {
+                                            currentScene = choice.nextScene;
+                                            saveSession();
+                                            showScene(currentScene);
+                                        } else if (choice.nextChapter) {
+                                            currentChapter = choice.nextChapter;
+                                            currentScene = 0;
+                                            loadChapter(currentChapter).then(() => showScene(currentScene));
+                                        }
+                                    };
+                                    btn.addEventListener('touchstart', handleChoice);
+                                    btn.addEventListener('click', handleChoice);
+                                }
+                                dialogueBox.appendChild(btn);
+                            });
+                        }
+                    } else if (scene.nextScene !== undefined) {
+                        const handleNext = () => {
+                            currentScene = scene.nextScene;
+                            saveSession();
+                            if (overlay) overlay.remove();
+                            showScene(currentScene);
+                        };
+                        dialogueBox.touchHandler = handleNext;
+                        dialogueBox.addEventListener('touchstart', handleNext);
+                        dialogueBox.addEventListener('click', handleNext);
+                    } else if (scene.id === scriptData.scenes.length - 1) {
+                        currentChapter++;
+                        currentScene = 0;
+                        if (currentChapter <= 10) {
+                            loadChapter(currentChapter).then(() => showScene(currentScene));
+                        } else {
+                            showStartScreen();
+                        }
+                    }
+                });
+            };
+
+            if (shouldFade) {
+                fadeOut(() => {
+                    applyScene();
+                    fadeIn();
+                });
+            } else {
+                applyScene();
             }
-            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
-            charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+
+            if (scene.leadsToEnding) {
+                loadFinals(scene.leadsToEnding);
+            }
         }
 
-        // Установка имени спикера
-        document.getElementById('speaker-name').textContent = speakerName;
+        function showSceneWithTimer(scene, timeoutMs = 10000) {
+            const progressElement = document.getElementById('progress');
+            const totalScenes = scriptData.scenes.length;
+            const progressPercent = ((scene.id + 1) / totalScenes) * 100;
+            progressElement.style.width = `${progressPercent}%`;
 
-        // Добавляем оверлей (если есть упоминание телефона)
-        let overlay = null;
-        const textLower = displayText.toLowerCase();
-        if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
-            textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-            const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
-            overlay = createDefaultOverlay(sceneId, sceneData);
-        }
+            const backgroundElement = document.getElementById('background');
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            const dialogueElement = document.getElementById('dialogue-text');
+            const dialogueBox = document.querySelector('.dialogue-box');
 
-        typeText(displayText, dialogueElement, () => {
-            dialogueBox.style.pointerEvents = 'auto';
-            if (scene.choices && scene.choices.length > 0) {
-                if (scene.choices.some(c => c.timer)) {
-                    showSceneWithTimer(scene);
-                } else {
+            let displayText = scene.text[stats.language];
+            if (stats.completionCount >= 1 && scene.second_playthrough_text) {
+                displayText = scene.second_playthrough_text[stats.language];
+            }
+
+            const newBackground = scene.background || 'none';
+            const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+
+            const applyScene = async () => {
+                const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
+                if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
+                    console.warn(`Фон ${newBackground}.png не найден`);
+                    showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+                }
+                backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
+                currentBackground = newBackground;
+
+                charLeft.style.backgroundImage = 'none';
+                charRight.style.backgroundImage = 'none';
+                charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+                charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+                const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
+                if (scene.characterLeft) {
+                    const leftChar = scene.characterLeft.includes('${stats.appearance}') 
+                        ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterLeft;
+                    const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
+                    if (!(await checkAssetExists(leftCharUrl))) {
+                        console.warn(`Персонаж ${leftChar}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
+                    }
+                    charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+                    charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+                }
+                if (scene.characterRight) {
+                    const rightChar = scene.characterRight.includes('${stats.appearance}') 
+                        ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+                        : scene.characterRight;
+                    const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
+                    if (!(await checkAssetExists(rightCharUrl))) {
+                        console.warn(`Персонаж ${rightChar}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
+                    }
+                    charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+                    charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+                }
+
+                if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
+                if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
+
+                document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+                if (dialogueBox.touchHandler) {
+                    dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+                    dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+                    dialogueBox.touchHandler = null;
+                }
+
+                let overlay = null;
+                const textLower = displayText.toLowerCase();
+                if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
+                    textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
+                    overlay = createDefaultOverlay(scene.id);
+                }
+
+                document.getElementById('speaker-name').textContent = speakerName;
+
+                if (scene.sound) playSound(scene.sound);
+                if (scene.music) playMusic(scene.music);
+
+                typeText(displayText, dialogueElement, () => {
+                    dialogueBox.style.pointerEvents = 'auto';
                     scene.choices.forEach(choice => {
                         const btn = createChoiceButton(choice);
                         if (choice.condition && !checkCondition(choice.condition)) {
@@ -1320,7 +1427,11 @@ async function preloadAssets(chapterId, options = {}) {
                                 updateDiamondsDisplay();
                                 saveChoice(choice.id, choice.effects, choice.memoryTag);
                                 if (choice.effects) showChoiceEffects(choice.effects);
+                                clearInterval(countdownInterval);
+                                clearTimeout(timer);
                                 if (overlay) overlay.remove();
+                                document.getElementById('timer-countdown')?.remove();
+                                if (tickSound) tickSound.pause();
                                 if (choice.nextScene !== undefined) {
                                     currentScene = choice.nextScene;
                                     saveSession();
@@ -1336,720 +1447,356 @@ async function preloadAssets(chapterId, options = {}) {
                         }
                         dialogueBox.appendChild(btn);
                     });
-                }
-            } else if (scene.nextScene !== undefined) {
-                const handleNext = () => {
-                    currentScene = scene.nextScene;
-                    saveSession();
-                    if (overlay) overlay.remove();
-                    showScene(currentScene);
-                };
-                dialogueBox.touchHandler = handleNext;
-                dialogueBox.addEventListener('touchstart', handleNext);
-                dialogueBox.addEventListener('click', handleNext);
-            } else if (scene.id === scriptData.scenes.length - 1) {
-                currentChapter++;
-                currentScene = 0;
-                if (currentChapter <= 10) {
-                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                } else {
-                    showStartScreen();
-                }
-            }
-        });
-    };
 
-    if (shouldFade) {
-        fadeOut(() => {
-            applyScene();
-            fadeIn();
-        });
-    } else {
-        applyScene();
-    }
+                    const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
+                    let timeLeft = timerDuration / 1000;
 
-    if (scene.leadsToEnding) {
-        loadFinals(scene.leadsToEnding);
-    }
-}
+                    const countdownElement = document.createElement('div');
+                    countdownElement.id = 'timer-countdown';
+                    countdownElement.textContent = timeLeft;
+                    document.getElementById('game-container').appendChild(countdownElement);
 
-            function showSceneWithTimer(scene, timeoutMs = 10000) {
-    const progressElement = document.getElementById('progress');
-    const totalScenes = scriptData.scenes.length;
-    const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-    progressElement.style.width = `${progressPercent}%`;
+                    const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
+                    tickSound.loop = false;
+                    tickSound.play().catch(err => {
+                        console.warn('Ошибка воспроизведения sfx_tick:', err);
+                        showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
+                    });
 
-    const backgroundElement = document.getElementById('background');
-    const charLeft = document.getElementById('character-left');
-    const charRight = document.getElementById('character-right');
-    const dialogueElement = document.getElementById('dialogue-text');
-    const dialogueBox = document.querySelector('.dialogue-box');
+                    const countdownInterval = setInterval(() => {
+                        timeLeft--;
+                        countdownElement.textContent = timeLeft;
+                        if (overlay) {
+                            overlay.classList.add('flash-svg');
+                            setTimeout(() => overlay.classList.remove('flash-svg'), 500);
+                        }
+                        if ('vibrate' in navigator) navigator.vibrate(200);
+                        if (timeLeft <= 0) {
+                            clearInterval(countdownInterval);
+                            tickSound.pause();
+                        }
+                    }, 1000);
 
-    let displayText = scene.text[stats.language];
-    if (stats.completionCount >= 1 && scene.second_playthrough_text) {
-        displayText = scene.second_playthrough_text[stats.language];
-    }
-
-    const newBackground = scene.background || 'none';
-    const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
-
-    const applyScene = async () => {
-        const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
-        if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-         console.warn(`Фон ${newBackground}.png не найден`);
-         showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
-        }
-        backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
-        currentBackground = newBackground;
-
-        charLeft.style.backgroundImage = 'none';
-        charRight.style.backgroundImage = 'none';
-        charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-        charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-        const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-        if (scene.characterLeft) {
-            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                : scene.characterLeft;
-            const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
-            if (!(await checkAssetExists(leftCharUrl))) {
-                console.warn(`Персонаж ${leftChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
-            }
-            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
-            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-        }
-        if (scene.characterRight) {
-            const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                : scene.characterRight;
-            const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
-            if (!(await checkAssetExists(rightCharUrl))) {
-                console.warn(`Персонаж ${rightChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
-            }
-            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
-            charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-        }
-
-        if (scene.characterLeftOffset) charLeft.style.left = scene.characterLeftOffset;
-        if (scene.characterRightOffset) charRight.style.right = scene.characterRightOffset;
-
-        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-        if (dialogueBox.touchHandler) {
-            dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-            dialogueBox.touchHandler = null;
-        }
-
-        // SVG-смартфон для сцен с упоминанием телефона
-        let overlay = null;
-        const textLower = displayText.toLowerCase();
-        if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
-            textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-            overlay = createDefaultOverlay(scene.id);
-        }
-
-        document.getElementById('speaker-name').textContent = speakerName;
-
-        // Звуки и музыка
-        if (scene.sound) playSound(scene.sound);
-        if (scene.music) playMusic(scene.music);
-
-        typeText(displayText, dialogueElement, () => {
-        dialogueBox.style.pointerEvents = 'auto';
-        scene.choices.forEach(choice => {
-            const btn = createChoiceButton(choice);
-            if (choice.condition && !checkCondition(choice.condition)) {
-                btn.style.display = 'none';
-            } else if (choice.cost && stats.diamonds < choice.cost) {
-                btn.disabled = true;
-            } else {
-                const handleChoice = (e) => {
-                    e.preventDefault();
-                    if (choice.cost) stats.diamonds -= choice.cost;
-                    updateDiamondsDisplay();
-                    saveChoice(choice.id, choice.effects, choice.memoryTag);
-                    if (choice.effects) showChoiceEffects(choice.effects);
-                    clearInterval(countdownInterval);
-                    clearTimeout(timer);
-                    if (overlay) overlay.remove();
-                    document.getElementById('timer-countdown')?.remove();
-                    if (tickSound) tickSound.pause();
-                    if (choice.nextScene !== undefined) {
-                        currentScene = choice.nextScene;
-                        saveSession();
-                        showScene(currentScene);
-                    } else if (choice.nextChapter) {
-                        currentChapter = choice.nextChapter;
-                        currentScene = 0;
-                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                    }
-                };
-                btn.addEventListener('touchstart', handleChoice);
-                btn.addEventListener('click', handleChoice);
-            }
-            dialogueBox.appendChild(btn);
-        });
-
-        const timerDuration = scene.choices.find(c => c.timer)?.timer * 1000 || 10000;
-        let timeLeft = timerDuration / 1000;
-
-        const countdownElement = document.createElement('div');
-        countdownElement.id = 'timer-countdown';
-        countdownElement.textContent = timeLeft;
-        document.getElementById('game-container').appendChild(countdownElement);
-
-        const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
-        tickSound.loop = false;
-        tickSound.play().catch(err => {
-            console.warn('Ошибка воспроизведения sfx_tick:', err);
-            showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
-        });
-
-        const countdownInterval = setInterval(() => {
-            timeLeft--;
-            countdownElement.textContent = timeLeft;
-            if (overlay) {
-                overlay.classList.add('flash-svg');
-                setTimeout(() => overlay.classList.remove('flash-svg'), 500);
-            }
-            if ('vibrate' in navigator) navigator.vibrate(200);
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-                tickSound.pause();
-            }
-        }, 1000);
-
-        const timer = setTimeout(() => {
-            const defaultChoice = scene.choices.find(c => c.id === 'ignore');
-            clearInterval(countdownInterval);
-            if (overlay) overlay.remove();
-            document.getElementById('timer-countdown')?.remove();
-            tickSound.pause();
-            if (defaultChoice && defaultChoice.nextScene !== undefined) {
-                currentScene = defaultChoice.nextScene;
-                saveSession();
-                showScene(currentScene);
-            } else if (scene.id === scriptData.scenes.length - 1) { // Добавляем переход на следующую главу
-                currentChapter++;
-                currentScene = 0;
-                if (currentChapter <= 10) {
-                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                } else {
-                    showStartScreen();
-                }
-            } else {
-                console.warn('Нет сцены по умолчанию для таймера!');
-            }
-        }, timerDuration);
-    });
-
-    if (shouldFade) {
-        fadeOut(() => {
-            applyScene();
-            fadeIn();
-        });
-    } else {
-        applyScene();
-    }
-
-    if (scene.leadsToEnding) {
-        loadFinals(scene.leadsToEnding);
-    }
-}
-
-
-
-function showGallery() {
-    const galleryDiv = document.createElement('div');
-    galleryDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;';
-    stats.memories.forEach(memory => {
-        const img = document.createElement('img');
-        img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
-        img.style.cssText = 'display: block; margin: 20px auto; max-width: 80%;';
-        img.onerror = () => {
-            console.warn(`Воспоминание ${memory}.png не найдено`);
-            showErrorMessage(stats.language === "ru" ? `Воспоминание ${memory} не найдено` : `Memory ${memory} not found`);
-        };
-        galleryDiv.appendChild(img);
-    });
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
-    closeBtn.style.cssText = 'position: fixed; top: 10px; right: 10px;';
-    closeBtn.onclick = () => galleryDiv.remove();
-    galleryDiv.appendChild(closeBtn);
-    document.body.appendChild(galleryDiv);
-}
-
-async function loadFinals(endingId) {
-    const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
-    const finalsData = await response.json();
-    const ending = finalsData.endings.find(e => e.id === endingId);
-    if (ending && checkRequirements(ending.requirements)) {
-        showEnding(ending);
-    } else {
-        console.warn('Концовка не найдена или требования не выполнены');
-        showStartScreen();
-    }
-}
-
-function checkRequirements(requirements) {
-    if (!requirements) return true;
-    for (let key in requirements) {
-        const value = stats[key] || stats.relationships[key.split('.')[1]] || 0;
-        const req = requirements[key];
-        if (req.startsWith('>')) {
-            const compareValue = req.includes('+') ? 
-                (stats[req.split('+')[0].slice(1)] + stats[req.split('+')[1]]) : 
-                parseInt(req.slice(1));
-            return value > compareValue;
-        }
-        return value >= parseInt(req);
-    }
-    return true;
-}
-
-           function showEnding(ending) {
-    const scene = ending.scenes[0];
-    const backgroundElement = document.getElementById('background');
-    const charLeft = document.getElementById('character-left');
-    const charRight = document.getElementById('character-right');
-    const dialogueElement = document.getElementById('dialogue-text');
-    const speakerName = document.getElementById('speaker-name');
-
-    const bgUrl = `/heart_at_crossroads/assets/backgrounds/${scene.background}.png`;
-    checkAssetExists(bgUrl).then(exists => {
-        if (!exists) {
-            console.warn(`Фон ${scene.background}.png не найден`);
-            showErrorMessage(stats.language === "ru" ? `Фон ${scene.background} не найден` : `Background ${scene.background} not found`);
-        }
-        backgroundElement.style.backgroundImage = `url('${bgUrl}')`;
-    });
-
-    if (scene.characterLeft) {
-        const leftCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterLeft.split('_')[0]}/${scene.characterLeft}.png`;
-        checkAssetExists(leftCharUrl).then(exists => {
-            if (!exists) {
-                console.warn(`Персонаж ${scene.characterLeft}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterLeft} не найден` : `Character ${scene.characterLeft} not found`);
-            }
-            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
-        });
-    } else charLeft.style.backgroundImage = 'none';
-
-    if (scene.characterRight) {
-        const rightCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterRight.split('_')[0]}/${scene.characterRight}.png`;
-        checkAssetExists(rightCharUrl).then(exists => {
-            if (!exists) {
-                console.warn(`Персонаж ${scene.characterRight}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterRight} не найден` : `Character ${scene.characterRight} not found`);
-            }
-            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
-        });
-    } else charRight.style.backgroundImage = 'none';
-
-    speakerName.textContent = scene.speaker[stats.language];
-    typeText(stats.completionCount >= 1 && scene.second_playthrough_text ? 
-        scene.second_playthrough_text[stats.language] : scene.text[stats.language], 
-        dialogueElement, () => {
-            showEpilogue(ending.epilogue[stats.language]);
-        });
-
-    if (scene.sound) playSound(scene.sound);
-    if (scene.music) playMusic(scene.music);
-} // Здесь должна быть закрывающая скобка
-
-function showEpilogue(epilogueText) {
-    const epilogueDiv = document.createElement('div');
-    epilogueDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10;';
-    epilogueDiv.textContent = epilogueText;
-    document.body.appendChild(epilogueDiv);
-    setTimeout(() => {
-        epilogueDiv.remove();
-        stats.completionCount++;
-        saveSession();
-        showStartScreen();
-    }, 5000);
-}
-
-
-
-        function showMessengerOverlay(sceneId) {
-            console.log(`Создание оверлея для сцены ${sceneId}`);
-            const existingOverlay = document.getElementById('messenger-overlay');
-            if (existingOverlay) existingOverlay.remove();
-
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('id', 'messenger-overlay');
-            svg.setAttribute('width', '240');
-            svg.setAttribute('height', '400');
-            svg.setAttribute('viewBox', '0 0 300 500');
-            svg.style.position = 'absolute';
-            svg.style.top = '0';
-            svg.style.left = '0';
-            svg.style.zIndex = '2';
-
-            let avatarSrc, senderName, messages;
-            if (sceneId === 7) {
-                avatarSrc = "/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png";
-                senderName = "Лёша";
-                messages = [
-                    { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: stats.language === "ru" ? "Тусим вечером" : "Party tonight" },
-                    { id: "msg2", x: 50, y: 180, width: 100, textX: 60, textY: 205, text: stats.language === "ru" ? "Дима будет" : "Dima’s coming" },
-                    { id: "msg3", x: 50, y: 240, width: 90, textX: 60, textY: 265, text: stats.language === "ru" ? "Приходи" : "Be there" }
-                ];
-            } else if (sceneId === 21) {
-                avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png";
-                senderName = "Марк";
-                const fullText = stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost";
-                const maxCharsPerLine = 15;
-                const lines = [];
-                let currentLine = "";
-                fullText.split(" ").forEach(word => {
-                    if ((currentLine + word).length <= maxCharsPerLine) {
-                        currentLine += (currentLine ? " " : "") + word;
-                    } else {
-                        lines.push(currentLine);
-                        currentLine = word;
-                    }
+                    const timer = setTimeout(() => {
+                        const defaultChoice = scene.choices.find(c => c.id === 'ignore');
+                        clearInterval(countdownInterval);
+                        if (overlay) overlay.remove();
+                        document.getElementById('timer-countdown')?.remove();
+                        tickSound.pause();
+                        if (defaultChoice && defaultChoice.nextScene !== undefined) {
+                            currentScene = defaultChoice.nextScene;
+                            saveSession();
+                            showScene(currentScene);
+                        } else if (scene.id === scriptData.scenes.length - 1) {
+                            currentChapter++;
+                            currentScene = 0;
+                            if (currentChapter <= 10) {
+                                loadChapter(currentChapter).then(() => showScene(currentScene));
+                            } else {
+                                showStartScreen();
+                            }
+                        } else {
+                            console.warn('Нет сцены по умолчанию для таймера!');
+                        }
+                    }, timerDuration);
                 });
-                if (currentLine) lines.push(currentLine);
-                messages = lines.map((line, idx) => ({
-                    id: `msg${idx + 1}`,
-                    x: 50,
-                    y: 120 + idx * 40,
-                    width: 180,
-                    textX: 60,
-                    textY: 145 + idx * 40,
-                    text: line
-                }));
-            } else {
-                console.warn(`Оверлей не предусмотрен для сцены ${sceneId}`);
-                return null;
-            }
-
-            svg.innerHTML = `
-                <!-- Корпус смартфона -->
-                <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
-                
-                <!-- Экран смартфона с фоновым изображением -->
-                <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
-                <image xlink:href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
-                
-                <!-- Заголовок Telegram с именем пользователя и аватаркой -->
-                <rect x="30" y="50" width="240" height="50" fill="#fff"/>
-                <!-- Аватарка с подгрузкой изображения -->
-                <clipPath id="avatarClip">
-                    <circle cx="60" cy="75" r="15"/>
-                </clipPath>
-                <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${avatarSrc}')"/>
-                <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
-                <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
-                
-                <!-- Разделительная линия -->
-                <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
-                
-                <!-- Сообщения -->
-                <g class="messages">
-                    ${messages.map((msg, idx) => `
-                        <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
-                        <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
-                    `).join('')}
-                    <!-- Пустое ответное сообщение -->
-                    <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
-                    <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
-                </g>
-            `;
-
-            console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
-            document.getElementById('game-container').appendChild(svg);
-
-            gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
-            messages.forEach((msg, idx) => {
-                gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
-            });
-            gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
-            gsap.to(`#text${messages.length + 1}`, { 
-                opacity: 1, 
-                duration: 0, 
-                delay: 0.5 + messages.length * 0.5 + 0.5, 
-                onStart: function() {
-                    let text = "...";
-                    let index = 0;
-                    let interval = setInterval(() => {
-                        document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
-                        index++;
-                        if (index > text.length) clearInterval(interval);
-                    }, 100);
-                }
-            });
-
-            return svg;
-        }
-
-        function showChoiceEffects(effects) {
-            const validStats = ['crown', 'heart', 'leaf', 'diamonds'];
-            for (let key in effects) {
-                if (validStats.includes(key)) {
-                    const feedback = document.createElement('img');
-                    feedback.className = 'choice-feedback';
-                    feedback.src = `/heart_at_crossroads/assets/ui/${key}.png`;
-                    feedback.onerror = () => console.warn(`Изображение для ${key} не найдено`);
-                    document.getElementById('game-container').appendChild(feedback);
-                    setTimeout(() => feedback.remove(), 3000);
-                }
-            }
-        }
-
-       function createDefaultOverlay(sceneId) {
-    console.log(`Создание дефолтного оверлея для сцены ${sceneId}`);
-    const existingOverlay = document.getElementById(`phone-overlay-${sceneId}`);
-    if (existingOverlay) existingOverlay.remove();
-
-    // Проверяем на специфические сцены с мессенджером
-    if (sceneId === 7 || sceneId === 21) {
-        return showMessengerOverlay(sceneId);
-    }
-
-    // Создаем общий телефонный оверлей для других сцен
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('id', `phone-overlay-${sceneId}`);
-    svg.setAttribute('width', '240');
-    svg.setAttribute('height', '400');
-    svg.setAttribute('viewBox', '0 0 300 500');
-    svg.className = 'phone-overlay'; // Используем класс для стилей
-
-    // Используем аватарку по умолчанию
-    const defaultAvatarSrc = "/heart_at_crossroads/assets/characters/anna/anna_messenger_ava.png";
-    const senderName = stats.language === "ru" ? "Новое сообщение" : "New message";
-
-    // Создаем базовое сообщение
-    const defaultText = stats.language === "ru" ? "Проверь сообщения" : "Check your messages";
-    const messages = [
-        { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: defaultText }
-    ];
-
-    svg.innerHTML = `
-        <!-- Корпус смартфона -->
-        <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
-        
-        <!-- Экран смартфона с фоновым изображением -->
-        <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
-        <image xlink:href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
-        
-        <!-- Заголовок с именем пользователя и аватаркой -->
-        <rect x="30" y="50" width="240" height="50" fill="#fff"/>
-        <!-- Аватарка с подгрузкой изображения -->
-        <clipPath id="avatarClip">
-            <circle cx="60" cy="75" r="15"/>
-        </clipPath>
-        <image xlink:href="${defaultAvatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${defaultAvatarSrc}'); showErrorMessage(stats.language === 'ru' ? 'Аватарка не найдена' : 'Avatar not found');"/>
-        <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
-        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
-        
-        <!-- Разделительная линия -->
-        <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
-        
-        <!-- Сообщения -->
-        <g class="messages">
-            ${messages.map((msg, idx) => `
-                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
-                <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
-            `).join('')}
-            <!-- Пустое ответное сообщение -->
-            <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
-            <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
-        </g>
-    `;
-
-    console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
-    document.getElementById('game-container').appendChild(svg);
-    
-    // Анимации как в showMessengerOverlay
-    gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
-    messages.forEach((msg, idx) => {
-        gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
-    });
-    gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
-    gsap.to(`#text${messages.length + 1}`, { 
-        opacity: 1, 
-        duration: 0, 
-        delay: 0.5 + messages.length * 0.5 + 0.5, 
-        onStart: function() {
-            let text = "...";
-            let index = 0;
-            let interval = setInterval(() => {
-                document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
-                index++;
-                if (index > text.length) clearInterval(interval);
-            }, 100);
-        }
-    });
-    
-    return svg;
-}      
-
-        function showChapterPlaceholder() {
-            const existingPlaceholder = document.querySelector('.placeholder-message');
-            if (existingPlaceholder) existingPlaceholder.remove();
-            const placeholder = document.createElement('div');
-            placeholder.className = 'placeholder-message';
-            placeholder.textContent = stats.language === "ru" ? 
-                'Временная заглушка: эта глава в разработке. Перезапустите игру.' : 
-                'Temporary placeholder: this chapter is in development. Restart the game.';
-            document.getElementById('game-container').appendChild(placeholder);
-            document.getElementById('character-left').style.backgroundImage = 'none';
-            document.getElementById('character-right').style.backgroundImage = 'none';
-            document.getElementById('speaker-name').textContent = '';
-            document.getElementById('dialogue-text').textContent = '';
-            const restartHandler = (e) => {
-                e.preventDefault();
-                placeholder.remove();
-                currentChapter = 1;
-                currentScene = 0;
-                loadChapter(1).then(() => showScene(currentScene));
             };
-            document.body.ontouchstart = restartHandler;
-            document.body.onclick = restartHandler;
+
+            if (shouldFade) {
+                fadeOut(() => {
+                    applyScene();
+                    fadeIn();
+                });
+            } else {
+                applyScene();
+            }
+
+            if (scene.leadsToEnding) {
+                loadFinals(scene.leadsToEnding);
+            }
+        } // Добавлена закрывающая скобка для showSceneWithTimer
+
+        function showGallery() {
+            const galleryDiv = document.createElement('div');
+            galleryDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;';
+            stats.memories.forEach(memory => {
+                const img = document.createElement('img');
+                img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
+                img.style.cssText = 'display: block; margin: 20px auto; max-width: 80%;';
+                img.onerror = () => {
+                    console.warn(`Воспоминание ${memory}.png не найдено`);
+                    showErrorMessage(stats.language === "ru" ? `Воспоминание ${memory} не найдено` : `Memory ${memory} not found`);
+                };
+                galleryDiv.appendChild(img);
+            });
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
+            closeBtn.style.cssText = 'position: fixed; top: 10px; right: 10px;';
+            closeBtn.onclick = () => galleryDiv.remove();
+            galleryDiv.appendChild(closeBtn);
+            document.body.appendChild(galleryDiv);
         }
 
-        function checkSceneCondition(scene) {
-            return !scene.condition || checkCondition(scene.condition);
+        async function loadFinals(endingId) {
+            const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
+            const finalsData = await response.json();
+            const ending = finalsData.endings.find(e => e.id === endingId);
+            if (ending && checkRequirements(ending.requirements)) {
+                showEnding(ending);
+            } else {
+                console.warn('Концовка не найдена или требования не выполнены');
+                showStartScreen();
+            }
         }
 
-        function checkCondition(condition) {
-            for (let key in condition) {
-                const value = key.startsWith('relationships.') ? stats.relationships[key.split('.')[1]] || 0 : stats[key] || 0;
-                const cond = condition[key];
-                if (cond === "true") return value === true;
-                if (cond === "false") return value === false;
-                if (cond.startsWith('>=')) return value >= parseInt(cond.slice(2));
-                if (cond.startsWith('>')) return value > parseInt(cond.slice(1));
-                if (cond.startsWith('<=')) return value <= parseInt(cond.slice(2));
-                if (cond.startsWith('<')) return value < parseInt(cond.slice(1));
-                if (key === 'crown' && cond === '>heart+leaf') return value > (stats.heart + stats.leaf);
-                if (key === 'completionCount') {
-                    if (cond === 'first') return value === 0;
-                    if (cond === 'second') return value === 1;
-                    if (cond === 'third') return value === 2;
-                    return value === parseInt(cond);
+        function checkRequirements(requirements) {
+            if (!requirements) return true;
+            for (let key in requirements) {
+                const value = stats[key] || stats.relationships[key.split('.')[1]] || 0;
+                const req = requirements[key];
+                if (req.startsWith('>')) {
+                    const compareValue = req.includes('+') ? 
+                        (stats[req.split('+')[0].slice(1)] + stats[req.split('+')[1]]) : 
+                        parseInt(req.slice(1));
+                    return value > compareValue;
                 }
-                return value === parseInt(cond);
+                return value >= parseInt(req);
             }
             return true;
         }
 
-        function typeText(text, element, callback) {
-            element.textContent = '';
-            if (element.typeTimer) clearTimeout(element.typeTimer);
-            isTyping = true;
-            let i = 0;
-            const speed = 50;
-            
-            const parts = text.split('||')
-                .map(part => part.trim())
-                .filter(part => part.length > 0);
-            
-            console.log('Частей текста:', parts.length);
-            let partIndex = 0;
-            const dialogueBox = document.querySelector('.dialogue-box');
-            
-            function clearHandlers() {
-                if (dialogueBox.tapHandler) {
-                    dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
-                    dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
-                    dialogueBox.tapHandler = null;
+        function showEnding(ending) {
+            const scene = ending.scenes[0];
+            const backgroundElement = document.getElementById('background');
+            const charLeft = document.getElementById('character-left');
+            const charRight = document.getElementById('character-right');
+            const dialogueElement = document.getElementById('dialogue-text');
+            const speakerName = document.getElementById('speaker-name');
+
+            const bgUrl = `/heart_at_crossroads/assets/backgrounds/${scene.background}.png`;
+            checkAssetExists(bgUrl).then(exists => {
+                if (!exists) {
+                    console.warn(`Фон ${scene.background}.png не найден`);
+                    showErrorMessage(stats.language === "ru" ? `Фон ${scene.background} не найден` : `Background ${scene.background} not found`);
                 }
-            }
-            
-            clearHandlers();
-            
-            function type() {
-                if (partIndex >= parts.length) {
-                    console.error(`Некорректный индекс: ${partIndex}, всего частей: ${parts.length}`);
-                    isTyping = false;
-                    if (callback) callback();
-                    return;
-                }
-                
-                if (i < parts[partIndex].length) {
-                    element.textContent += parts[partIndex].charAt(i);
-                    i++;
-                    element.typeTimer = setTimeout(type, speed);
-                } else {
-                    isTyping = false;
-                    console.log(`Завершена часть ${partIndex + 1} из ${parts.length}`);
-                    setupTapHandler();
-                }
-            }
-            
-            function setupTapHandler() {
-                clearHandlers();
-                
-                dialogueBox.tapHandler = (e) => {
-                    e.preventDefault();
-                    
-                    if (isTyping) {
-                        console.log(`Пропуск анимации части ${partIndex + 1}`);
-                        clearTimeout(element.typeTimer);
-                        element.textContent = parts[partIndex];
-                        isTyping = false;
-                        setupTapHandler();
-                    } else if (partIndex < parts.length - 1) {
-                        console.log(`Переход к части ${partIndex + 2}`);
-                        i = 0;
-                        partIndex++;
-                        element.textContent = '';
-                        isTyping = true;
-                        type();
-                        setupTapHandler();
-                    } else {
-                        console.log('Все части показаны, вызываем callback');
-                        clearHandlers();
-                        if (callback) callback();
+                backgroundElement.style.backgroundImage = `url('${bgUrl}')`;
+            });
+
+            if (scene.characterLeft) {
+                const leftCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterLeft.split('_')[0]}/${scene.characterLeft}.png`;
+                checkAssetExists(leftCharUrl).then(exists => {
+                    if (!exists) {
+                        console.warn(`Персонаж ${scene.characterLeft}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterLeft} не найден` : `Character ${scene.characterLeft} not found`);
                     }
-                };
-                
-                dialogueBox.addEventListener('touchstart', dialogueBox.tapHandler);
-                dialogueBox.addEventListener('click', dialogueBox.tapHandler);
-            }
-            
-            type();
-            setupTapHandler();
+                    charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+                });
+            } else charLeft.style.backgroundImage = 'none';
+
+            if (scene.characterRight) {
+                const rightCharUrl = `/heart_at_crossroads/assets/characters/${scene.characterRight.split('_')[0]}/${scene.characterRight}.png`;
+                checkAssetExists(rightCharUrl).then(exists => {
+                    if (!exists) {
+                        console.warn(`Персонаж ${scene.characterRight}.png не найден`);
+                        showErrorMessage(stats.language === "ru" ? `Персонаж ${scene.characterRight} не найден` : `Character ${scene.characterRight} not found`);
+                    }
+                    charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+                });
+            } else charRight.style.backgroundImage = 'none';
+
+            speakerName.textContent = scene.speaker[stats.language];
+            typeText(stats.completionCount >= 1 && scene.second_playthrough_text ? 
+                scene.second_playthrough_text[stats.language] : scene.text[stats.language], 
+                dialogueElement, () => {
+                    showEpilogue(ending.epilogue[stats.language]);
+                });
+
+            if (scene.sound) playSound(scene.sound);
+            if (scene.music) playMusic(scene.music);
         }
 
-        function fadeOut(callback) {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.add('fade-out');
-            charLeft.classList.add('fade-out');
-            charRight.classList.add('fade-out');
-            dialogue.classList.add('fade-out');
-            setTimeout(callback, 1000);
+        function showEpilogue(epilogueText) {
+            const epilogueDiv = document.createElement('div');
+            epilogueDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10;';
+            epilogueDiv.textContent = epilogueText;
+            document.body.appendChild(epilogueDiv);
+            setTimeout(() => {
+                epilogueDiv.remove();
+                stats.completionCount++;
+                saveSession();
+                showStartScreen();
+            }, 5000);
         }
 
-        function fadeIn() {
-            const bg = document.getElementById('background');
-            const charLeft = document.getElementById('character-left');
-            const charRight = document.getElementById('character-right');
-            const dialogue = document.getElementById('dialogue-box');
-            bg.classList.remove('fade-out');
-            charLeft.classList.remove('fade-out');
-            charRight.classList.remove('fade-out');
-            dialogue.classList.remove('fade-out');
-        }
 
-        function handleMenu(e) {
-            e.preventDefault();
-            stats.hasReturnedViaMenu = true;
-            resetGameState();
-            saveSession();
-            showStartScreen();
+
+        function showMessengerOverlay(sceneId) {
+    console.log(`Создание оверлея для сцены ${sceneId}`);
+    const existingOverlay = document.getElementById('messenger-overlay');
+    if (existingOverlay) existingOverlay.remove();
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'messenger-overlay');
+    svg.setAttribute('width', '240');
+    svg.setAttribute('height', '400');
+    svg.setAttribute('viewBox', '0 0 300 500');
+    svg.classList.add('phone-overlay');
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '0');
+    rect.setAttribute('y', '0');
+    rect.setAttribute('width', '300');
+    rect.setAttribute('height', '500');
+    rect.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
+    svg.appendChild(rect);
+
+    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
+
+    const avatar = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    avatar.setAttribute('x', '20');
+    avatar.setAttribute('y', '20');
+    avatar.setAttribute('width', '50');
+    avatar.setAttribute('height', '50');
+    avatar.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 
+        `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`);
+    svg.appendChild(avatar);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', '80');
+    text.setAttribute('y', '50');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-size', '16');
+    text.textContent = speaker;
+    svg.appendChild(text);
+
+    const message = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    message.setAttribute('x', '20');
+    message.setAttribute('y', '100');
+    message.setAttribute('fill', '#fff');
+    message.setAttribute('font-size', '14');
+    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
+    svg.appendChild(message);
+
+    document.getElementById('game-container').appendChild(svg);
+    return svg;
+}
+
+function createDefaultOverlay(sceneId, sceneData = {}) {
+    console.log(`Создание стандартного оверлея для сцены ${sceneId}`);
+    const overlay = document.createElement('div');
+    overlay.classList.add('phone-overlay');
+    overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png) no-repeat center/cover';
+    
+    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
+    const avatar = document.createElement('img');
+    avatar.src = `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`;
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    avatar.style.position = 'absolute';
+    avatar.style.top = '20px';
+    avatar.style.left = '20px';
+    avatar.onerror = () => console.warn(`Аватар для ${speaker} не найден`);
+    overlay.appendChild(avatar);
+
+    const name = document.createElement('div');
+    name.textContent = speaker;
+    name.style.position = 'absolute';
+    name.style.top = '25px';
+    name.style.left = '70px';
+    name.style.color = '#fff';
+    name.style.fontSize = '16px';
+    overlay.appendChild(name);
+
+    const message = document.createElement('div');
+    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
+    message.style.position = 'absolute';
+    message.style.top = '70px';
+    message.style.left = '20px';
+    message.style.right = '20px';
+    message.style.color = '#fff';
+    message.style.fontSize = '14px';
+    overlay.appendChild(message);
+
+    document.getElementById('game-container').appendChild(overlay);
+    return overlay;
+}
+
+function checkCondition(condition) {
+    if (!condition) return true;
+    const [key, operator, value] = condition.split(' ');
+    const statValue = stats[key] || stats.relationships[key] || 0;
+    const compareValue = parseInt(value);
+    switch (operator) {
+        case '>': return statValue > compareValue;
+        case '<': return statValue < compareValue;
+        case '>=': return statValue >= compareValue;
+        case '<=': return statValue <= compareValue;
+        case '==': return statValue == compareValue;
+        case '!=': return statValue != compareValue;
+        default: return false;
+    }
+}
+
+function typeText(text, element, callback) {
+    if (isTyping) return;
+    isTyping = true;
+    element.textContent = '';
+    let i = 0;
+    const speed = 50;
+    function type() {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        } else {
+            isTyping = false;
+            if (callback) callback();
         }
+    }
+    type();
+}
+
+function fadeOut(callback) {
+    const elements = [
+        document.getElementById('background'),
+        document.getElementById('character-left'),
+        document.getElementById('character-right'),
+        document.querySelector('.dialogue-box')
+    ];
+    elements.forEach(el => el.classList.add('fade-out'));
+    setTimeout(() => {
+        elements.forEach(el => el.classList.remove('fade-out'));
+        if (callback) callback();
+    }, 1000);
+}
+
+function fadeIn() {
+    const elements = [
+        document.getElementById('background'),
+        document.getElementById('character-left'),
+        document.getElementById('character-right'),
+        document.querySelector('.dialogue-box')
+    ];
+    elements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 1s ease';
+        setTimeout(() => el.style.opacity = '1', 10);
+    });
+}
+
+function showChoiceEffects(effects) {
+    const feedback = document.createElement('img');
+    feedback.className = 'choice-feedback';
+    if (effects.crown) feedback.src = '/heart_at_crossroads/assets/ui/crown.png';
+    else if (effects.heart) feedback.src = '/heart_at_crossroads/assets/ui/heart.png';
+    else if (effects.leaf) feedback.src = '/heart_at_crossroads/assets/ui/leaf.png';
+    else return;
+    document.getElementById('game-container').appendChild(feedback);
+    setTimeout(() => feedback.remove(), 3000);
+}
+
+// Закрытие тега <script>
     </script>
 </body>
 </html>
