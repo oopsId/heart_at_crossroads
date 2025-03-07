@@ -918,6 +918,99 @@
             }
         }
 
+           function showMessengerOverlay(sceneId) {
+    console.log(`Создание оверлея для сцены ${sceneId}`);
+    const existingOverlay = document.getElementById('messenger-overlay');
+    if (existingOverlay) existingOverlay.remove();
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'messenger-overlay');
+    svg.setAttribute('width', '240');
+    svg.setAttribute('height', '400');
+    svg.setAttribute('viewBox', '0 0 300 500');
+    svg.classList.add('phone-overlay');
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '0');
+    rect.setAttribute('y', '0');
+    rect.setAttribute('width', '300');
+    rect.setAttribute('height', '500');
+    rect.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
+    svg.appendChild(rect);
+
+    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
+
+    const avatar = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    avatar.setAttribute('x', '20');
+    avatar.setAttribute('y', '20');
+    avatar.setAttribute('width', '50');
+    avatar.setAttribute('height', '50');
+    avatar.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 
+        `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`);
+    svg.appendChild(avatar);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', '80');
+    text.setAttribute('y', '50');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-size', '16');
+    text.textContent = speaker;
+    svg.appendChild(text);
+
+    const message = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    message.setAttribute('x', '20');
+    message.setAttribute('y', '100');
+    message.setAttribute('fill', '#fff');
+    message.setAttribute('font-size', '14');
+    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
+    svg.appendChild(message);
+
+    document.getElementById('game-container').appendChild(svg);
+    return svg;
+}
+
+function createDefaultOverlay(sceneId, sceneData = {}) {
+    console.log(`Создание стандартного оверлея для сцены ${sceneId}`);
+    const overlay = document.createElement('div');
+    overlay.classList.add('phone-overlay');
+    overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png) no-repeat center/cover';
+    
+    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
+    const avatar = document.createElement('img');
+    avatar.src = `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`;
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    avatar.style.position = 'absolute';
+    avatar.style.top = '20px';
+    avatar.style.left = '20px';
+    avatar.onerror = () => console.warn(`Аватар для ${speaker} не найден`);
+    overlay.appendChild(avatar);
+
+    const name = document.createElement('div');
+    name.textContent = speaker;
+    name.style.position = 'absolute';
+    name.style.top = '25px';
+    name.style.left = '70px';
+    name.style.color = '#fff';
+    name.style.fontSize = '16px';
+    overlay.appendChild(name);
+
+    const message = document.createElement('div');
+    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
+    message.style.position = 'absolute';
+    message.style.top = '70px';
+    message.style.left = '20px';
+    message.style.right = '20px';
+    message.style.color = '#fff';
+    message.style.fontSize = '14px';
+    overlay.appendChild(message);
+
+    document.getElementById('game-container').appendChild(overlay);
+    return overlay;
+}
+
+
         async function startGame() {
             try {
                 console.log('startGame вызван');
@@ -976,6 +1069,7 @@
                 .then(res => res.ok)
                 .catch(() => false);
         }
+        
 
         async function preloadAssets(chapterId, options = {}) {
             console.log(`Начало загрузки ресурсов для главы: ${chapterId}`);
@@ -1630,98 +1724,7 @@
 
 
 
-        function showMessengerOverlay(sceneId) {
-    console.log(`Создание оверлея для сцены ${sceneId}`);
-    const existingOverlay = document.getElementById('messenger-overlay');
-    if (existingOverlay) existingOverlay.remove();
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('id', 'messenger-overlay');
-    svg.setAttribute('width', '240');
-    svg.setAttribute('height', '400');
-    svg.setAttribute('viewBox', '0 0 300 500');
-    svg.classList.add('phone-overlay');
-
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', '0');
-    rect.setAttribute('y', '0');
-    rect.setAttribute('width', '300');
-    rect.setAttribute('height', '500');
-    rect.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
-    svg.appendChild(rect);
-
-    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
-    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
-
-    const avatar = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-    avatar.setAttribute('x', '20');
-    avatar.setAttribute('y', '20');
-    avatar.setAttribute('width', '50');
-    avatar.setAttribute('height', '50');
-    avatar.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 
-        `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`);
-    svg.appendChild(avatar);
-
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', '80');
-    text.setAttribute('y', '50');
-    text.setAttribute('fill', '#fff');
-    text.setAttribute('font-size', '16');
-    text.textContent = speaker;
-    svg.appendChild(text);
-
-    const message = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    message.setAttribute('x', '20');
-    message.setAttribute('y', '100');
-    message.setAttribute('fill', '#fff');
-    message.setAttribute('font-size', '14');
-    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
-    svg.appendChild(message);
-
-    document.getElementById('game-container').appendChild(svg);
-    return svg;
-}
-
-function createDefaultOverlay(sceneId, sceneData = {}) {
-    console.log(`Создание стандартного оверлея для сцены ${sceneId}`);
-    const overlay = document.createElement('div');
-    overlay.classList.add('phone-overlay');
-    overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png) no-repeat center/cover';
-    
-    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
-    const avatar = document.createElement('img');
-    avatar.src = `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`;
-    avatar.style.width = '40px';
-    avatar.style.height = '40px';
-    avatar.style.position = 'absolute';
-    avatar.style.top = '20px';
-    avatar.style.left = '20px';
-    avatar.onerror = () => console.warn(`Аватар для ${speaker} не найден`);
-    overlay.appendChild(avatar);
-
-    const name = document.createElement('div');
-    name.textContent = speaker;
-    name.style.position = 'absolute';
-    name.style.top = '25px';
-    name.style.left = '70px';
-    name.style.color = '#fff';
-    name.style.fontSize = '16px';
-    overlay.appendChild(name);
-
-    const message = document.createElement('div');
-    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
-    message.style.position = 'absolute';
-    message.style.top = '70px';
-    message.style.left = '20px';
-    message.style.right = '20px';
-    message.style.color = '#fff';
-    message.style.fontSize = '14px';
-    overlay.appendChild(message);
-
-    document.getElementById('game-container').appendChild(overlay);
-    return overlay;
-}
-
+     
 function checkCondition(condition) {
     if (!condition) return true;
     const [key, operator, value] = condition.split(' ');
