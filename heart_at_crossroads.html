@@ -1417,40 +1417,40 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 // Обработка следующей сцены
-    function handleNextScene(scene, dialogueBox, overlay) {
+       function handleNextScene(scene, dialogueBox, overlay) {
     if (!scene.nextScene) return;
 
     console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
+    console.log(`[handleNextScene] Параметры: scene.id=${scene.id}, dialogueBox=${dialogueBox ? 'найден' : 'не найден'}, overlay=${overlay ? 'найден' : 'не найден'}`);
     if (!dialogueBox) {
         console.error('[handleNextScene] dialogueBox не найден!');
         return;
     }
 
     const handleNext = (e) => {
-        e.preventDefault(); // Оставляем, так как нужен контроль перехода
+        e.preventDefault();
         console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
         currentScene = scene.nextScene;
         saveSession();
         if (overlay) overlay.remove();
         dialogueBox.style.pointerEvents = 'none';
+        dialogueBox.removeEventListener('touchstart', handleNext, { passive: false });
+        dialogueBox.removeEventListener('click', handleNext);
         showScene(currentScene);
     };
 
     // Очистка старых обработчиков
     if (dialogueBox.touchHandler) {
-        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler, { passive: false });
         dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+        console.log('[handleNextScene] Очищены старые touchHandler');
     }
 
-    // Установка новых с passive: false из-за e.preventDefault()
     dialogueBox.touchHandler = handleNext;
     dialogueBox.addEventListener('touchstart', handleNext, { passive: false });
     dialogueBox.addEventListener('click', handleNext);
     dialogueBox.style.pointerEvents = 'auto';
     console.log(`[handleNextScene] Обработчики установлены, pointerEvents: ${dialogueBox.style.pointerEvents}`);
-
-    // Тестовый вызов для проверки
-    console.log('[handleNextScene] Проверка: кликните dialogueBox');
 }
 
 // Обработка конца главы
@@ -1467,7 +1467,7 @@ function handleChapterEnd(scene) {
     }
 }
 
-async function showScene(sceneId) {
+           async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes[sceneId];
     if (!scene) {
@@ -1483,6 +1483,7 @@ async function showScene(sceneId) {
     if (stats.completionCount >= 1 && scene.second_playthrough_text) {
         displayText = scene.second_playthrough_text[stats.language];
     }
+    console.log(`[showScene] Текст для отображения: ${displayText}`);
 
     const newBackground = scene.background || 'none';
     const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
@@ -1517,8 +1518,7 @@ async function showScene(sceneId) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
     }
-} 
-
+}
 
 
         function showSceneWithTimer(scene, timeoutMs = 10000) {
@@ -1861,11 +1861,21 @@ function typeText(text, element, callback) {
     if (!dialogueBox) console.error(`[${callId}] dialogueBox не найден!`);
 
     function clearHandlers() {
-        if (dialogueBox && dialogueBox.tapHandler) {
-            dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
-            dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
-            console.log(`[${callId}] Очистка обработчиков тапов`);
-            dialogueBox.tapHandler = null;
+        if (dialogueBox) {
+            if (dialogueBox.tapHandler) {
+                dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler, { passive: false });
+                dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
+                console.log(`[${callId}] Очистка обработчиков тапов (tapHandler)`);
+                dialogueBox.tapHandler = null;
+            }
+            if (dialogueBox.touchHandler) {
+                dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler, { passive: false });
+                dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+                console.log(`[${callId}] Очистка обработчиков тапов (touchHandler)`);
+                dialogueBox.touchHandler = null;
+            }
+        } else {
+            console.error(`[${callId}] dialogueBox не найден при очистке обработчиков`);
         }
     }
     clearHandlers();
@@ -1879,10 +1889,10 @@ function typeText(text, element, callback) {
             clearHandlers();
             console.log(`[${callId}] Все части напечатаны, вызываем callback`);
             if (callback) {
-                console.log(`[${callId}] Запускаем callback (все части)`);
+                console.log(`[${callId}] Callback существует, запускаем`);
                 callback();
             } else {
-                console.log(`[${callId}] Callback не передан (все части)`);
+                console.log(`[${callId}] Callback не передан`);
             }
             return;
         }
@@ -1899,10 +1909,10 @@ function typeText(text, element, callback) {
                 console.log(`[${callId}] Последняя часть завершена, вызываем callback`);
                 clearHandlers();
                 if (callback) {
-                    console.log(`[${callId}] Запускаем callback (последняя часть)`);
+                    console.log(`[${callId}] Callback существует, запускаем`);
                     callback();
                 } else {
-                    console.log(`[${callId}] Callback не передан (последняя часть)`);
+                    console.log(`[${callId}] Callback не передан`);
                 }
             }
         }
@@ -1910,6 +1920,7 @@ function typeText(text, element, callback) {
 
     function handleTap(e) {
         e.preventDefault();
+        e.stopPropagation();
         console.log(`[${callId}] Тап, isTyping: ${isTyping}, partIndex=${partIndex}`);
         if (isTyping) {
             console.log(`[${callId}] Пропускаем анимацию части ${partIndex + 1}`);
@@ -1952,7 +1963,7 @@ function typeText(text, element, callback) {
 
     if (dialogueBox) {
         dialogueBox.tapHandler = handleTap;
-        dialogueBox.addEventListener('touchstart', handleTap);
+        dialogueBox.addEventListener('touchstart', handleTap, { passive: false });
         dialogueBox.addEventListener('click', handleTap);
         console.log(`[${callId}] Обработчик тапов установлен`);
     } else {
