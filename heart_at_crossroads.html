@@ -1294,28 +1294,36 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
         }
 
         async function loadChapter(chapterId) {
-            console.log(`Загрузка главы ${chapterId}`);
-            const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`;
-            try {
-                const response = await fetch(jsonPath, {
-                    headers: {
-                        'Content-Type': 'application/json; charset=UTF-8',
-                        'Accept': 'application/json'
-                    }
-                });
-                if (!response.ok) throw new Error(`Не удалось загрузить главу ${chapterId}: ${response.statusText}`);
-                const text = await response.text();
-                const data = JSON.parse(text);
-                if (!data || !data.scenes || !Array.isArray(data.scenes)) {
-                    throw new Error('Некорректный формат JSON');
-                }
-                scriptData = data;
-                console.log(`Данные главы ${chapterId} успешно загружены`);
-            } catch (error) {
-                console.error('Ошибка загрузки главы:', error);
-                throw error;
+    console.log(`Загрузка главы ${chapterId}`);
+    const jsonPath = `/heart_at_crossroads/assets/data/chapter${chapterId}.json`;
+    try {
+        const response = await fetch(jsonPath, {
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Accept': 'application/json'
             }
+        });
+        if (!response.ok) {
+            console.warn(`Глава ${chapterId} не найдена: ${response.statusText}`);
+            showErrorMessage(stats.language === "ru" ? `Глава ${chapterId} не найдена` : `Chapter ${chapterId} not found`);
+            showStartScreen();
+            return false;
         }
+        const text = await response.text();
+        const data = JSON.parse(text);
+        if (!data || !data.scenes || !Array.isArray(data.scenes)) {
+            throw new Error('Некорректный формат JSON');
+        }
+        scriptData = data;
+        console.log(`Данные главы ${chapterId} успешно загружены`);
+        return true;
+    } catch (error) {
+        console.error('Ошибка загрузки главы:', error);
+        showErrorMessage(stats.language === "ru" ? `Ошибка загрузки главы ${chapterId}` : `Error loading chapter ${chapterId}`);
+        showStartScreen();
+        return false;
+    }
+}
 
         function createChoiceButton(choice) {
             const btn = document.createElement('button');
@@ -1526,20 +1534,20 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 // Обработка конца главы
-function handleChapterEnd(scene) {
+  function handleChapterEnd(scene) {
     if (scene.id !== scriptData.scenes.length - 1) return;
 
     console.log(`[${Date.now()}] Конец главы, переход к следующей`);
     currentChapter++;
     currentScene = 0;
-    if (currentChapter <= 10) {
-        loadChapter(currentChapter).then(() => showScene(currentScene));
-    } else {
-        showStartScreen();
+    loadChapter(currentChapter).then(success => {
+        if (success) {
+            showScene(currentScene);
+        }
+    });
     }
-}
 
-                async function showScene(sceneId) {
+async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes[sceneId];
     if (!scene) {
