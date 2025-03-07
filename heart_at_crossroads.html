@@ -918,7 +918,7 @@
             }
         }
 
-           function showMessengerOverlay(sceneId) {
+               function showMessengerOverlay(sceneId) {
     console.log(`Создание оверлея для сцены ${sceneId}`);
     const existingOverlay = document.getElementById('messenger-overlay');
     if (existingOverlay) existingOverlay.remove();
@@ -928,45 +928,111 @@
     svg.setAttribute('width', '240');
     svg.setAttribute('height', '400');
     svg.setAttribute('viewBox', '0 0 300 500');
-    svg.classList.add('phone-overlay');
+    svg.classList.add('phone-overlay'); // Добавляем класс из CSS
 
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', '0');
-    rect.setAttribute('y', '0');
-    rect.setAttribute('width', '300');
-    rect.setAttribute('height', '500');
-    rect.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
-    svg.appendChild(rect);
+    let avatarSrc, senderName, messages;
+    if (sceneId === 7) {
+        avatarSrc = "/heart_at_crossroads/assets/characters/lesha/lyosha_messenger_ava.png";
+        senderName = "Лёша";
+        messages = [
+            { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: stats.language === "ru" ? "Тусим вечером" : "Party tonight" },
+            { id: "msg2", x: 50, y: 180, width: 100, textX: 60, textY: 205, text: stats.language === "ru" ? "Дима будет" : "Dima’s coming" },
+            { id: "msg3", x: 50, y: 240, width: 90, textX: 60, textY: 265, text: stats.language === "ru" ? "Приходи" : "Be there" }
+        ];
+    } else if (sceneId === 21) {
+        avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png";
+        senderName = "Марк";
+        const fullText = stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost";
+        const maxCharsPerLine = 15;
+        const lines = [];
+        let currentLine = "";
+        fullText.split(" ").forEach(word => {
+            if ((currentLine + word).length <= maxCharsPerLine) {
+                currentLine += (currentLine ? " " : "") + word;
+            } else {
+                lines.push(currentLine);
+                currentLine = word;
+            }
+        });
+        if (currentLine) lines.push(currentLine);
+        messages = lines.map((line, idx) => ({
+            id: `msg${idx + 1}`,
+            x: 50,
+            y: 120 + idx * 40,
+            width: 180,
+            textX: 60,
+            textY: 145 + idx * 40,
+            text: line
+        }));
+    } else {
+        // Дефолтный случай для других сцен с "телефоном"
+        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+        avatarSrc = `/heart_at_crossroads/assets/characters/${sceneData.speaker?.[stats.language]?.toLowerCase() || 'unknown'}/${sceneData.speaker?.[stats.language]?.toLowerCase() || 'unknown'}_messenger_ava.png`;
+        senderName = sceneData.speaker?.[stats.language] || "Unknown";
+        messages = [{
+            id: "msg1",
+            x: 50,
+            y: 120,
+            width: 200,
+            textX: 60,
+            textY: 145,
+            text: sceneData.text?.[stats.language]?.substring(0, 50) || "Сообщение..."
+        }];
+    }
 
-    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
-    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
+    svg.innerHTML = `
+        <!-- Корпус смартфона -->
+        <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
+        <!-- Экран смартфона с фоновым изображением -->
+        <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
+        <image xlink:href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
+        <!-- Заголовок Telegram с именем пользователя и аватаркой -->
+        <rect x="30" y="50" width="240" height="50" fill="#fff"/>
+        <clipPath id="avatarClip">
+            <circle cx="60" cy="75" r="15"/>
+        </clipPath>
+        <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${avatarSrc}')"/>
+        <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
+        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
+        <!-- Разделительная линия -->
+        <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
+        <!-- Сообщения -->
+        <g class="messages">
+            ${messages.map((msg, idx) => `
+                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
+                <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
+            `).join('')}
+            <!-- Пустое ответное сообщение -->
+            <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
+            <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
+        </g>
+    `;
 
-    const avatar = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-    avatar.setAttribute('x', '20');
-    avatar.setAttribute('y', '20');
-    avatar.setAttribute('width', '50');
-    avatar.setAttribute('height', '50');
-    avatar.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 
-        `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`);
-    svg.appendChild(avatar);
-
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', '80');
-    text.setAttribute('y', '50');
-    text.setAttribute('fill', '#fff');
-    text.setAttribute('font-size', '16');
-    text.textContent = speaker;
-    svg.appendChild(text);
-
-    const message = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    message.setAttribute('x', '20');
-    message.setAttribute('y', '100');
-    message.setAttribute('fill', '#fff');
-    message.setAttribute('font-size', '14');
-    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
-    svg.appendChild(message);
-
+    console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
     document.getElementById('game-container').appendChild(svg);
+
+    // Анимация появления
+    console.log(`Запуск анимации для сцены ${sceneId}`);
+    gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
+    messages.forEach((msg, idx) => {
+        gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
+    });
+    gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
+    gsap.to(`#text${messages.length + 1}`, { 
+        opacity: 1, 
+        duration: 0, 
+        delay: 0.5 + messages.length * 0.5 + 0.5, 
+        onStart: function() {
+            let text = "...";
+            let index = 0;
+            let interval = setInterval(() => {
+                document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
+                index++;
+                if (index > text.length) clearInterval(interval);
+            }, 100);
+        }
+    });
+
     return svg;
 }
 
