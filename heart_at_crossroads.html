@@ -1804,7 +1804,7 @@ function typeText(text, element, callback) {
         if (i < parts[partIndex].length) {
             element.textContent += parts[partIndex].charAt(i);
             i++;
-            console.log(`Печатаем символ ${i} из части ${partIndex + 1}: "${parts[partIndex]}"`);
+            // console.log(`Печатаем символ ${i} из части ${partIndex + 1}: "${parts[partIndex]}"`);
             element.typeTimer = setTimeout(type, speed);
         } else {
             isTyping = false;
