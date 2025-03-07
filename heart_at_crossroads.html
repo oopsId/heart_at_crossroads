@@ -1745,57 +1745,67 @@ function typeText(text, element, callback) {
     if (isTyping) return; // Не начинаем, если уже печатаем
     isTyping = true;
     element.textContent = ''; // Очищаем текст
-    const parts = text.split('||').map(part => part.trim()); // Делим текст на части
-    let partIndex = 0; // Номер текущей части
-    let i = 0; // Номер символа в части
-    const speed = 50; // Скорость печати (50 мс)
-    const dialogueBox = document.querySelector('.dialogue-box'); // Бокс с текстом
+    if (element.typeTimer) clearTimeout(element.typeTimer); // Очищаем старый таймер
+    const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0); // Делим и убираем пустое
+    let partIndex = 0;
+    let i = 0;
+    const speed = 50;
+    const dialogueBox = document.querySelector('.dialogue-box');
 
-    // Функция печати текста
+    // Очистка обработчиков
+    function clearHandlers() {
+        if (dialogueBox.tapHandler) {
+            dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
+            dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
+            dialogueBox.tapHandler = null;
+        }
+    }
+    clearHandlers();
+
+    // Печать текста
     function type() {
-        if (partIndex >= parts.length) { // Если все части напечатаны
+        if (partIndex >= parts.length) {
             isTyping = false;
-            dialogueBox.onclick = null; // Убираем обработчик
-            dialogueBox.ontouchstart = null;
-            if (callback) callback(); // Запускаем следующее действие (кнопки или сцена)
+            clearHandlers();
+            if (callback) callback();
             return;
         }
-
-        if (i < parts[partIndex].length) { // Печатаем символы текущей части
+        if (i < parts[partIndex].length) {
             element.textContent += parts[partIndex].charAt(i);
             i++;
-            setTimeout(type, speed);
+            element.typeTimer = setTimeout(type, speed);
         } else {
-            isTyping = false; // Часть напечатана полностью
+            isTyping = false;
         }
     }
 
-    // Обработка тапа
+    // Обработка тапов
     function handleTap(e) {
         e.preventDefault();
-        if (isTyping) { // Если печатаем — показываем часть целиком
+        if (isTyping) {
+            clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             i = parts[partIndex].length;
             isTyping = false;
-        } else if (partIndex < parts.length - 1) { // Если есть следующая часть
+        } else if (partIndex < parts.length - 1) {
             partIndex++;
             i = 0;
             element.textContent = '';
             isTyping = true;
             type();
-        } else { // Если это последняя часть
+        } else {
             isTyping = false;
-            dialogueBox.onclick = null;
-            dialogueBox.ontouchstart = null;
-            if (callback) callback(); // Переходим к следующему
+            clearHandlers();
+            if (callback) callback();
         }
     }
 
-    // Устанавливаем обработчик тапов
-    dialogueBox.onclick = handleTap;
-    dialogueBox.ontouchstart = handleTap;
+    // Установка обработчика
+    dialogueBox.tapHandler = handleTap;
+    dialogueBox.addEventListener('touchstart', handleTap);
+    dialogueBox.addEventListener('click', handleTap);
 
-    // Начинаем печатать
+    // Старт
     type();
 }
 
