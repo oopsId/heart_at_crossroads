@@ -1765,15 +1765,16 @@ function checkCondition(condition) {
 
 function typeText(text, element, callback) {
     if (isTyping) {
-        console.log(`[${Date.now()}] typeText уже выполняется, пропускаем вызов`);
+        console.log(`[${Date.now()}] typeText уже идёт, пропускаем`);
         return;
     }
     const callId = Date.now();
-    console.log(`[${callId}] Начинаем печать текста: "${text}"`);
+    console.log(`[${callId}] Начинаем печатать текст: "${text}"`);
     isTyping = true;
+    console.log(`[${callId}] isTyping установлен в true`);
     element.textContent = '';
     if (element.typeTimer) {
-        console.log(`[${callId}] Очистка предыдущего таймера`);
+        console.log(`[${callId}] Очищаем старый таймер`);
         clearTimeout(element.typeTimer);
     }
     const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0);
@@ -1787,7 +1788,7 @@ function typeText(text, element, callback) {
         if (dialogueBox.tapHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
             dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
-            console.log(`[${callId}] Обработчики тапов очищены`);
+            console.log(`[${callId}] Очистка обработчиков тапов`);
             dialogueBox.tapHandler = null;
         }
     }
@@ -1795,10 +1796,11 @@ function typeText(text, element, callback) {
 
     function type() {
         if (partIndex >= parts.length) {
-            console.error(`[${callId}] Некорректный индекс: ${partIndex}, всего частей: ${parts.length}`);
+            console.error(`[${callId}] Ошибка индекса: ${partIndex}, частей: ${parts.length}`);
             isTyping = false;
+            console.log(`[${callId}] isTyping сброшен в false (все части готовы)`);
             clearHandlers();
-            console.log(`[${callId}] Все части текста напечатаны, вызов callback`);
+            console.log(`[${callId}] Все части напечатаны, вызываем callback`);
             if (callback) callback();
             return;
         }
@@ -1809,29 +1811,40 @@ function typeText(text, element, callback) {
             element.typeTimer = setTimeout(type, speed);
         } else {
             isTyping = false;
+            console.log(`[${callId}] isTyping сброшен в false (часть ${partIndex + 1} готова)`);
             console.log(`[${callId}] Завершена часть ${partIndex + 1} из ${parts.length}`);
-            // Если это последняя часть, сразу вызываем callback
             if (partIndex === parts.length - 1) {
-                console.log(`[${callId}] Это последняя часть, вызываем callback`);
+                console.log(`[${callId}] Последняя часть завершена, вызываем callback`);
                 clearHandlers();
-                if (callback) callback();
+                if (callback) {
+                    console.log(`[${callId}] Запускаем callback`);
+                    callback();
+                } else {
+                    console.log(`[${callId}] Callback не передан`);
+                }
             }
         }
     }
 
     function handleTap(e) {
         e.preventDefault();
+        console.log(`[${callId}] Тап, isTyping: ${isTyping}`);
         if (isTyping) {
-            console.log(`[${callId}] Пропуск анимации части ${partIndex + 1}`);
+            console.log(`[${callId}] Пропускаем анимацию части ${partIndex + 1}`);
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             i = parts[partIndex].length;
             isTyping = false;
-            // Если это последняя часть, вызываем callback
+            console.log(`[${callId}] isTyping сброшен в false (анимация пропущена)`);
             if (partIndex === parts.length - 1) {
                 console.log(`[${callId}] Пропущена последняя часть, вызываем callback`);
                 clearHandlers();
-                if (callback) callback();
+                if (callback) {
+                    console.log(`[${callId}] Запускаем callback после пропуска`);
+                    callback();
+                } else {
+                    console.log(`[${callId}] Callback не передан после пропуска`);
+                }
             }
         } else if (partIndex < parts.length - 1) {
             console.log(`[${callId}] Переход к части ${partIndex + 2}`);
@@ -1839,12 +1852,19 @@ function typeText(text, element, callback) {
             i = 0;
             element.textContent = '';
             isTyping = true;
+            console.log(`[${callId}] isTyping установлен в true (следующая часть)`);
             type();
         } else {
             console.log(`[${callId}] Все части показаны, вызываем callback`);
             isTyping = false;
+            console.log(`[${callId}] isTyping сброшен в false (финальный тап)`);
             clearHandlers();
-            if (callback) callback();
+            if (callback) {
+                console.log(`[${callId}] Запускаем callback после финального тапа`);
+                callback();
+            } else {
+                console.log(`[${callId}] Callback не передан после финального тапа`);
+            }
         }
     }
 
@@ -1855,7 +1875,6 @@ function typeText(text, element, callback) {
 
     type();
 }
-
 
   
 function fadeOut(callback) {
