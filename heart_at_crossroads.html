@@ -1567,13 +1567,11 @@ function handleChoices(scene, dialogueBox, overlay) {
         return;
     }
 
-    // Обновление прогресс-бара
     const progressElement = document.getElementById('progress');
     const totalScenes = scriptData.scenes.length;
     const progressPercent = ((sceneId + 1) / totalScenes) * 100;
     progressElement.style.width = `${progressPercent}%`;
 
-    // Выбор текста в зависимости от прохождения
     const dialogueBox = document.querySelector('.dialogue-box');
     const dialogueElement = document.getElementById('dialogue-text');
     let displayText = scene.text[stats.language];
@@ -1582,17 +1580,14 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
     console.log(`[showScene] Текст для отображения: ${displayText}`);
 
-    // Проверка необходимости затухания
     const newBackground = scene.background || 'none';
     const shouldFade = currentBackground !== newBackground || sceneId === scriptData.scenes.length - 1;
 
-    // Основная логика сцены
     const applyScene = async () => {
         console.log('[applyScene] Применяем сцену');
         currentBackground = await setupBackground(newBackground, stats.language);
         await setupCharacters(scene, stats.language, stats);
 
-        // Проверка на наличие таймера в выборах для выбора правильного оверлея
         const overlay = createOverlayIfNeeded(sceneId, displayText, scene.choices && scene.choices.some(c => c.timer));
         clearDialogueHandlers(dialogueBox);
         dialogueBox.style.pointerEvents = 'none';
@@ -1600,14 +1595,48 @@ function handleChoices(scene, dialogueBox, overlay) {
         console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
             console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
-            dialogueBox.style.pointerEvents = 'auto'; // Включаем клики после текста
+            console.log(`[showScene] Проверка: scene.id=${sceneId}, totalScenes=${totalScenes}, nextScene=${scene.nextScene}`);
+            dialogueBox.style.pointerEvents = 'auto';
             handleChoices(scene, dialogueBox, overlay);
             handleNextScene(scene, dialogueBox, overlay);
             handleChapterEnd(scene);
+
+            // Проверка на конец главы или ветки
+            if (!scene.choices && scene.nextScene === null) {
+                console.log(`[showScene] nextScene === null, считаем концом главы`);
+                currentChapter++;
+                currentScene = 0;
+                loadChapter(currentChapter).then(success => {
+                    if (success) {
+                        console.log(`[showScene] Успешно перешли к главе ${currentChapter}, сцена ${currentScene}`);
+                        showScene(currentScene);
+                    } else {
+                        console.warn(`[showScene] Не удалось загрузить главу ${currentChapter}`);
+                        showStartScreen();
+                    }
+                });
+            } else if (!scene.choices && scene.nextScene === undefined) {
+                console.warn(`[showScene] Нет choices/nextScene для сцены ${sceneId}, но nextScene не null`);
+                if (sceneId === scriptData.scenes.length - 1) {
+                    console.log(`[showScene] Это последняя сцена, завершаем главу`);
+                    currentChapter++;
+                    currentScene = 0;
+                    loadChapter(currentChapter).then(success => {
+                        if (success) showScene(currentScene);
+                    });
+                } else {
+                    console.log(`[showScene] Принудительный переход к следующей сцене`);
+                    addTapHandler(dialogueBox, () => {
+                        if (overlay) overlay.remove();
+                        currentScene = sceneId + 1;
+                        saveSession();
+                        showScene(currentScene);
+                    });
+                }
+            }
         });
     };
 
-    // Применение сцены с эффектом затухания, если нужно
     if (shouldFade) {
         fadeOut(() => {
             applyScene();
@@ -1617,7 +1646,6 @@ function handleChoices(scene, dialogueBox, overlay) {
         await applyScene();
     }
 
-    // Загрузка концовки, если есть
     if (scene.leadsToEnding) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
