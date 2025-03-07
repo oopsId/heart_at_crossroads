@@ -1427,7 +1427,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 
     const handleNext = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Оставляем, так как нужен контроль перехода
         console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
         currentScene = scene.nextScene;
         saveSession();
@@ -1442,12 +1442,15 @@ function handleChoices(scene, dialogueBox, overlay) {
         dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
     }
 
-    // Установка новых
+    // Установка новых с passive: false из-за e.preventDefault()
     dialogueBox.touchHandler = handleNext;
-    dialogueBox.addEventListener('touchstart', handleNext);
+    dialogueBox.addEventListener('touchstart', handleNext, { passive: false });
     dialogueBox.addEventListener('click', handleNext);
-    dialogueBox.style.pointerEvents = 'auto'; // Явно включаем взаимодействие
+    dialogueBox.style.pointerEvents = 'auto';
     console.log(`[handleNextScene] Обработчики установлены, pointerEvents: ${dialogueBox.style.pointerEvents}`);
+
+    // Тестовый вызов для проверки
+    console.log('[handleNextScene] Проверка: кликните dialogueBox');
 }
 
 // Обработка конца главы
@@ -1480,11 +1483,9 @@ async function showScene(sceneId) {
     if (stats.completionCount >= 1 && scene.second_playthrough_text) {
         displayText = scene.second_playthrough_text[stats.language];
     }
-    console.log(`[showScene] Текст для отображения: ${displayText}`);
 
     const newBackground = scene.background || 'none';
     const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
-    console.log(`[showScene] shouldFade: ${shouldFade}, currentBackground: ${currentBackground}, newBackground: ${newBackground}`);
 
     const applyScene = async () => {
         console.log('[applyScene] Применяем сцену');
@@ -1492,7 +1493,7 @@ async function showScene(sceneId) {
         await setupCharacters(scene, stats.language, stats);
         const overlay = createOverlayIfNeeded(sceneId, displayText);
         clearDialogueHandlers(dialogueBox);
-        dialogueBox.style.pointerEvents = 'none'; // Сбрасываем перед печатью
+        dialogueBox.style.pointerEvents = 'none';
 
         console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
@@ -1504,13 +1505,11 @@ async function showScene(sceneId) {
     };
 
     if (shouldFade) {
-        console.log('[showScene] Выполняем fadeOut');
         fadeOut(() => {
             applyScene();
             fadeIn();
         });
     } else {
-        console.log('[showScene] Применяем сцену без fade');
         await applyScene();
     }
 
@@ -1518,7 +1517,7 @@ async function showScene(sceneId) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
     }
-}    
+} 
 
 
 
