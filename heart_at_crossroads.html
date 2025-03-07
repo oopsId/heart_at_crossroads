@@ -1433,13 +1433,22 @@ async function setupCharacters(scene, language, stats) {
 }
 
 // Создание оверлея
-   function createOverlayIfNeeded(sceneId, displayText) {
-    console.log(`[createOverlayIfNeeded] Проверка текста: ${displayText}`);
+   function createOverlayIfNeeded(sceneId, displayText, hasTimer = false) {
+    console.log(`[createOverlayIfNeeded] Проверка сцены ${sceneId}, hasTimer: ${hasTimer}`);
     const textLower = displayText.toLowerCase();
-    if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') ||
-        textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-        console.log(`[createOverlayIfNeeded] Создаём оверлей для сцены ${sceneId}`);
-        return showMessengerOverlay(sceneId); // Теперь ваш красивый SVG
+    const isPhoneScene = textLower.includes('телефон') || textLower.includes('phone') || 
+                        textLower.includes('telegram') || textLower.includes('whatsapp') || 
+                        textLower.includes('вконтакте') || textLower.includes('vkontakte');
+    
+    if (isPhoneScene) {
+        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+        if (hasTimer) {
+            console.log(`[createOverlayIfNeeded] Создаём showMessengerOverlay для сцены ${sceneId}`);
+            return showMessengerOverlay(sceneId);
+        } else {
+            console.log(`[createOverlayIfNeeded] Создаём createDefaultOverlay для сцены ${sceneId}`);
+            return createDefaultOverlay(sceneId, sceneData);
+        }
     }
     return null;
 }
@@ -1602,7 +1611,7 @@ async function showScene(sceneId) {
 }
 
 
-                         function showSceneWithTimer(scene, timeoutMs = 10000) {
+                        function showSceneWithTimer(scene, timeoutMs = 10000) {
     console.log(`[showSceneWithTimer] Показ сцены ${scene.id} с таймером (${timeoutMs}мс)`);
 
     // Элементы DOM
@@ -1687,13 +1696,11 @@ async function showScene(sceneId) {
             console.log('[showSceneWithTimer] Очищены старые touchHandler');
         }
 
-        // Создание оверлея, если нужно
+        // Создание оверлея для сцены с таймером (ТОЛЬКО showMessengerOverlay)
         let overlay = null;
-        const textLower = displayText.toLowerCase();
-        if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
-            textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-            overlay = createOverlayIfNeeded(scene.id, displayText); // Вызывает showMessengerOverlay
-            console.log(`[showSceneWithTimer] Оверлей создан для сцены ${scene.id}`);
+        if (scene.choices && scene.choices.some(c => c.timer)) {
+            overlay = showMessengerOverlay(scene.id); // Используем showMessengerOverlay для сцен с таймером
+            console.log(`[showSceneWithTimer] Создан оверлей с таймером для сцены ${scene.id}`);
         }
 
         // Установка имени спикера
@@ -1791,11 +1798,9 @@ async function showScene(sceneId) {
                 } else if (scene.id === scriptData.scenes.length - 1) {
                     currentChapter++;
                     currentScene = 0;
-                    if (currentChapter <= 10) {
-                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                    } else {
-                        showStartScreen();
-                    }
+                    loadChapter(currentChapter).then(success => {
+                        if (success) showScene(currentScene);
+                    });
                 } else {
                     console.warn('Нет сцены по умолчанию для таймера!');
                 }
@@ -1818,7 +1823,7 @@ async function showScene(sceneId) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
     }
-}    
+}
 
         function showGallery() {
             const galleryDiv = document.createElement('div');
