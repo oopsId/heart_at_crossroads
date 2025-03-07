@@ -1445,6 +1445,7 @@ typeText(displayText, dialogueElement, () => {
         loadFinals(scene.leadsToEnding);
     }
 }
+       }
 
         function showSceneWithTimer(scene, timeoutMs = 10000) {
             const progressElement = document.getElementById('progress');
@@ -1630,7 +1631,7 @@ typeText(displayText, dialogueElement, () => {
             if (scene.leadsToEnding) {
                 loadFinals(scene.leadsToEnding);
             }
-        } // Добавлена закрывающая скобка для showSceneWithTimer
+        } 
 
         function showGallery() {
             const galleryDiv = document.createElement('div');
