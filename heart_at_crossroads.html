@@ -1281,8 +1281,9 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
             saveSession();
         }
 
-       // Обновление прогресс-бара
+            // Обновление прогресс-бара
 function updateProgress(sceneId, totalScenes) {
+    console.log(`[updateProgress] Обновляем прогресс: ${sceneId + 1}/${totalScenes}`);
     const progressElement = document.getElementById('progress');
     const progressPercent = ((sceneId + 1) / totalScenes) * 100;
     progressElement.style.width = `${progressPercent}%`;
@@ -1290,10 +1291,15 @@ function updateProgress(sceneId, totalScenes) {
 
 // Настройка фона с проверкой
 async function setupBackground(newBackground, language) {
+    console.log(`[setupBackground] Устанавливаем фон: ${newBackground}`);
     const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
-    if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-        console.warn(`Фон ${newBackground}.png не найден`);
-        showErrorMessage(language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+    if (bgUrl !== 'none') {
+        const exists = await checkAssetExists(bgUrl);
+        console.log(`[setupBackground] Проверка фона ${bgUrl}: ${exists ? 'найден' : 'не найден'}`);
+        if (!exists) {
+            console.warn(`Фон ${newBackground}.png не найден`);
+            showErrorMessage(language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+        }
     }
     document.getElementById('background').style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
     return newBackground;
@@ -1301,6 +1307,7 @@ async function setupBackground(newBackground, language) {
 
 // Настройка персонажей
 async function setupCharacters(scene, language, stats) {
+    console.log(`[setupCharacters] Настройка персонажей для сцены ${scene.id}`);
     const charLeft = document.getElementById('character-left');
     const charRight = document.getElementById('character-right');
     const speakerName = scene.speaker ? scene.speaker[language] : '';
@@ -1315,7 +1322,9 @@ async function setupCharacters(scene, language, stats) {
             ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
             : scene.characterLeft;
         const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
-        if (!(await checkAssetExists(leftCharUrl))) {
+        const exists = await checkAssetExists(leftCharUrl);
+        console.log(`[setupCharacters] Проверка персонажа ${leftCharUrl}: ${exists ? 'найден' : 'не найден'}`);
+        if (!exists) {
             console.warn(`Персонаж ${leftChar}.png не найден`);
             showErrorMessage(language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
         }
@@ -1328,7 +1337,9 @@ async function setupCharacters(scene, language, stats) {
             ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
             : scene.characterRight;
         const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
-        if (!(await checkAssetExists(rightCharUrl))) {
+        const exists = await checkAssetExists(rightCharUrl);
+        console.log(`[setupCharacters] Проверка персонажа ${rightCharUrl}: ${exists ? 'найден' : 'не найден'}`);
+        if (!exists) {
             console.warn(`Персонаж ${rightChar}.png не найден`);
             showErrorMessage(language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
         }
@@ -1337,14 +1348,17 @@ async function setupCharacters(scene, language, stats) {
     }
 
     document.getElementById('speaker-name').textContent = speakerName;
+    console.log(`[setupCharacters] Имя спикера: ${speakerName}`);
 }
 
 // Создание оверлея
 function createOverlayIfNeeded(sceneId, displayText) {
+    console.log(`[createOverlayIfNeeded] Проверка текста: ${displayText}`);
     const textLower = displayText.toLowerCase();
     if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') ||
         textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
         const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+        console.log(`[createOverlayIfNeeded] Создаём оверлей для сцены ${sceneId}`);
         return createDefaultOverlay(sceneId, sceneData);
     }
     return null;
@@ -1352,7 +1366,7 @@ function createOverlayIfNeeded(sceneId, displayText) {
 
 // Очистка обработчиков
 function clearDialogueHandlers(dialogueBox) {
-    console.log('Очистка старых обработчиков перед выводом текста');
+    console.log('[clearDialogueHandlers] Очистка старых обработчиков');
     dialogueBox.onclick = null;
     dialogueBox.ontouchstart = null;
     document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
@@ -1363,6 +1377,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     dialogueBox.style.pointerEvents = 'auto';
     if (!scene.choices || scene.choices.length === 0) return;
 
+    console.log(`[handleChoices] Обработка выбора для сцены ${scene.id}`);
     if (scene.choices.some(c => c.timer)) {
         console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
         showSceneWithTimer(scene);
@@ -1451,16 +1466,20 @@ async function showScene(sceneId) {
     if (stats.completionCount >= 1 && scene.second_playthrough_text) {
         displayText = scene.second_playthrough_text[stats.language];
     }
+    console.log(`[showScene] Текст для отображения: ${displayText}`);
 
     const newBackground = scene.background || 'none';
     const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
+    console.log(`[showScene] shouldFade: ${shouldFade}, currentBackground: ${currentBackground}, newBackground: ${newBackground}`);
 
     const applyScene = async () => {
+        console.log('[applyScene] Применяем сцену');
         currentBackground = await setupBackground(newBackground, stats.language);
         await setupCharacters(scene, stats.language, stats);
         const overlay = createOverlayIfNeeded(sceneId, displayText);
         clearDialogueHandlers(dialogueBox);
 
+        console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
             console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
             handleChoices(scene, dialogueBox, overlay);
@@ -1470,11 +1489,13 @@ async function showScene(sceneId) {
     };
 
     if (shouldFade) {
+        console.log('[showScene] Выполняем fadeOut');
         fadeOut(() => {
             applyScene();
             fadeIn();
         });
     } else {
+        console.log('[showScene] Применяем сцену без fade');
         await applyScene();
     }
 
@@ -1482,7 +1503,9 @@ async function showScene(sceneId) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
     }
-}
+}     
+
+
 
         function showSceneWithTimer(scene, timeoutMs = 10000) {
             const progressElement = document.getElementById('progress');
