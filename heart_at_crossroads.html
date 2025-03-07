@@ -1364,72 +1364,72 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
         dialogueBox.ontouchstart = null;
         document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
 
-        typeText(displayText, dialogueElement, () => {
-            console.log(`Текст сцены ${sceneId} полностью показан`);
-            dialogueBox.style.pointerEvents = 'auto';
-            if (scene.choices && scene.choices.length > 0) {
-                if (scene.choices.some(c => c.timer)) {
-                    console.log('Переход к showSceneWithTimer');
-                    showSceneWithTimer(scene);
+        // Внутри applyScene:
+typeText(displayText, dialogueElement, () => {
+    console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
+    dialogueBox.style.pointerEvents = 'auto';
+    if (scene.choices && scene.choices.length > 0) {
+        if (scene.choices.some(c => c.timer)) {
+            console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
+            showSceneWithTimer(scene);
+        } else {
+            console.log(`[${Date.now()}] Показываем кнопки выбора`);
+            scene.choices.forEach(choice => {
+                const btn = createChoiceButton(choice);
+                if (choice.condition && !checkCondition(choice.condition)) {
+                    btn.style.display = 'none';
+                } else if (choice.cost && stats.diamonds < choice.cost) {
+                    btn.disabled = true;
                 } else {
-                    console.log('Показываем кнопки выбора');
-                    scene.choices.forEach(choice => {
-                        const btn = createChoiceButton(choice);
-                        if (choice.condition && !checkCondition(choice.condition)) {
-                            btn.style.display = 'none';
-                        } else if (choice.cost && stats.diamonds < choice.cost) {
-                            btn.disabled = true;
-                        } else {
-                            const handleChoice = (e) => {
-                                e.preventDefault();
-                                console.log(`Выбор сделан: ${choice.id}`);
-                                if (choice.cost) stats.diamonds -= choice.cost;
-                                updateDiamondsDisplay();
-                                saveChoice(choice.id, choice.effects, choice.memoryTag);
-                                if (choice.effects) showChoiceEffects(choice.effects);
-                                if (overlay) overlay.remove();
-                                if (choice.nextScene !== undefined) {
-                                    currentScene = choice.nextScene;
-                                    saveSession();
-                                    showScene(currentScene);
-                                } else if (choice.nextChapter) {
-                                    currentChapter = choice.nextChapter;
-                                    currentScene = 0;
-                                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                                }
-                            };
-                            btn.addEventListener('touchstart', handleChoice);
-                            btn.addEventListener('click', handleChoice);
+                    const handleChoice = (e) => {
+                        e.preventDefault();
+                        console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
+                        if (choice.cost) stats.diamonds -= choice.cost;
+                        updateDiamondsDisplay();
+                        saveChoice(choice.id, choice.effects, choice.memoryTag);
+                        if (choice.effects) showChoiceEffects(choice.effects);
+                        if (overlay) overlay.remove();
+                        if (choice.nextScene !== undefined) {
+                            currentScene = choice.nextScene;
+                            saveSession();
+                            showScene(currentScene);
+                        } else if (choice.nextChapter) {
+                            currentChapter = choice.nextChapter;
+                            currentScene = 0;
+                            loadChapter(currentChapter).then(() => showScene(currentScene));
                         }
-                        dialogueBox.appendChild(btn);
-                    });
+                    };
+                    btn.addEventListener('touchstart', handleChoice);
+                    btn.addEventListener('click', handleChoice);
                 }
-            } else if (scene.nextScene !== undefined) {
-                console.log(`Установка обработчика для перехода к сцене ${scene.nextScene}`);
-                const handleNext = (e) => {
-                    e.preventDefault();
-                    console.log(`Тап: переход к сцене ${scene.nextScene}`);
-                    currentScene = scene.nextScene;
-                    saveSession();
-                    if (overlay) overlay.remove();
-                    dialogueBox.style.pointerEvents = 'none'; // Предотвращаем лишние тапы
-                    showScene(currentScene);
-                };
-                dialogueBox.touchHandler = handleNext;
-                dialogueBox.addEventListener('touchstart', handleNext);
-                dialogueBox.addEventListener('click', handleNext);
-            } else if (scene.id === scriptData.scenes.length - 1) {
-                console.log('Конец главы, переход к следующей');
-                currentChapter++;
-                currentScene = 0;
-                if (currentChapter <= 10) {
-                    loadChapter(currentChapter).then(() => showScene(currentScene));
-                } else {
-                    showStartScreen();
-                }
-            }
-        });
-    };
+                dialogueBox.appendChild(btn);
+            });
+        }
+    } else if (scene.nextScene !== undefined) {
+        console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
+        const handleNext = (e) => {
+            e.preventDefault();
+            console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
+            currentScene = scene.nextScene;
+            saveSession();
+            if (overlay) overlay.remove();
+            dialogueBox.style.pointerEvents = 'none';
+            showScene(currentScene);
+        };
+        dialogueBox.touchHandler = handleNext;
+        dialogueBox.addEventListener('touchstart', handleNext);
+        dialogueBox.addEventListener('click', handleNext);
+    } else if (scene.id === scriptData.scenes.length - 1) {
+        console.log(`[${Date.now()}] Конец главы, переход к следующей`);
+        currentChapter++;
+        currentScene = 0;
+        if (currentChapter <= 10) {
+            loadChapter(currentChapter).then(() => showScene(currentScene));
+        } else {
+            showStartScreen();
+        }
+    }
+});
 
     if (shouldFade) {
         fadeOut(() => {
@@ -1768,7 +1768,7 @@ function typeText(text, element, callback) {
         console.log(`[${Date.now()}] typeText уже выполняется, пропускаем вызов`);
         return;
     }
-    const callId = Date.now(); // Уникальный ID вызова для отслеживания
+    const callId = Date.now();
     console.log(`[${callId}] Начинаем печать текста: "${text}"`);
     isTyping = true;
     element.textContent = '';
@@ -1805,10 +1805,17 @@ function typeText(text, element, callback) {
         if (i < parts[partIndex].length) {
             element.textContent += parts[partIndex].charAt(i);
             i++;
+            console.log(`[${callId}] Печатаем символ ${i} части ${partIndex + 1}: "${parts[partIndex]}"`);
             element.typeTimer = setTimeout(type, speed);
         } else {
             isTyping = false;
             console.log(`[${callId}] Завершена часть ${partIndex + 1} из ${parts.length}`);
+            // Если это последняя часть, сразу вызываем callback
+            if (partIndex === parts.length - 1) {
+                console.log(`[${callId}] Это последняя часть, вызываем callback`);
+                clearHandlers();
+                if (callback) callback();
+            }
         }
     }
 
@@ -1820,6 +1827,12 @@ function typeText(text, element, callback) {
             element.textContent = parts[partIndex];
             i = parts[partIndex].length;
             isTyping = false;
+            // Если это последняя часть, вызываем callback
+            if (partIndex === parts.length - 1) {
+                console.log(`[${callId}] Пропущена последняя часть, вызываем callback`);
+                clearHandlers();
+                if (callback) callback();
+            }
         } else if (partIndex < parts.length - 1) {
             console.log(`[${callId}] Переход к части ${partIndex + 2}`);
             partIndex++;
@@ -1842,6 +1855,9 @@ function typeText(text, element, callback) {
 
     type();
 }
+
+
+  
 function fadeOut(callback) {
     const elements = [
         document.getElementById('background'),
