@@ -1417,10 +1417,15 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 // Обработка следующей сцены
-function handleNextScene(scene, dialogueBox, overlay) {
+    function handleNextScene(scene, dialogueBox, overlay) {
     if (!scene.nextScene) return;
 
     console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
+    if (!dialogueBox) {
+        console.error('[handleNextScene] dialogueBox не найден!');
+        return;
+    }
+
     const handleNext = (e) => {
         e.preventDefault();
         console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
@@ -1430,9 +1435,19 @@ function handleNextScene(scene, dialogueBox, overlay) {
         dialogueBox.style.pointerEvents = 'none';
         showScene(currentScene);
     };
+
+    // Очистка старых обработчиков
+    if (dialogueBox.touchHandler) {
+        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler);
+        dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+    }
+
+    // Установка новых
     dialogueBox.touchHandler = handleNext;
     dialogueBox.addEventListener('touchstart', handleNext);
     dialogueBox.addEventListener('click', handleNext);
+    dialogueBox.style.pointerEvents = 'auto'; // Явно включаем взаимодействие
+    console.log(`[handleNextScene] Обработчики установлены, pointerEvents: ${dialogueBox.style.pointerEvents}`);
 }
 
 // Обработка конца главы
@@ -1449,7 +1464,6 @@ function handleChapterEnd(scene) {
     }
 }
 
-// Основная функция showScene
 async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes[sceneId];
@@ -1478,6 +1492,7 @@ async function showScene(sceneId) {
         await setupCharacters(scene, stats.language, stats);
         const overlay = createOverlayIfNeeded(sceneId, displayText);
         clearDialogueHandlers(dialogueBox);
+        dialogueBox.style.pointerEvents = 'none'; // Сбрасываем перед печатью
 
         console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
@@ -1503,7 +1518,7 @@ async function showScene(sceneId) {
         console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
         loadFinals(scene.leadsToEnding);
     }
-}     
+}    
 
 
 
