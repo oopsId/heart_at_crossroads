@@ -771,6 +771,12 @@
                 alert(statsText);
             }
 
+            function handleShowGallery(e) {
+            e.preventDefault();
+            console.log('handleShowGallery вызван');
+            showGallery();
+                }
+
             function handleLanguageSwitch(e) {
                 e.preventDefault();
                 console.log('handleLanguageSwitch вызван');
@@ -788,6 +794,7 @@
             addEventListeners(menuBtn, ['click', 'touchstart'], handleMenu);
             addEventListeners(statsBtn, ['click', 'touchstart'], handleShowStats);
             addEventListeners(galleryBtn, ['click', 'touchstart'], (e) => e.preventDefault());
+            addEventListeners(galleryBtn, ['click', 'touchstart'], handleShowGallery);
             addEventListeners(languageBtn, ['click', 'touchstart'], handleLanguageSwitch);
 
             // Кнопка "Назад"
