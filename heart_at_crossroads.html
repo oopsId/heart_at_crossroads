@@ -1778,14 +1778,15 @@ function typeText(text, element, callback) {
         clearTimeout(element.typeTimer);
     }
     const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0);
-    console.log(`[${callId}] Частей текста: ${parts.length}`);
+    console.log(`[${callId}] Частей текста: ${parts.length}, parts: ${JSON.stringify(parts)}`);
     let partIndex = 0;
     let i = 0;
     const speed = 50;
     const dialogueBox = document.querySelector('.dialogue-box');
+    if (!dialogueBox) console.error(`[${callId}] dialogueBox не найден!`);
 
     function clearHandlers() {
-        if (dialogueBox.tapHandler) {
+        if (dialogueBox && dialogueBox.tapHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
             dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
             console.log(`[${callId}] Очистка обработчиков тапов`);
@@ -1795,13 +1796,19 @@ function typeText(text, element, callback) {
     clearHandlers();
 
     function type() {
+        console.log(`[${callId}] type(): partIndex=${partIndex}, i=${i}, parts.length=${parts.length}`);
         if (partIndex >= parts.length) {
             console.error(`[${callId}] Ошибка индекса: ${partIndex}, частей: ${parts.length}`);
             isTyping = false;
             console.log(`[${callId}] isTyping сброшен в false (все части готовы)`);
             clearHandlers();
             console.log(`[${callId}] Все части напечатаны, вызываем callback`);
-            if (callback) callback();
+            if (callback) {
+                console.log(`[${callId}] Запускаем callback (все части)`);
+                callback();
+            } else {
+                console.log(`[${callId}] Callback не передан (все части)`);
+            }
             return;
         }
         if (i < parts[partIndex].length) {
@@ -1817,10 +1824,10 @@ function typeText(text, element, callback) {
                 console.log(`[${callId}] Последняя часть завершена, вызываем callback`);
                 clearHandlers();
                 if (callback) {
-                    console.log(`[${callId}] Запускаем callback`);
+                    console.log(`[${callId}] Запускаем callback (последняя часть)`);
                     callback();
                 } else {
-                    console.log(`[${callId}] Callback не передан`);
+                    console.log(`[${callId}] Callback не передан (последняя часть)`);
                 }
             }
         }
@@ -1828,7 +1835,7 @@ function typeText(text, element, callback) {
 
     function handleTap(e) {
         e.preventDefault();
-        console.log(`[${callId}] Тап, isTyping: ${isTyping}`);
+        console.log(`[${callId}] Тап, isTyping: ${isTyping}, partIndex=${partIndex}`);
         if (isTyping) {
             console.log(`[${callId}] Пропускаем анимацию части ${partIndex + 1}`);
             clearTimeout(element.typeTimer);
@@ -1868,15 +1875,18 @@ function typeText(text, element, callback) {
         }
     }
 
-    dialogueBox.tapHandler = handleTap;
-    dialogueBox.addEventListener('touchstart', handleTap);
-    dialogueBox.addEventListener('click', handleTap);
-    console.log(`[${callId}] Обработчик тапов установлен`);
+    if (dialogueBox) {
+        dialogueBox.tapHandler = handleTap;
+        dialogueBox.addEventListener('touchstart', handleTap);
+        dialogueBox.addEventListener('click', handleTap);
+        console.log(`[${callId}] Обработчик тапов установлен`);
+    } else {
+        console.error(`[${callId}] Не удалось установить обработчик тапов: dialogueBox отсутствует`);
+    }
 
     type();
 }
 
-  
 function fadeOut(callback) {
     const elements = [
         document.getElementById('background'),
@@ -1916,7 +1926,4 @@ function showChoiceEffects(effects) {
     setTimeout(() => feedback.remove(), 3000);
 }
 
-// Закрытие тега <script>
-    </script>
-</body>
-</html>
+</script>
