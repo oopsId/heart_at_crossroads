@@ -1742,21 +1742,60 @@ function checkCondition(condition) {
 }
 
 function typeText(text, element, callback) {
-    if (isTyping) return;
+    if (isTyping) return; // Не начинаем, если уже печатаем
     isTyping = true;
-    element.textContent = '';
-    let i = 0;
-    const speed = 50;
+    element.textContent = ''; // Очищаем текст
+    const parts = text.split('||').map(part => part.trim()); // Делим текст на части
+    let partIndex = 0; // Номер текущей части
+    let i = 0; // Номер символа в части
+    const speed = 50; // Скорость печати (50 мс)
+    const dialogueBox = document.querySelector('.dialogue-box'); // Бокс с текстом
+
+    // Функция печати текста
     function type() {
-        if (i < text.length) {
-            element.textContent += text.charAt(i);
+        if (partIndex >= parts.length) { // Если все части напечатаны
+            isTyping = false;
+            dialogueBox.onclick = null; // Убираем обработчик
+            dialogueBox.ontouchstart = null;
+            if (callback) callback(); // Запускаем следующее действие (кнопки или сцена)
+            return;
+        }
+
+        if (i < parts[partIndex].length) { // Печатаем символы текущей части
+            element.textContent += parts[partIndex].charAt(i);
             i++;
             setTimeout(type, speed);
         } else {
-            isTyping = false;
-            if (callback) callback();
+            isTyping = false; // Часть напечатана полностью
         }
     }
+
+    // Обработка тапа
+    function handleTap(e) {
+        e.preventDefault();
+        if (isTyping) { // Если печатаем — показываем часть целиком
+            element.textContent = parts[partIndex];
+            i = parts[partIndex].length;
+            isTyping = false;
+        } else if (partIndex < parts.length - 1) { // Если есть следующая часть
+            partIndex++;
+            i = 0;
+            element.textContent = '';
+            isTyping = true;
+            type();
+        } else { // Если это последняя часть
+            isTyping = false;
+            dialogueBox.onclick = null;
+            dialogueBox.ontouchstart = null;
+            if (callback) callback(); // Переходим к следующему
+        }
+    }
+
+    // Устанавливаем обработчик тапов
+    dialogueBox.onclick = handleTap;
+    dialogueBox.ontouchstart = handleTap;
+
+    // Начинаем печатать
     type();
 }
 
