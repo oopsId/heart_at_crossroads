@@ -1281,7 +1281,161 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
             saveSession();
         }
 
-       function showScene(sceneId) {
+       // Обновление прогресс-бара
+function updateProgress(sceneId, totalScenes) {
+    const progressElement = document.getElementById('progress');
+    const progressPercent = ((sceneId + 1) / totalScenes) * 100;
+    progressElement.style.width = `${progressPercent}%`;
+}
+
+// Настройка фона с проверкой
+async function setupBackground(newBackground, language) {
+    const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
+    if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
+        console.warn(`Фон ${newBackground}.png не найден`);
+        showErrorMessage(language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
+    }
+    document.getElementById('background').style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
+    return newBackground;
+}
+
+// Настройка персонажей
+async function setupCharacters(scene, language, stats) {
+    const charLeft = document.getElementById('character-left');
+    const charRight = document.getElementById('character-right');
+    const speakerName = scene.speaker ? scene.speaker[language] : '';
+
+    charLeft.style.backgroundImage = 'none';
+    charRight.style.backgroundImage = 'none';
+    charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+    charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
+
+    if (scene.characterLeft) {
+        const leftChar = scene.characterLeft.includes('${stats.appearance}')
+            ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
+            : scene.characterLeft;
+        const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
+        if (!(await checkAssetExists(leftCharUrl))) {
+            console.warn(`Персонаж ${leftChar}.png не найден`);
+            showErrorMessage(language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
+        }
+        charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
+        charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
+    }
+
+    if (scene.characterRight) {
+        const rightChar = scene.characterRight.includes('${stats.appearance}')
+            ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
+            : scene.characterRight;
+        const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
+        if (!(await checkAssetExists(rightCharUrl))) {
+            console.warn(`Персонаж ${rightChar}.png не найден`);
+            showErrorMessage(language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
+        }
+        charRight.style.backgroundImage = `url('${rightCharUrl}')`;
+        charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
+    }
+
+    document.getElementById('speaker-name').textContent = speakerName;
+}
+
+// Создание оверлея
+function createOverlayIfNeeded(sceneId, displayText) {
+    const textLower = displayText.toLowerCase();
+    if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') ||
+        textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
+        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+        return createDefaultOverlay(sceneId, sceneData);
+    }
+    return null;
+}
+
+// Очистка обработчиков
+function clearDialogueHandlers(dialogueBox) {
+    console.log('Очистка старых обработчиков перед выводом текста');
+    dialogueBox.onclick = null;
+    dialogueBox.ontouchstart = null;
+    document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+}
+
+// Обработка выбора
+function handleChoices(scene, dialogueBox, overlay) {
+    dialogueBox.style.pointerEvents = 'auto';
+    if (!scene.choices || scene.choices.length === 0) return;
+
+    if (scene.choices.some(c => c.timer)) {
+        console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
+        showSceneWithTimer(scene);
+    } else {
+        console.log(`[${Date.now()}] Показываем кнопки выбора`);
+        scene.choices.forEach(choice => {
+            const btn = createChoiceButton(choice);
+            if (choice.condition && !checkCondition(choice.condition)) {
+                btn.style.display = 'none';
+            } else if (choice.cost && stats.diamonds < choice.cost) {
+                btn.disabled = true;
+            } else {
+                const handleChoice = (e) => {
+                    e.preventDefault();
+                    console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
+                    if (choice.cost) stats.diamonds -= choice.cost;
+                    updateDiamondsDisplay();
+                    saveChoice(choice.id, choice.effects, choice.memoryTag);
+                    if (choice.effects) showChoiceEffects(choice.effects);
+                    if (overlay) overlay.remove();
+                    if (choice.nextScene !== undefined) {
+                        currentScene = choice.nextScene;
+                        saveSession();
+                        showScene(currentScene);
+                    } else if (choice.nextChapter) {
+                        currentChapter = choice.nextChapter;
+                        currentScene = 0;
+                        loadChapter(currentChapter).then(() => showScene(currentScene));
+                    }
+                };
+                btn.addEventListener('touchstart', handleChoice);
+                btn.addEventListener('click', handleChoice);
+            }
+            dialogueBox.appendChild(btn);
+        });
+    }
+}
+
+// Обработка следующей сцены
+function handleNextScene(scene, dialogueBox, overlay) {
+    if (!scene.nextScene) return;
+
+    console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
+    const handleNext = (e) => {
+        e.preventDefault();
+        console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
+        currentScene = scene.nextScene;
+        saveSession();
+        if (overlay) overlay.remove();
+        dialogueBox.style.pointerEvents = 'none';
+        showScene(currentScene);
+    };
+    dialogueBox.touchHandler = handleNext;
+    dialogueBox.addEventListener('touchstart', handleNext);
+    dialogueBox.addEventListener('click', handleNext);
+}
+
+// Обработка конца главы
+function handleChapterEnd(scene) {
+    if (scene.id !== scriptData.scenes.length - 1) return;
+
+    console.log(`[${Date.now()}] Конец главы, переход к следующей`);
+    currentChapter++;
+    currentScene = 0;
+    if (currentChapter <= 10) {
+        loadChapter(currentChapter).then(() => showScene(currentScene));
+    } else {
+        showStartScreen();
+    }
+}
+
+// Основная функция showScene
+async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes[sceneId];
     if (!scene) {
@@ -1289,17 +1443,10 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
         return;
     }
 
-    const progressElement = document.getElementById('progress');
-    const totalScenes = scriptData.scenes.length;
-    const progressPercent = ((scene.id + 1) / totalScenes) * 100;
-    progressElement.style.width = `${progressPercent}%`;
+    updateProgress(scene.id, scriptData.scenes.length);
 
-    const backgroundElement = document.getElementById('background');
-    const charLeft = document.getElementById('character-left');
-    const charRight = document.getElementById('character-right');
-    const dialogueElement = document.getElementById('dialogue-text');
     const dialogueBox = document.querySelector('.dialogue-box');
-
+    const dialogueElement = document.getElementById('dialogue-text');
     let displayText = scene.text[stats.language];
     if (stats.completionCount >= 1 && scene.second_playthrough_text) {
         displayText = scene.second_playthrough_text[stats.language];
@@ -1309,127 +1456,18 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
     const shouldFade = currentBackground !== newBackground || scene.id === scriptData.scenes.length - 1;
 
     const applyScene = async () => {
-        const bgUrl = newBackground === 'none' ? 'none' : `/heart_at_crossroads/assets/backgrounds/${newBackground}.png`;
-        if (bgUrl !== 'none' && !(await checkAssetExists(bgUrl))) {
-            console.warn(`Фон ${newBackground}.png не найден`);
-            showErrorMessage(stats.language === "ru" ? `Фон ${newBackground} не найден` : `Background ${newBackground} not found`);
-        }
-        backgroundElement.style.backgroundImage = bgUrl === 'none' ? 'none' : `url('${bgUrl}')`;
-        currentBackground = newBackground;
+        currentBackground = await setupBackground(newBackground, stats.language);
+        await setupCharacters(scene, stats.language, stats);
+        const overlay = createOverlayIfNeeded(sceneId, displayText);
+        clearDialogueHandlers(dialogueBox);
 
-        charLeft.style.backgroundImage = 'none';
-        charRight.style.backgroundImage = 'none';
-        charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-        charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
-
-        const speakerName = scene.speaker ? scene.speaker[stats.language] : '';
-        if (scene.characterLeft) {
-            const leftChar = scene.characterLeft.includes('${stats.appearance}') 
-                ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
-                : scene.characterLeft;
-            const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
-            if (!(await checkAssetExists(leftCharUrl))) {
-                console.warn(`Персонаж ${leftChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
-            }
-            charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
-            charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
-        }
-        if (scene.characterRight) {
-            const rightChar = scene.characterRight.includes('${stats.appearance}') 
-                ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
-                : scene.characterRight;
-            const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
-            if (!(await checkAssetExists(rightCharUrl))) {
-                console.warn(`Персонаж ${rightChar}.png не найден`);
-                showErrorMessage(stats.language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
-            }
-            charRight.style.backgroundImage = `url('${rightCharUrl}')`;
-            charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
-        }
-
-        document.getElementById('speaker-name').textContent = speakerName;
-
-        let overlay = null;
-        const textLower = displayText.toLowerCase();
-        if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') || 
-            textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-            const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
-            overlay = createDefaultOverlay(sceneId, sceneData);
-        }
-
-        // Очистка старых обработчиков перед вызовом typeText
-        console.log('Очистка старых обработчиков перед выводом текста');
-        dialogueBox.onclick = null;
-        dialogueBox.ontouchstart = null;
-        document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
-
-        // Внутри applyScene:
-typeText(displayText, dialogueElement, () => {
-    console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
-    dialogueBox.style.pointerEvents = 'auto';
-    if (scene.choices && scene.choices.length > 0) {
-        if (scene.choices.some(c => c.timer)) {
-            console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
-            showSceneWithTimer(scene);
-        } else {
-            console.log(`[${Date.now()}] Показываем кнопки выбора`);
-            scene.choices.forEach(choice => {
-                const btn = createChoiceButton(choice);
-                if (choice.condition && !checkCondition(choice.condition)) {
-                    btn.style.display = 'none';
-                } else if (choice.cost && stats.diamonds < choice.cost) {
-                    btn.disabled = true;
-                } else {
-                    const handleChoice = (e) => {
-                        e.preventDefault();
-                        console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
-                        if (choice.cost) stats.diamonds -= choice.cost;
-                        updateDiamondsDisplay();
-                        saveChoice(choice.id, choice.effects, choice.memoryTag);
-                        if (choice.effects) showChoiceEffects(choice.effects);
-                        if (overlay) overlay.remove();
-                        if (choice.nextScene !== undefined) {
-                            currentScene = choice.nextScene;
-                            saveSession();
-                            showScene(currentScene);
-                        } else if (choice.nextChapter) {
-                            currentChapter = choice.nextChapter;
-                            currentScene = 0;
-                            loadChapter(currentChapter).then(() => showScene(currentScene));
-                        }
-                    };
-                    btn.addEventListener('touchstart', handleChoice);
-                    btn.addEventListener('click', handleChoice);
-                }
-                dialogueBox.appendChild(btn);
-            });
-        }
-    } else if (scene.nextScene !== undefined) {
-        console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
-        const handleNext = (e) => {
-            e.preventDefault();
-            console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
-            currentScene = scene.nextScene;
-            saveSession();
-            if (overlay) overlay.remove();
-            dialogueBox.style.pointerEvents = 'none';
-            showScene(currentScene);
-        };
-        dialogueBox.touchHandler = handleNext;
-        dialogueBox.addEventListener('touchstart', handleNext);
-        dialogueBox.addEventListener('click', handleNext);
-    } else if (scene.id === scriptData.scenes.length - 1) {
-        console.log(`[${Date.now()}] Конец главы, переход к следующей`);
-        currentChapter++;
-        currentScene = 0;
-        if (currentChapter <= 10) {
-            loadChapter(currentChapter).then(() => showScene(currentScene));
-        } else {
-            showStartScreen();
-        }
-    }
-});
+        typeText(displayText, dialogueElement, () => {
+            console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
+            handleChoices(scene, dialogueBox, overlay);
+            handleNextScene(scene, dialogueBox, overlay);
+            handleChapterEnd(scene);
+        });
+    };
 
     if (shouldFade) {
         fadeOut(() => {
@@ -1437,7 +1475,7 @@ typeText(displayText, dialogueElement, () => {
             fadeIn();
         });
     } else {
-        applyScene();
+        await applyScene();
     }
 
     if (scene.leadsToEnding) {
@@ -1445,7 +1483,6 @@ typeText(displayText, dialogueElement, () => {
         loadFinals(scene.leadsToEnding);
     }
 }
-       }
 
         function showSceneWithTimer(scene, timeoutMs = 10000) {
             const progressElement = document.getElementById('progress');
