@@ -1352,14 +1352,13 @@ async function setupCharacters(scene, language, stats) {
 }
 
 // Создание оверлея
-function createOverlayIfNeeded(sceneId, displayText) {
+   function createOverlayIfNeeded(sceneId, displayText) {
     console.log(`[createOverlayIfNeeded] Проверка текста: ${displayText}`);
     const textLower = displayText.toLowerCase();
     if (textLower.includes('телефон') || textLower.includes('phone') || textLower.includes('telegram') ||
         textLower.includes('whatsapp') || textLower.includes('вконтакте') || textLower.includes('vkontakte')) {
-        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
         console.log(`[createOverlayIfNeeded] Создаём оверлей для сцены ${sceneId}`);
-        return createDefaultOverlay(sceneId, sceneData);
+        return showMessengerOverlay(sceneId); // Теперь ваш красивый SVG
     }
     return null;
 }
