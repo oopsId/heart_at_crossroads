@@ -1765,18 +1765,19 @@ function checkCondition(condition) {
 
 function typeText(text, element, callback) {
     if (isTyping) {
-        console.log('typeText уже выполняется, пропускаем вызов');
+        console.log(`[${Date.now()}] typeText уже выполняется, пропускаем вызов`);
         return;
     }
-    console.log(`Начинаем печать текста: "${text}"`);
+    const callId = Date.now(); // Уникальный ID вызова для отслеживания
+    console.log(`[${callId}] Начинаем печать текста: "${text}"`);
     isTyping = true;
     element.textContent = '';
     if (element.typeTimer) {
-        console.log('Очистка предыдущего таймера');
+        console.log(`[${callId}] Очистка предыдущего таймера`);
         clearTimeout(element.typeTimer);
     }
     const parts = text.split('||').map(part => part.trim()).filter(part => part.length > 0);
-    console.log('Частей текста:', parts.length);
+    console.log(`[${callId}] Частей текста: ${parts.length}`);
     let partIndex = 0;
     let i = 0;
     const speed = 50;
@@ -1786,7 +1787,7 @@ function typeText(text, element, callback) {
         if (dialogueBox.tapHandler) {
             dialogueBox.removeEventListener('touchstart', dialogueBox.tapHandler);
             dialogueBox.removeEventListener('click', dialogueBox.tapHandler);
-            console.log('Обработчики тапов очищены');
+            console.log(`[${callId}] Обработчики тапов очищены`);
             dialogueBox.tapHandler = null;
         }
     }
@@ -1794,41 +1795,40 @@ function typeText(text, element, callback) {
 
     function type() {
         if (partIndex >= parts.length) {
-            console.error(`Некорректный индекс: ${partIndex}, всего частей: ${parts.length}`);
+            console.error(`[${callId}] Некорректный индекс: ${partIndex}, всего частей: ${parts.length}`);
             isTyping = false;
             clearHandlers();
-            console.log('Все части текста напечатаны, вызов callback');
+            console.log(`[${callId}] Все части текста напечатаны, вызов callback`);
             if (callback) callback();
             return;
         }
         if (i < parts[partIndex].length) {
             element.textContent += parts[partIndex].charAt(i);
             i++;
-            // console.log(`Печатаем символ ${i} из части ${partIndex + 1}: "${parts[partIndex]}"`);
             element.typeTimer = setTimeout(type, speed);
         } else {
             isTyping = false;
-            console.log(`Завершена часть ${partIndex + 1} из ${parts.length}`);
+            console.log(`[${callId}] Завершена часть ${partIndex + 1} из ${parts.length}`);
         }
     }
 
     function handleTap(e) {
         e.preventDefault();
         if (isTyping) {
-            console.log(`Пропуск анимации части ${partIndex + 1}`);
+            console.log(`[${callId}] Пропуск анимации части ${partIndex + 1}`);
             clearTimeout(element.typeTimer);
             element.textContent = parts[partIndex];
             i = parts[partIndex].length;
             isTyping = false;
         } else if (partIndex < parts.length - 1) {
-            console.log(`Переход к части ${partIndex + 2}`);
+            console.log(`[${callId}] Переход к части ${partIndex + 2}`);
             partIndex++;
             i = 0;
             element.textContent = '';
             isTyping = true;
             type();
         } else {
-            console.log('Все части показаны, вызываем callback');
+            console.log(`[${callId}] Все части показаны, вызываем callback`);
             isTyping = false;
             clearHandlers();
             if (callback) callback();
@@ -1838,11 +1838,10 @@ function typeText(text, element, callback) {
     dialogueBox.tapHandler = handleTap;
     dialogueBox.addEventListener('touchstart', handleTap);
     dialogueBox.addEventListener('click', handleTap);
-    console.log('Обработчик тапов установлен');
+    console.log(`[${callId}] Обработчик тапов установлен`);
 
     type();
 }
-
 function fadeOut(callback) {
     const elements = [
         document.getElementById('background'),
