@@ -1435,23 +1435,22 @@ async function setupCharacters(scene, language, stats) {
 // Создание оверлея
    function createOverlayIfNeeded(sceneId, displayText, hasTimer = false) {
     console.log(`[createOverlayIfNeeded] Проверка сцены ${sceneId}, hasTimer: ${hasTimer}`);
-    const textLower = displayText.toLowerCase();
-    const isPhoneScene = textLower.includes('телефон') || textLower.includes('phone') || 
-                        textLower.includes('telegram') || textLower.includes('whatsapp') || 
-                        textLower.includes('вконтакте') || textLower.includes('vkontakte');
+    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
     
-    if (isPhoneScene) {
-        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+    // Проверяем поле phone в данных сцены
+    const hasPhoneField = sceneData.phone === 1;
+    
+    if (hasPhoneField) {
         if (hasTimer) {
-            console.log(`[createOverlayIfNeeded] Создаём showMessengerOverlay для сцены ${sceneId}`);
+            console.log(`[createOverlayIfNeeded] Создаём showMessengerOverlay для сцены ${sceneId} (phone=1, hasTimer=true)`);
             return showMessengerOverlay(sceneId);
         } else {
-            console.log(`[createOverlayIfNeeded] Создаём createDefaultOverlay для сцены ${sceneId}`);
+            console.log(`[createOverlayIfNeeded] Создаём createDefaultOverlay для сцены ${sceneId} (phone=1, hasTimer=false)`);
             return createDefaultOverlay(sceneId, sceneData);
         }
-    }
-    return null;
-}
+        }
+      return null;
+      }
 
 // Очистка обработчиков
 function clearDialogueHandlers(dialogueBox) {
