@@ -1466,45 +1466,97 @@ function handleChoices(scene, dialogueBox, overlay) {
     if (!scene.choices || scene.choices.length === 0) return;
 
     console.log(`[handleChoices] Обработка выбора для сцены ${scene.id}`);
-    if (scene.choices.some(c => c.timer)) {
-        console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
-        showSceneWithTimer(scene);
-    } else {
-        console.log(`[${Date.now()}] Показываем кнопки выбора`);
-        scene.choices.forEach(choice => {
-            const btn = createChoiceButton(choice);
-            if (choice.condition && !checkCondition(choice.condition)) {
-                btn.style.display = 'none';
-            } else if (choice.cost && stats.diamonds < choice.cost) {
-                btn.disabled = true;
-            } else {
-                const handleChoice = (e) => {
-                    e.preventDefault();
-                    console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
-                    if (choice.cost) stats.diamonds -= choice.cost;
-                    updateDiamondsDisplay();
-                    saveChoice(choice.id, choice.effects, choice.memoryTag);
-                    if (choice.effects) showChoiceEffects(choice.effects);
-                    if (overlay) overlay.remove();
-                    if (choice.nextScene !== undefined) {
-                        currentScene = choice.nextScene;
-                        saveSession();
-                        showScene(currentScene);
-                    } else if (choice.nextChapter) {
-                        currentChapter = choice.nextChapter;
-                        currentScene = 0;
-                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                    }
-                };
-                btn.addEventListener('touchstart', handleChoice);
-                btn.addEventListener('click', handleChoice);
+    console.log(`[${Date.now()}] Показываем кнопки выбора`);
+
+    // Очищаем старые кнопки
+    document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
+
+    scene.choices.forEach(choice => {
+        const btn = createChoiceButton(choice);
+        if (choice.condition && !checkCondition(choice.condition)) {
+            btn.style.display = 'none';
+        } else if (choice.cost && stats.diamonds < choice.cost) {
+            btn.disabled = true;
+        } else {
+            const handleChoice = (e) => {
+                e.preventDefault();
+                console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
+                if (choice.cost) stats.diamonds -= choice.cost;
+                updateDiamondsDisplay();
+                saveChoice(choice.id, choice.effects, choice.memoryTag);
+                if (choice.effects) showChoiceEffects(choice.effects);
+                if (overlay) overlay.remove();
+                dialogueBox.innerHTML = ''; // Очищаем кнопки
+                if (choice.nextScene !== undefined) {
+                    currentScene = choice.nextScene;
+                    saveSession();
+                    showScene(currentScene);
+                } else if (choice.nextChapter) {
+                    currentChapter = choice.nextChapter;
+                    currentScene = 0;
+                    loadChapter(currentChapter).then(() => showScene(currentScene));
+                }
+            };
+            btn.addEventListener('touchstart', handleChoice, { passive: false });
+            btn.addEventListener('click', handleChoice);
+        }
+        dialogueBox.appendChild(btn);
+    });
+
+    // Таймер, если есть "timer" в сцене или выборе
+    if (scene.timer || scene.choices.some(c => c.timer)) {
+        const timerDuration = (scene.timer || scene.choices.find(c => c.timer)?.timer) * 1000;
+        console.log(`[${Date.now()}] Запуск таймера на ${timerDuration / 1000} секунд`);
+        let timeLeft = timerDuration / 1000;
+
+        const countdownElement = document.createElement('div');
+        countdownElement.id = 'timer-countdown';
+        countdownElement.textContent = timeLeft;
+        document.getElementById('game-container').appendChild(countdownElement);
+
+        const tickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_tick.mp3');
+        tickSound.loop = false;
+        tickSound.play().catch(err => {
+            console.warn('Ошибка воспроизведения sfx_tick:', err);
+            showErrorMessage(stats.language === "ru" ? 'Звук sfx_tick.mp3 не найден' : 'Sound sfx_tick.mp3 not found');
+        });
+
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            if (overlay) {
+                overlay.classList.add('flash-svg');
+                setTimeout(() => overlay.classList.remove('flash-svg'), 500);
             }
-            dialogueBox.appendChild(btn);
+            if ('vibrate' in navigator) navigator.vibrate(200);
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                tickSound.pause();
+                countdownElement.remove();
+                console.log(`[${Date.now()}] Время вышло, переход к умолчанию`);
+                const defaultChoice = scene.choices.find(c => c.id === 'ignore') || scene.choices[0];
+                if (overlay) overlay.remove();
+                currentScene = defaultChoice.nextScene;
+                saveSession();
+                showScene(currentScene);
+            }
+        }, 1000);
+
+        // Останавливаем таймер при выборе
+        scene.choices.forEach(choice => {
+            const btn = dialogueBox.querySelector(`.choice-btn:nth-child(${scene.choices.indexOf(choice) + 1})`);
+            const stopTimer = () => {
+                clearInterval(countdownInterval);
+                tickSound.pause();
+                countdownElement.remove();
+            };
+            btn.addEventListener('touchstart', stopTimer, { once: true });
+            btn.addEventListener('click', stopTimer, { once: true });
         });
     }
 }
 
-// Обработка следующей сцены
+                                  // Обработка следующей сцены
        function handleNextScene(scene, dialogueBox, overlay) {
     if (!scene.nextScene) return;
 
@@ -1558,7 +1610,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     });
 }
 
-    async function showScene(sceneId) {
+                      async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes.find(s => s.id === sceneId);
     if (!scene) {
@@ -1587,44 +1639,43 @@ function handleChoices(scene, dialogueBox, overlay) {
         currentBackground = await setupBackground(newBackground, stats.language);
         await setupCharacters(scene, stats.language, stats);
 
-        const overlay = createOverlayIfNeeded(sceneId, displayText, scene.choices && scene.choices.some(c => c.timer));
+        // Проверяем необходимость оверлея
+        const hasTimer = scene.timer || (scene.choices && scene.choices.some(c => c.timer));
+        let overlay = createOverlayIfNeeded(sceneId, displayText, hasTimer);
+        console.log(`[showScene] Оверлей для сцены ${sceneId}: ${overlay ? 'создан' : 'не требуется'}`);
+
         clearDialogueHandlers(dialogueBox);
         dialogueBox.style.pointerEvents = 'none';
+
+        if (scene.sound) playSound(scene.sound);
+        if (scene.music) playMusic(scene.music);
 
         console.log('[applyScene] Запускаем typeText');
         typeText(displayText, dialogueElement, () => {
             console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
-            console.log(`[showScene] Проверка: scene.id=${sceneId}, totalScenes=${totalScenes}, nextScene=${scene.nextScene}`);
             dialogueBox.style.pointerEvents = 'auto';
+
             handleChoices(scene, dialogueBox, overlay);
             handleNextScene(scene, dialogueBox, overlay);
             handleChapterEnd(scene);
 
-            // Проверка на конец главы или ветки
             if (!scene.choices && scene.nextScene === null) {
                 console.log(`[showScene] nextScene === null, считаем концом главы`);
                 currentChapter++;
                 currentScene = 0;
                 loadChapter(currentChapter).then(success => {
-                    if (success) {
-                        console.log(`[showScene] Успешно перешли к главе ${currentChapter}, сцена ${currentScene}`);
-                        showScene(currentScene);
-                    } else {
-                        console.warn(`[showScene] Не удалось загрузить главу ${currentChapter}`);
-                        showStartScreen();
-                    }
+                    if (success) showScene(currentScene);
+                    else showStartScreen();
                 });
             } else if (!scene.choices && scene.nextScene === undefined) {
-                console.warn(`[showScene] Нет choices/nextScene для сцены ${sceneId}, но nextScene не null`);
+                console.warn(`[showScene] Нет choices/nextScene для сцены ${sceneId}`);
                 if (sceneId === scriptData.scenes.length - 1) {
-                    console.log(`[showScene] Это последняя сцена, завершаем главу`);
                     currentChapter++;
                     currentScene = 0;
                     loadChapter(currentChapter).then(success => {
                         if (success) showScene(currentScene);
                     });
                 } else {
-                    console.log(`[showScene] Принудительный переход к следующей сцене`);
                     addTapHandler(dialogueBox, () => {
                         if (overlay) overlay.remove();
                         currentScene = sceneId + 1;
@@ -1650,7 +1701,6 @@ function handleChoices(scene, dialogueBox, overlay) {
         loadFinals(scene.leadsToEnding);
     }
 }
-
 
                         function showSceneWithTimer(scene, timeoutMs = 10000) {
     console.log(`[showSceneWithTimer] Показ сцены ${scene.id} с таймером (${timeoutMs}мс)`);
