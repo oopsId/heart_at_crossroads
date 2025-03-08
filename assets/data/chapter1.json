@@ -16,11 +16,12 @@
             },
             "text": {
                 "ru": "Утро стремительно ворвалось в мою жизнь. Я открыла глаза и наблюдала за солнечными лучами, падающими из окна в мою комнату. Первые дни в новой квартире уже прошли, но я так и не смогла к ней привыкнуть. || Я продолжаю задаваться вопросом: «Чего же я хочу?» А в ответ — всё та же тишина, которая тянет вниз. || Я посмотрела в отражение смартфона, пригладила растрепавшиеся за ночь локоны и нехотя натянула кремовый свитер. || Смартфон мерцал на беззвучке — Катя, проявляя сестринские чувства, спамила в WhatsApp, а 'ВКонтакте' прислал свежие гороскопы с давно забытой подписки: «Весы, сегодня тебя ждёт выбор». || Смешно. Я не верю в звёзды, но вдруг они правы? Ещё и ТикТок начал рекомендовать странные видео про судьбу. || И всё же эта моя новая жизнь — новое начало или ложная надежда? А вот и подруженька...",
-                "en": "Morning burst into my life abruptly. I opened my eyes and watched the sunlight streaming through the window into my room. The first days in the new apartment had already passed, but I still couldn’t get used to it. || I keep asking myself the question: “What do I want?” And in response, there’s still the same silence that drags me down. || I looked at my reflection in the smartphone, smoothed out the curls that had gotten messy overnight, and reluctantly pulled on a cream sweater. || The smartphone flickered on silent mode — Katya, showing sisterly affection, was spamming me on WhatsApp, and 'VKontakte' sent fresh horoscopes from a long-forgotten subscription: “Libra, a choice awaits you today.” || Funny. I don’t believe in the stars, but what if they’re right? Even TikTok started recommending weird videos about fate. || And yet, is this new life of mine a fresh start or a false hope? And here comes my dear friend..."
+                "en": "Morning burst into my life abruptly. I opened my eyes and watched the sunlight streaming through the window into my room. The first days in the new apartment had already passed, but I still couldn't get used to it. || I keep asking myself the question: 'What do I want?' And in response, there's still the same silence that drags me down. || I looked at my reflection in the smartphone, smoothed out the curls that had gotten messy overnight, and reluctantly pulled on a cream sweater. || The smartphone flickered on silent mode — Katya, showing sisterly affection, was spamming me on WhatsApp, and 'VKontakte' sent fresh horoscopes from a long-forgotten subscription: 'Libra, a choice awaits you today.' || Funny. I don't believe in the stars, but what if they're right? Even TikTok started recommending weird videos about fate. || And yet, is this new life of mine a fresh start or a false hope? And here comes my dear friend..."
             },
+            "phone": 1,
             "second_playthrough_text": {
                 "ru": "Утро стремительно ворвалось в мою жизнь. Я открыла глаза и наблюдала за солнечными лучами, падающими из окна в мою комнату. Первые дни в новой квартире уже прошли, но я так и не смогла к ней привыкнуть. || Я продолжаю задаваться вопросом: «Чего же я хочу?» А в ответ — всё та же тишина, которая тянет вниз. || Я посмотрела в отражение смартфона, пригладила растрепавшиеся за ночь локоны и нехотя натянула кремовый свитер. || Смартфон мерцал на беззвучке — Катя, проявляя сестринские чувства, спамила в WhatsApp, а 'ВКонтакте' прислал свежие гороскопы с давно забытой подписки: «Весы, сегодня тебя ждёт выбор». || Смешно. Я не верю в звёзды, но вдруг они правы? Ещё и ТикТок начал рекомендовать странные видео про судьбу. || И всё же эта моя новая жизнь — новое начало или ложная надежда? А вот и подруженька...",
-                "en": "Morning burst into my life abruptly. I opened my eyes and watched the sunlight streaming through the window into my room. The first days in the new apartment had already passed, but I still couldn’t get used to it. || I keep asking myself the question: “What do I want?” And in response, there’s still the same silence that drags me down. || I looked at my reflection in the smartphone, smoothed out the curls that had gotten messy overnight, and reluctantly pulled on a cream sweater. || The smartphone flickered on silent mode — Katya, showing sisterly affection, was spamming me on WhatsApp, and 'VKontakte' sent fresh horoscopes from a long-forgotten subscription: “Libra, a choice awaits you today.” || Funny. I don’t believe in the stars, but what if they’re right? Even TikTok started recommending weird videos about fate. || And yet, is this new life of mine a fresh start or a false hope? And here comes my dear friend..."
+                "en": "Morning burst into my life abruptly. I opened my eyes and watched the sunlight streaming through the window into my room. The first days in the new apartment had already passed, but I still couldn't get used to it. || I keep asking myself the question: 'What do I want?' And in response, there's still the same silence that drags me down. || I looked at my reflection in the smartphone, smoothed out the curls that had gotten messy overnight, and reluctantly pulled on a cream sweater. || The smartphone flickered on silent mode — Katya, showing sisterly affection, was spamming me on WhatsApp, and 'VKontakte' sent fresh horoscopes from a long-forgotten subscription: 'Libra, a choice awaits you today.' || Funny. I don't believe in the stars, but what if they're right? Even TikTok started recommending weird videos about fate. || And yet, is this new life of mine a fresh start or a false hope? And here comes my dear friend..."
             },
             "sound": "sfx_morning_birds",
             "music": "bgm_morning_melancholy",
@@ -37,11 +38,13 @@
             },
             "text": {
                 "ru": "«Аньчик, у меня тааакие новости. Хочешь сходить со мной в одно интересное место? Слышала что-нибудь про офис TrendWare? Тогда пошли, по дороге расскажу.»",
-                "en": "«Anychik, I’ve got suuuuch news. Want to come with me to an interesting place? Have you heard anything about the TrendWare office? Then let’s go, I’ll tell you on the way.»"
+                "en": "Anychik, I've got suuuuch news. Want to come with me to an interesting place? Have you heard anything about the TrendWare office? Then let's go, I'll tell you on the way."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "«Ань, опять ты тут? Помнишь, как мы уже ходили по этим тропам? ‘TrendWave’ зовёт снова, идём!»",
-                "en": "‘Anya, you again? Remember how we’ve tread these paths before? ‘TrendWave’ calls again, let’s go!’)"
+                "ru": "«Ань, опять ты тут? Помнишь, как мы уже ходили по этим тропам? 'TrendWave' зовёт снова, идём!»",
+                "en": "Anya, you again? Remember how we've tread these paths before? 'TrendWave' calls again, let's go!"
             },
             "new_detail": {
                 "ru": "Вика мельком взглянула на старое фото на столе — мы вдвоём, ещё до её работы в клубе.",
@@ -61,9 +64,11 @@
                 "en": "Anna"
             },
             "text": {
-                "ru": "Я скосила взгляд на телефон — три пропущенных от Вики и сообщение в Telegram: ‘Ты где?’. Сердце сжалось, как будто знало больше, чем я.|| «Не знаю… Может, останусь? Чувствую себя потерянной.»",
-                "en": "I glanced at my phone — three missed calls from Vika and a Telegram message: ‘Where you at?’. My heart tightened, as if it knew more than I did. ‘I don’t know… Maybe stay? I feel lost.’"
+                "ru": "Я скосила взгляд на телефон — три пропущенных от Вики и сообщение в Telegram: 'Ты где?'. Сердце сжалось, как будто знало больше, чем я.",
+                "en": "I glanced at my phone — three missed calls from Vika and a Telegram message: 'Where you at?'. My heart tightened, as if it knew more than I did."
             },
+            "phone": 1,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Я скосила взгляд на телефон — три пропущенных от Вики. Странно, но я словно знала об этом заранее. «Не знаю, Вик... Иногда кажется, будто мы ходим по кругу, понимаешь? Как в петле времени.»",
                 "en": "I glanced at my phone — three missed calls from Vika. Strange, but I somehow knew about them in advance. 'I don't know, Vik... Sometimes it feels like we're going in circles, you know? Like in a time loop.'"
@@ -83,11 +88,13 @@
             },
             "text": {
                 "ru": "«Останешься — пропадёшь тут одна с этими стенами. Там движ, люди, шансы! Без тебя не пойду, ладно?»",
-                "en": "‘Stay here and you’ll fade away alone with these walls. There’s action, people, chances! I won’t go without you, okay?’"
+                "en": "Stay here and you'll fade away alone with these walls. There's action, people, chances! I won't go without you, okay?"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Останешься — пропадёшь тут одна с этими стенами. Они съедят тебя, Аня! Там движ, люди, шансы! Жизнь проходит мимо тебя, понимаешь? Без тебя не пойду, ладно? Пожалуйста...»",
-                "en": "'Stay here and you'll fade away alone with these walls. They'll eat you alive, Anna! There's action, people, chances! Life is passing you by, don't you see? I won't go without you, okay? Please...'"
+                "en": "Stay here and you'll fade away alone with these walls. They'll eat you alive, Anna! There's action, people, chances! Life is passing you by, don't you see? I won't go without you, okay? Please..."
             },
             "sound": "sfx_footsteps_highheels",
             "music": null,
@@ -96,7 +103,7 @@
                     "id": "agree",
                     "text": {
                         "ru": "Ладно, идём",
-                        "en": "Alright, let’s go"
+                        "en": "Alright, let's go"
                     },
                     "nextScene": 4,
                     "effects": { "crown": 1, "relationships.vika": 1 }
@@ -105,7 +112,7 @@
                     "id": "refuse",
                     "text": {
                         "ru": "Нет, останусь",
-                        "en": "No, I’ll stay"
+                        "en": "No, I'll stay"
                     },
                     "nextScene": 5,
                     "effects": { "heart": 1, "relationships.vika": -1 }
@@ -114,7 +121,7 @@
                     "id": "premium",
                     "text": {
                         "ru": "Что за студия? Расскажи! (5 бриллиантов)",
-                        "en": "What’s this studio? Tell me! (5 diamonds)"
+                        "en": "What's this studio? Tell me! (5 diamonds)"
                     },
                     "nextScene": 6,
                     "cost": 5,
@@ -133,11 +140,13 @@
             },
             "text": {
                 "ru": "«Вот это я понимаю! Собирайся, Аньчик, встряхнём этот город!»",
-                "en": "‘Now that’s what I’m talking about! Get ready, Anyushka, let’s shake up this city!’"
+                "en": "Now that's what I'm talking about! Get ready, Anyushka, let's shake up this city!"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Вот это я понимаю! Собирайся, Аньчик, встряхнём этот город! Они даже не подозревают, какая буря к ним приближается!»",
-                "en": "'Now that's what I'm talking about! Get ready, Anyushka, let's shake up this city! They don't even suspect what storm is coming their way!'"
+                "en": "Now that's what I'm talking about! Get ready, Anyushka, let's shake up this city! They don't even suspect what storm is coming their way!"
             },
             "sound": "sfx_excited_laugh",
             "music": "bgm_upbeat_friendship",
@@ -154,11 +163,13 @@
             },
             "text": {
                 "ru": "«Серьёзно? Ладно, сиди, но я ещё вернусь за тобой.»",
-                "en": "‘Seriously? Fine, stay, but I’ll come back for you.’"
+                "en": "Seriously? Fine, stay, but I'll come back for you."
             },
+            "phone": 1,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Серьёзно? Ты опять закрываешься от мира? Ладно, сиди, но я ещё вернусь за тобой. Ты не можешь вечно прятаться, Аня.»",
-                "en": "'Seriously? Shutting yourself off from the world again? Fine, stay, but I'll come back for you. You can't hide forever, Anna.'"
+                "en": "Seriously? Shutting yourself off from the world again? Fine, stay, but I'll come back for you. You can't hide forever, Anna."
             },
             "sound": "sfx_disappointed_sigh",
             "music": "bgm_melancholy_moment",
@@ -174,12 +185,14 @@
                 "en": "Vika"
             },
             "text": {
-                "ru": "«‘TrendWave’ — не просто контора. Во ‘ВКонтакте’ пишут, что они что-то мутят, глубже, чем сайты. Хочу сама узнать, что там.»",
-                "en": "‘‘TrendWave’ isn’t just a company. People on ‘VKontakte’ say they’re up to something, deeper than websites. I want to figure it out myself.’"
+                "ru": "«'TrendWave' — не просто контора. Во 'ВКонтакте' пишут, что они что-то мутят, глубже, чем сайты. Хочу сама узнать, что там.»",
+                "en": "'TrendWave' isn't just a company. People on 'VKontakte' say they're up to something, deeper than websites. I want to figure it out myself."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "«'TrendWave' — не просто контора. Знаешь, во 'ВКонтакте' пишут, что они что-то мутят, глубже, чем сайты. Какие-то революционные технологии и разработки. Я слышала, что у них офигенные проекты и какой-то безумно харизматичный босс.|| Хочу сама узнать, что там. Может, это наш шанс изменить всё.»",
-                "en": "''TrendWave' isn't just a company. You know, people on 'VKontakte' say they're up to something, deeper than websites. Some revolutionary technologies and developments. I've heard they have amazing projects and some insanely charismatic boss. I want to figure it out myself. This could be our chance to change everything.'"
+                "ru": "'TrendWave' — не просто контора. Знаешь, во 'ВКонтакте' пишут, что они что-то мутят, глубже, чем сайты. Какие-то революционные технологии и разработки. Я слышала, что у них офигенные проекты и какой-то безумно харизматичный босс.|| Хочу сама узнать, что там. Может, это наш шанс изменить всё.",
+                "en": "'TrendWave' isn't just a company. You know, people on 'VKontakte' say they're up to something, deeper than websites. Some revolutionary technologies and developments. I've heard they have amazing projects and some insanely charismatic boss. I want to figure it out myself. This could be our chance to change everything."
             },
             "sound": "sfx_quiet_whisper",
             "music": "bgm_mystery_reveal",
@@ -195,12 +208,14 @@
                 "en": "Anna"
             },
             "text": {
-                "ru": "Мы вышли из дома, и телефон завибрировал в кармане шубки. Лёша в Telegram: ‘Тусим вечером, Дима будет. Приходи!’ Я замерла, глядя на экран. Что я чувствую? Тепло от его слов или просто привычка отвечать? Может, гороскоп во ‘ВКонтакте’ был прав про выбор?",
-                "en": "We stepped out of the house, and my phone buzzed in my fur coat pocket. Lyosha on Telegram: ‘Party tonight, Dima’s coming. Be there!’ I froze, staring at the screen. What do I feel? Warmth from his words or just a habit of replying? Maybe that horoscope on ‘VKontakte’ was right about a choice?"
+                "ru": "Мы вышли из дома, и телефон завибрировал в кармане шубки. Лёша в Telegram: 'Тусим вечером, Дима будет. Приходи!'. Я замерла, глядя на экран. Что я чувствую? Тепло от его слов или просто привычка отвечать? Может, гороскоп во 'ВКонтакте' был прав про выбор?",
+                "en": "We stepped out of the house, and my phone buzzed in my fur coat pocket. Lyosha on Telegram: 'Party tonight, Dima's coming. Be there!'. I froze, staring at the screen. What do I feel? Warmth from his words or just a habit of replying? Maybe that horoscope on 'VKontakte' was right about a choice?"
             },
+            "phone": 1,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "Мы вышли из дома, и телефон завибрировал в кармане шубки. Лёша в Telegram: 'Тусим вечером, Дима будет. Приходи, будет круто! Скучаю по тебе!'|| Я замерла, глядя на экран. Что я чувствую теперь? Не дежавю — скорее усталость от повторения. Словно вселенная играет со мной, предлагая те же выборы.",
-                "en": "We stepped out of the house, and my phone buzzed in my fur coat pocket. Lyosha on Telegram: 'Party tonight, Dima's coming. Be there, it'll be awesome! Miss you!' I froze, staring at the screen. What do I feel now? Not déjà vu — more like fatigue from repetition. As if the universe is playing with me, offering the same choices."
+                "ru": "Мы вышли из дома, и телефон завибрировал в кармане шубки. Лёша в Telegram: 'Тусим вечером, Дима будет. Приходи, будет круто! Скучаю по тебе!'.|| Я замерла, глядя на экран. Что я чувствую теперь? Не дежавю — скорее усталость от повторения. Словно вселенная играет со мной, предлагая те же выборы.",
+                "en": "We stepped out of the house, and my phone buzzed in my fur coat pocket. Lyosha on Telegram: 'Party tonight, Dima's coming. Be there, it'll be awesome! Miss you!'. I froze, staring at the screen. What do I feel now? Not déjà vu — more like fatigue from repetition. As if the universe is playing with me, offering the same choices."
             },
             "sound": "sfx_phone_vibrate",
             "music": "bgm_tension_rise",
@@ -208,8 +223,8 @@
                 {
                     "id": "yes",
                     "text": {
-                        "ru": "[Ответить: ‘Ок, буду!’] (10 сек)",
-                        "en": "[Reply: ‘Ok, I’ll be there!’] (10 sec)"
+                        "ru": "[Ответить: 'Ок, буду!'] (10 сек)",
+                        "en": "[Reply: 'Ok, I'll be there!'] (10 sec)"
                     },
                     "timer": 10,
                     "nextScene": 8,
@@ -219,8 +234,8 @@
                 {
                     "id": "no",
                     "text": {
-                        "ru": "[Ответить: ‘Не сегодня’] (10 сек)",
-                        "en": "[Reply: ‘Not tonight’] (10 sec)"
+                        "ru": "[Ответить: 'Не сегодня'] (10 сек)",
+                        "en": "[Reply: 'Not tonight'] (10 sec)"
                     },
                     "timer": 10,
                     "nextScene": 9,
@@ -248,11 +263,13 @@
             },
             "text": {
                 "ru": "«Класс! Дима с фотками будет, заценишь.»",
-                "en": "‘Cool! Dima’s bringing pics, you’ll love it.’"
+                "en": "Cool! Dima's bringing pics, you'll love it."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Класс! Дима с фотками будет, заценишь. Есть что-то особенное, что хочешь увидеть? ;)»",
-                "en": "'Cool! Dima's bringing pics, you'll love it. Anything special you want to see? ;)'"
+                "en": "Cool! Dima's bringing pics, you'll love it. Anything special you want to see? ;)"
             },
             "sound": "sfx_message_sent",
             "music": null,
@@ -269,11 +286,13 @@
             },
             "text": {
                 "ru": "«Опять ты за своё. Ладно, подумаю, как тебя вытащить.»",
-                "en": "‘You’re at it again. Fine, I’ll figure out how to drag you out.’"
+                "en": "You're at it again. Fine, I'll figure out how to drag you out."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Опять ты за своё. Ладно, подумаю, как тебя вытащить. Дима особенно расстроится — он там что-то особенное подготовил.»",
-                "en": "'You're at it again. Fine, I'll figure out how to drag you out. Dima will be especially disappointed — he prepared something special there.'"
+                "en": "You're at it again. Fine, I'll figure out how to drag you out. Dima will be especially disappointed — he prepared something special there."
             },
             "sound": "sfx_message_sent",
             "music": null,
@@ -292,6 +311,8 @@
                 "ru": "Я убрала телефон в карман. Лёша подождёт. Но что-то внутри шепнуло: вдруг это ошибка?",
                 "en": "I slipped the phone into my pocket. Lyosha can wait. But something inside whispered: what if this is a mistake?"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Я убрала телефон в карман. Лёша подождёт. Но что-то внутри шепнуло: вдруг это ошибка? Сердце болезненно сжалось, словно предчувствуя последствия.",
                 "en": "I slipped the phone into my pocket. Lyosha can wait. But something inside whispered: what if this is a mistake? My heart painfully tightened, as if foreseeing the consequences."
@@ -310,9 +331,11 @@
                 "en": "Anna"
             },
             "text": {
-                "ru": "Мы вошли в ‘TrendWave’, и воздух здесь был пропитан чем-то чужим — белые стены сияли холодом, золотые линии резали глаза, люди уткнулись в экраны, будто не замечая мира. ||Я поправила шубку, кожаные штаны скрипнули — свобода или просто маска? Что я чувствую? Это не моё место или я просто не готова?",
-                "en": "We stepped into ‘TrendWave’, and the air here was steeped in something foreign — white walls glowed with coldness, golden lines cut into my eyes, people buried in screens as if the world didn’t exist. I adjusted my fur coat, my leather pants creaked — freedom or just a mask? What do I feel? This isn’t my place, or am I just not ready?"
+                "ru": "Мы вошли в 'TrendWave', и воздух здесь был пропитан чем-то чужим — белые стены сияли холодом, золотые линии резали глаза, люди уткнулись в экраны, будто не замечая мира. ||Я поправила шубку, кожаные штаны скрипнули — свобода или просто маска? Что я чувствую? Это не моё место или я просто не готова?",
+                "en": "We stepped into 'TrendWave', and the air here was steeped in something foreign — white walls glowed with coldness, golden lines cut into my eyes, people buried in screens as if the world didn't exist. I adjusted my fur coat, my leather pants creaked — freedom or just a mask? What do I feel? This isn't my place, or am I just not ready?"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Мы вошли в 'TrendWave', и меня окутало странное чувство — будто я вернулась в место, которое хотела забыть. Те же белые стены, то же золотое сияние, те же люди с экранами.|| Но теперь всё казалось декорацией, игрой света и тени. Я поправила шубку, зная каждый угол, каждый поворот этого лабиринта.",
                 "en": "We stepped into 'TrendWave', and a strange feeling enveloped me — as if I'd returned to a place I wanted to forget. The same white walls, the same golden glow, the same people with screens. But now everything seemed like a decoration, a play of light and shadow. I adjusted my fur coat, knowing every corner, every turn of this labyrinth."
@@ -332,11 +355,13 @@
             },
             "text": {
                 "ru": "Я шагнула к лифту, и вдруг — столкновение. Парень — худой, очки сползли, свитер мятый — уронил телефон и поднял на меня взгляд. «Ой… Прости. Ты не из студии? Я Марк, айтишник, этаж ниже.»",
-                "en": "I stepped toward the elevator, and suddenly — a collision. A guy — thin, glasses slipping, sweater rumpled — dropped his phone and looked up at me. ‘Oh… Sorry. You’re not from the studio? I’m Mark, IT guy, floor below.’"
+                "en": "I stepped toward the elevator, and suddenly — a collision. A guy — thin, glasses slipping, sweater rumpled — dropped his phone and looked up at me. 'Oh… Sorry. You're not from the studio? I'm Mark, IT guy, floor below.'"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Я шагнула к лифту, и вдруг — столкновение. Парень — худой, очки сползли, свитер мятый — уронил телефон и поднял на меня взгляд. Его глаза встретились с моими, и в них промелькнуло странное узнавание. «Ой… Прости. Ты не из студии? Я Марк, айтишник, этаж ниже. Странно, но у меня такое чувство, будто мы уже встречались.»",
-                "en": "I stepped toward the elevator, and suddenly — a collision. A guy — thin, glasses slipping, sweater rumpled — dropped his phone and looked up at me. His eyes met mine, and a strange recognition flashed in them. ‘Oh… Sorry. You’re not from the studio? I’m Mark, IT guy, floor below. Strange, but I have this feeling like we’ve met before.’"
+                "en": "I stepped toward the elevator, and suddenly — a collision. A guy — thin, glasses slipping, sweater rumpled — dropped his phone and looked up at me. His eyes met mine, and a strange recognition flashed in them. 'Oh… Sorry. You're not from the studio? I'm Mark, IT guy, floor below. Strange, but I have this feeling like we've met before.'"
             },
             "sound": "sfx_collision_drop",
             "music": null,
@@ -344,8 +369,8 @@
                 {
                     "id": "smile",
                     "text": {
-                        "ru": "Улыбнуться: ‘Нет, я с подругой’",
-                        "en": "Smile: ‘No, I’m with a friend’"
+                        "ru": "Улыбнуться: 'Нет, я с подругой'",
+                        "en": "Smile: 'No, I'm with a friend'"
                     },
                     "nextScene": 13,
                     "effects": { "heart": 1 }
@@ -353,8 +378,8 @@
                 {
                     "id": "tease",
                     "text": {
-                        "ru": "Сказать: ‘Ты всегда такой неловкий?’",
-                        "en": "Say: ‘Are you always this clumsy?’"
+                        "ru": "Сказать: 'Ты всегда такой неловкий?'",
+                        "en": "Say: 'Are you always this clumsy?'"
                     },
                     "nextScene": 14,
                     "effects": { "crown": 1, "memoryTag": "mark_remembers_tease" }
@@ -381,11 +406,13 @@
             },
             "text": {
                 "ru": "«А… ну, ладно. Пока.»",
-                "en": "‘Oh… well, okay. Bye.’"
+                "en": "Oh… well, okay. Bye."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«А… ну, ладно. Твоя улыбка… всё такая же. Как будто я видел её прежде. Странное чувство…»",
-                "en": "‘Oh… well, okay. Your smile… still the same. Like I’ve seen it before. Strange feeling…’"
+                "en": "Oh… well, okay. Your smile… still the same. Like I've seen it before. Strange feeling…"
             },
             "sound": "sfx_awkward_silence",
             "music": null,
@@ -402,11 +429,13 @@
             },
             "text": {
                 "ru": "«Не всегда… Пока!»",
-                "en": "‘Not always… Bye!’"
+                "en": "Not always… Bye!"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Не всегда… Хотя рядом с тобой я почему-то всегда теряюсь. Как по сценарию. Забавно, да?»",
-                "en": "‘Not always… Though around you I somehow always get flustered. Like it’s scripted. Funny, isn’t it?’"
+                "en": "Not always… Though around you I somehow always get flustered. Like it's scripted. Funny, isn't it?"
             },
             "sound": "sfx_nervous_laugh",
             "music": null,
@@ -425,9 +454,11 @@
                 "ru": "Я отвернулась, но его взгляд остался за спиной, тёплый и неловкий.",
                 "en": "I turned away, but his gaze lingered behind me, warm and awkward."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Я отвернулась, но его взгляд остался за спиной, тёплый и неловкий. Как будто он знал, что я уйду, и всё равно смотрел, будто надеялся на другой исход.",
-                "en": "I turned away, but his gaze lingered behind me, warm and awkward. As if he knew I’d leave, yet still watched, hoping for a different ending."
+                "en": "I turned away, but his gaze lingered behind me, warm and awkward. As if he knew I'd leave, yet still watched, hoping for a different ending."
             },
             "sound": "sfx_footsteps_sneakers",
             "music": "bgm_fleeting_moment",
@@ -444,11 +475,13 @@
             },
             "text": {
                 "ru": "Вика вернулась с мужчиной — высокий, в пиджаке, взгляд острый. «Аннабель, это Сергей, босс тут. Ты вовремя!»",
-                "en": "Vika returned with a man — tall, in a blazer, sharp gaze. ‘Annabelle, this is Sergey, the boss here. Perfect timing!’"
+                "en": "Vika returned with a man — tall, in a blazer, sharp gaze. 'Annabelle, this is Sergey, the boss here. Perfect timing!'"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Вика вернулась с мужчиной — высокий, в пиджаке, взгляд острый, слишком знакомый. «Аннабель, это Сергей, босс тут. Ты вовремя! Хотя, кажется, ты уже знаешь, как это работает, да?»",
-                "en": "Vika returned with a man — tall, in a blazer, sharp gaze, all too familiar. ‘Annabelle, this is Sergey, the boss here. Perfect timing! Though it feels like you already know how this goes, don’t you?’"
+                "en": "Vika returned with a man — tall, in a blazer, sharp gaze, all too familiar. 'Annabelle, this is Sergey, the boss here. Perfect timing! Though it feels like you already know how this goes, don't you?'"
             },
             "sound": "sfx_office_chatter",
             "music": null,
@@ -465,11 +498,13 @@
             },
             "text": {
                 "ru": "«Ты Анна? Вика много о тебе говорила.»",
-                "en": "‘You’re Anna? Vika’s told me a lot about you.’"
+                "en": "You're Anna? Vika's told me a lot about you."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Ты Анна? Вика много о тебе говорила. Хотя, кажется, я уже слышал это имя где-то… странное ощущение.»",
-                "en": "‘You’re Anna? Vika’s told me a lot about you. Though it feels like I’ve heard that name somewhere before… weird feeling.’"
+                "en": "You're Anna? Vika's told me a lot about you. Though it feels like I've heard that name somewhere before… weird feeling."
             },
             "sound": "sfx_confident_step",
             "music": null,
@@ -477,8 +512,8 @@
                 {
                     "id": "polite",
                     "text": {
-                        "ru": "Кивнуть: ‘Приятно познакомиться’",
-                        "en": "Nod: ‘Nice to meet you’"
+                        "ru": "Кивнуть: 'Приятно познакомиться'",
+                        "en": "Nod: 'Nice to meet you'"
                     },
                     "nextScene": 18,
                     "effects": { "crown": 1, "memoryTag": "sergey_remembers_polite" }
@@ -486,8 +521,8 @@
                 {
                     "id": "honest",
                     "text": {
-                        "ru": "Сказать: ‘Я тут случайно, Вик’",
-                        "en": "Say: ‘I’m here by chance, Vik’"
+                        "ru": "Сказать: 'Я тут случайно, Вик'",
+                        "en": "Say: 'I'm here by chance, Vik'"
                     },
                     "nextScene": 19,
                     "effects": { "leaf": 1, "memoryTag": "vika_remembers_honest" }
@@ -495,8 +530,8 @@
                 {
                     "id": "premium",
                     "text": {
-                        "ru": "Улыбнуться: ‘Виктория всегда удивляет’ (15 бриллиантов)",
-                        "en": "Smile: ‘Viktoria always surprises’ (15 diamonds)"
+                        "ru": "Улыбнуться: 'Виктория всегда удивляет' (15 бриллиантов)",
+                        "en": "Smile: 'Viktoria always surprises' (15 diamonds)"
                     },
                     "nextScene": 20,
                     "cost": 15,
@@ -515,11 +550,13 @@
             },
             "text": {
                 "ru": "«Взаимно.»",
-                "en": "‘Likewise.’"
+                "en": "Likewise."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Взаимно. Почему-то кажется, что мы могли бы быть старыми знакомыми.»",
-                "en": "‘Likewise. For some reason, it feels like we could be old acquaintances.’"
+                "en": "Likewise. For some reason, it feels like we could be old acquaintances."
             },
             "sound": "sfx_chair_shift",
             "music": null,
@@ -536,11 +573,13 @@
             },
             "text": {
                 "ru": "«Аньчик, не порти момент…»",
-                "en": "‘Anyushka, don’t ruin the moment…’"
+                "en": "Anyushka, don't ruin the moment…"
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«Аньчик, опять ты так говоришь? Не порти момент, я же знаю, что ты можешь лучше.»",
-                "en": "‘Anyushka, saying that again? Don’t ruin the moment, I know you can do better.’"
+                "en": "Anyushka, saying that again? Don't ruin the moment, I know you can do better."
             },
             "sound": "sfx_worried_gasp",
             "music": null,
@@ -557,11 +596,13 @@
             },
             "text": {
                 "ru": "«И ты тоже. Интересно.»",
-                "en": "‘And you too. Interesting.’"
+                "en": "And you too. Interesting."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "«И ты тоже. Интересно, как будто мы уже пересекались где-то в другой жизни.»",
-                "en": "‘And you too. Interesting, like we’ve crossed paths in another life.’"
+                "en": "And you too. Interesting, like we've crossed paths in another life."
             },
             "sound": "sfx_subtle_chuckle",
             "music": null,
@@ -577,12 +618,14 @@
                 "en": "Anna"
             },
             "text": {
-                "ru": "Вечер окутал город мягкими тенями, шубка грела плечи, кроссовки шуршали по листьям. Телефон завибрировал — Марк в Telegram: ‘Ты красивая, когда теряешься.’ Сердце сжалось, пальцы дрогнули над экраном. ||Что я чувствую? Тепло? Или это просто слова? Гороскоп во ‘ВКонтакте’ говорил про выбор, и вот он — прямо передо мной.",
-                "en": "Evening draped the city in soft shadows, my fur coat warmed my shoulders, sneakers rustled through leaves. My phone buzzed — Mark on Telegram: ‘You’re beautiful when you’re lost.’ My heart tightened, fingers hovered over the screen.||What do I feel? Warmth? Or just words? The horoscope on ‘VKontakte’ mentioned a choice, and here it is — right in front of me."
+                "ru": "Вечер окутал город мягкими тенями, шубка грела плечи, кроссовки шуршали по листьям. Телефон завибрировал — Марк в Telegram: 'Ты красивая, когда теряешься.' Сердце сжалось, пальцы дрогнули над экраном. ||Что я чувствую? Тепло? Или это просто слова? Гороскоп во 'ВКонтакте' говорил про выбор, и вот он — прямо передо мной.",
+                "en": "Evening draped the city in soft shadows, my fur coat warmed my shoulders, sneakers rustled through leaves. My phone buzzed — Mark on Telegram: 'You're beautiful when you're lost.' My heart tightened, fingers hovered over the screen.||What do I feel? Warmth? Or just words? The horoscope on 'VKontakte' mentioned a choice, and here it is — right in front of me."
             },
+            "phone": 1,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "Вечер окутал город мягкими тенями, шубка грела плечи, кроссовки шуршали по листьям. Телефон завибрировал — Марк в Telegram: ‘Ты красивая, когда теряешься.’ Я знала, что он напишет это, и всё равно сердце сжалось. ||Что я чувствую? Тепло знакомых слов или тень старых ошибок? Гороскоп во ‘ВКонтакте’ опять оказался прав — выбор снова здесь.",
-                "en": "Evening draped the city in soft shadows, my fur coat warmed my shoulders, sneakers rustled through leaves. My phone buzzed — Mark on Telegram: ‘You’re beautiful when you’re lost.’ I knew he’d write this, yet my heart still tightened.|| What do I feel? The warmth of familiar words or the shadow of old mistakes? The horoscope on ‘VKontakte’ was right again — the choice is back."
+                "ru": "Вечер окутал город мягкими тенями, шубка грела плечи, кроссовки шуршали по листьям. Телефон завибрировал — Марк в Telegram: 'Ты красивая, когда теряешься.' Я знала, что он напишет это, и всё равно сердце сжалось. ||Что я чувствую? Тепло знакомых слов или тень старых ошибок? Гороскоп во 'ВКонтакте' опять оказался прав — выбор снова здесь.",
+                "en": "Evening draped the city in soft shadows, my fur coat warmed my shoulders, sneakers rustled through leaves. My phone buzzed — Mark on Telegram: 'You're beautiful when you're lost.' I knew he'd write this, yet my heart still tightened.|| What do I feel? The warmth of familiar words or the shadow of old mistakes? The horoscope on 'VKontakte' was right again — the choice is back."
             },
             "sound": "sfx_phone_vibrate",
             "music": "bgm_evening_dusk",
@@ -590,8 +633,8 @@
                 {
                     "id": "reply_thanks",
                     "text": {
-                        "ru": "[Ответить: ‘Спасибо, это мило’] (10 сек)",
-                        "en": "[Reply: ‘Thanks, that’s sweet’] (10 sec)"
+                        "ru": "[Ответить: 'Спасибо, это мило'] (10 сек)",
+                        "en": "[Reply: 'Thanks, that's sweet'] (10 sec)"
                     },
                     "timer": 10,
                     "nextScene": 22,
@@ -608,8 +651,8 @@
                 {
                     "id": "premium",
                     "text": {
-                        "ru": "[Ответить: ‘Докажи, что это не просто слова’] (15 бриллиантов) (10 сек)",
-                        "en": "[Reply: ‘Prove it’s not just words’] (15 diamonds) (10 sec)"
+                        "ru": "[Ответить: 'Докажи, что это не просто слова'] (15 бриллиантов) (10 сек)",
+                        "en": "[Reply: 'Prove it's not just words'] (15 diamonds) (10 sec)"
                     },
                     "timer": 10,
                     "nextScene": 24,
@@ -628,12 +671,14 @@
                 "en": "Mark"
             },
             "text": {
-                "ru": "‘Ещё увидимся.’",
-                "en": "‘See you later.’"
+                "ru": "Ещё увидимся.",
+                "en": "See you later."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "‘Ещё увидимся. Как и в прошлый раз, да?’",
-                "en": "‘See you later. Like last time, right?’"
+                "ru": "Ещё увидимся. Как и в прошлый раз, да?",
+                "en": "See you later. Like last time, right?"
             },
             "sound": "sfx_message_sent",
             "music": null,
@@ -652,9 +697,11 @@
                 "ru": "Я убрала телефон, но сердце стучало, будто знало больше, чем я.",
                 "en": "I put the phone away, but my heart pounded, as if it knew more than I did."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
                 "ru": "Я убрала телефон, но сердце стучало, будто знало, что я опять оставлю его без ответа. Как будто это уже было.",
-                "en": "I put the phone away, but my heart pounded, as if it knew I’d leave him unanswered again. Like it’s happened before."
+                "en": "I put the phone away, but my heart pounded, as if it knew I'd leave him unanswered again. Like it's happened before."
             },
             "sound": "sfx_phone_pocket",
             "music": "bgm_quiet_reflection",
@@ -670,12 +717,14 @@
                 "en": "Mark"
             },
             "text": {
-                "ru": "‘Докажу. Жди.’",
-                "en": "‘I’ll prove it. Wait and see.’"
+                "ru": "Докажу. Жди.",
+                "en": "I'll prove it. Wait and see."
             },
+            "phone": null,
+            "timer": null,
             "second_playthrough_text": {
-                "ru": "‘Докажу. Жди. Хотя, кажется, я уже обещал это… и не подвёл, верно?’",
-                "en": "‘I’ll prove it. Wait and see. Though it feels like I’ve promised this before… and didn’t let you down, right?’"
+                "ru": "Докажу. Жди. Хотя, кажется, я уже обещал это… и не подвёл, верно?",
+                "en": "I'll prove it. Wait and see. Though it feels like I've promised this before… and didn't let you down, right?"
             },
             "sound": "sfx_message_sent",
             "music": null,
