@@ -1391,36 +1391,36 @@ async function setupCharacters(scene, language, stats) {
     console.log(`[setupCharacters] Настройка персонажей для сцены ${scene.id}`);
     const charLeft = document.getElementById('character-left');
     const charRight = document.getElementById('character-right');
-    const speakerName = scene.speaker ? scene.speaker[language] : '';
+    
+    if (!charLeft || !charRight) {
+        console.error('[setupCharacters] Один из элементов персонажей не найден:', { charLeft, charRight });
+        return;
+    }
 
     charLeft.style.backgroundImage = 'none';
     charRight.style.backgroundImage = 'none';
     charLeft.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
     charRight.classList.remove('character-speaker', 'character-non-speaker', 'shiver', 'heartbeat');
 
+    const speakerName = scene.speaker ? scene.speaker[language] : '';
     if (scene.characterLeft) {
-        const leftChar = scene.characterLeft.includes('${stats.appearance}')
+        const leftChar = scene.characterLeft.includes('${stats.appearance}') 
             ? scene.characterLeft.replace('${stats.appearance}', stats.appearance)
             : scene.characterLeft;
         const leftCharUrl = `/heart_at_crossroads/assets/characters/${leftChar.split('_')[0]}/${leftChar}.png`;
-        const exists = await checkAssetExists(leftCharUrl);
-        console.log(`[setupCharacters] Проверка персонажа ${leftCharUrl}: ${exists ? 'найден' : 'не найден'}`);
-        if (!exists) {
+        if (!(await checkAssetExists(leftCharUrl))) {
             console.warn(`Персонаж ${leftChar}.png не найден`);
             showErrorMessage(language === "ru" ? `Персонаж ${leftChar} не найден` : `Character ${leftChar} not found`);
         }
         charLeft.style.backgroundImage = `url('${leftCharUrl}')`;
         charLeft.classList.add(speakerName === "Анна" || speakerName === "Anna" ? 'character-speaker' : 'character-non-speaker');
     }
-
     if (scene.characterRight) {
-        const rightChar = scene.characterRight.includes('${stats.appearance}')
+        const rightChar = scene.characterRight.includes('${stats.appearance}') 
             ? scene.characterRight.replace('${stats.appearance}', stats.appearance)
             : scene.characterRight;
         const rightCharUrl = `/heart_at_crossroads/assets/characters/${rightChar.split('_')[0]}/${rightChar}.png`;
-        const exists = await checkAssetExists(rightCharUrl);
-        console.log(`[setupCharacters] Проверка персонажа ${rightCharUrl}: ${exists ? 'найден' : 'не найден'}`);
-        if (!exists) {
+        if (!(await checkAssetExists(rightCharUrl))) {
             console.warn(`Персонаж ${rightChar}.png не найден`);
             showErrorMessage(language === "ru" ? `Персонаж ${rightChar} не найден` : `Character ${rightChar} not found`);
         }
@@ -1428,8 +1428,13 @@ async function setupCharacters(scene, language, stats) {
         charRight.classList.add(speakerName === "Вика" || speakerName === "Vika" ? 'character-speaker' : 'character-non-speaker');
     }
 
-    document.getElementById('speaker-name').textContent = speakerName;
-    console.log(`[setupCharacters] Имя спикера: ${speakerName}`);
+    const speakerElement = document.getElementById('speaker-name');
+    if (speakerElement) {
+        speakerElement.textContent = speakerName;
+        console.log(`[setupCharacters] Установлено имя спикера: ${speakerName}`);
+    } else {
+        console.error('[setupCharacters] Элемент speaker-name не найден в DOM!');
+    }
 }
 
 // Создание оверлея
