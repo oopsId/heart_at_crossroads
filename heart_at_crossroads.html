@@ -451,14 +451,14 @@
             z-index: 100;
         }
         #timer-countdown {
-            position: absolute;
-            bottom: calc(20% + 50px);
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 40px;
-            color: #ff4444;
-            font-weight: bold;
-            z-index: 4;
+        position: absolute;
+        bottom: calc(20% + 160px); /* Поднимаем выше */
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 60px; /* Увеличиваем размер */
+        color: #ff4444;
+        font-weight: bold;
+        z-index: 5; /* Увеличиваем z-index, чтобы был над диалоговым окном */
         }
         @keyframes flash {
             0% { filter: brightness(1); }
