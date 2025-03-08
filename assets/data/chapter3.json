@@ -8,7 +8,7 @@
         {
             "id": 0,
             "background": "bg_apartment_morning",
-            "characterLeft": "anna_thoughtful_style2",
+            "characterLeft": "anna_thoughtful_home",
             "characterRight": null,
             "speaker": {
                 "ru": "Анна",
@@ -142,7 +142,7 @@
         {
             "id": 5,
             "background": "bg_webstudio_day",
-            "characterLeft": "anna_neutral_style1",
+            "characterLeft": "anna_neutral_street",
             "characterRight": "vika_confident_style1",
             "speaker": {
                 "ru": "Вика",
@@ -163,7 +163,7 @@
         {
             "id": 6,
             "background": "bg_webstudio_day",
-            "characterLeft": "anna_surprised_style1",
+            "characterLeft": "anna_surprised_street",
             "characterRight": "sergey_confident",
             "speaker": {
                 "ru": "Сергей",
@@ -175,4 +175,185 @@
             },
             "second_playthrough_text": {
                 "ru": "Сергей стоял у окна, пиджак подчёркивал его уверенность, но теперь я видела старый журнал на столе — он и его бывший партнёр, которого он предал. «Анна, ты интересная. Опять здесь? Хочу, чтобы ты помогла с проектом — ты ведь знаешь, как это работает, да?»",
-                "en": "Sergey stood by the window, his blazer framing his confidence, but now I saw the old magazine
+                "en": "Sergey stood by the window, his blazer framing his confidence, but now I saw the old magazine on the desk — him and his former partner, the one he betrayed. ‘Anna, you’re interesting. Back again? I want you to help with a project — you know how this works, don’t you?’"
+            },
+            "sound": "sfx_confident_step",
+            "music": null,
+            "choices": [
+                {
+                    "id": "yes",
+                    "text": {
+                        "ru": "Да, могу предложить",
+                        "en": "Yes, I can suggest something"
+                    },
+                    "nextScene": 7,
+                    "effects": { "crown": 1, "relationships.sergey": 1 }
+                },
+                {
+                    "id": "no",
+                    "text": {
+                        "ru": "Не знаю, я не в этом",
+                        "en": "I don’t know, I’m not into this"
+                    },
+                    "nextScene": 8,
+                    "effects": { "leaf": 1 }
+                },
+                {
+                    "id": "premium",
+                    "text": {
+                        "ru": "А что за проект? Расскажи подробнее (15 бриллиантов)",
+                        "en": "What’s the project? Tell me more (15 diamonds)"
+                    },
+                    "nextScene": 9,
+                    "cost": 15,
+                    "effects": { "heart": 1, "relationships.sergey": 1 }
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_neutral_street",
+            "characterRight": "sergey_smile",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Хорошо. Покажи, на что способна.»",
+                "en": "‘Good. Show me what you’ve got.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Хорошо. Покажи, на что способна. Ты ведь уже делала это, Ань — давай удивим их снова?»",
+                "en": "‘Good. Show me what you’ve got. You’ve done this before, Anya — let’s surprise them again?’"
+            },
+            "sound": "sfx_chair_shift",
+            "music": null,
+            "nextScene": 10
+        },
+        {
+            "id": 8,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": "sergey_neutral",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Ладно, подумай ещё.»",
+                "en": "‘Alright, think it over.’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Ладно, подумай ещё. Ты всегда так осторожна, Ань — но ты ведь знаешь, что вернёшься к этому, да?»",
+                "en": "‘Alright, think it over. You’re always so cautious, Anya — but you know you’ll come back to this, don’t you?’"
+            },
+            "sound": "sfx_subtle_sigh",
+            "music": null,
+            "nextScene": 10
+        },
+        {
+            "id": 9,
+            "background": "bg_webstudio_day",
+            "characterLeft": "anna_smile_street",
+            "characterRight": "sergey_confident",
+            "speaker": {
+                "ru": "Сергей",
+                "en": "Sergey"
+            },
+            "text": {
+                "ru": "«Новый раздел на сайте — стиль, тренды, что-то личное. Мне нужен твой взгляд. Интересно?»",
+                "en": "‘A new section on the site — style, trends, something personal. I need your perspective. Interested?’"
+            },
+            "second_playthrough_text": {
+                "ru": "«Новый раздел на сайте — стиль, тренды, что-то личное. Мне нужен твой взгляд, Ань. Ты ведь уже видела, как это работает, да? Интересно повторить?»",
+                "en": "‘A new section on the site — style, trends, something personal. I need your perspective, Anya. You’ve seen how this works before, haven’t you? Interested in doing it again?’"
+            },
+            "sound": "sfx_quiet_whisper",
+            "music": "bgm_mystery_reveal",
+            "nextScene": 10
+        },
+        {
+            "id": 10,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Вечер упал на город мягкими тенями, шубка грела плечи, но внутри всё ещё дрожала неуверенность. Телефон пиликнул — Марк: ‘Ты как после вчера?’ Дима молчал, Сергей ждал ответа, а я… Что я чувствую? Тепло? Опасность? Или просто усталость от выбора?",
+                "en": "Evening fell over the city in soft shadows, my fur coat warmed my shoulders, but inside, uncertainty still quivered. My phone buzzed — Mark: ‘How are you after yesterday?’ Dima stayed silent, Sergey awaited an answer, and I… What do I feel? Warmth? Danger? Or just weariness from choosing?"
+            },
+            "second_playthrough_text": {
+                "ru": "Вечер упал на город мягкими тенями, шубка грела, но внутри дрожь — ты ведь знаешь, что я чувствую это снова. Телефон пиликнул — Марк: ‘Ты как после вчера?’ — как по расписанию. Дима молчит, Сергей ждёт, а в кармане шубки старый билет на поезд, который я так и не использовала, чтобы сбежать. Что я чувствую? Усталость от этой игры или страх, что она никогда не кончится?",
+                "en": "Evening fell over the city in soft shadows, my fur coat warmed me, but inside a shiver — you know I’m feeling this again. My phone buzzed — Mark: ‘How are you after yesterday?’ — right on schedule. Dima’s silent, Sergey waits, and in my coat pocket, the old train ticket I never used to escape. What do I feel? Tiredness from this game or fear it’ll never end?"
+            },
+            "sound": "sfx_street_ambient",
+            "music": "bgm_evening_dusk",
+            "choices": [
+                {
+                    "id": "mark_reply",
+                    "text": {
+                        "ru": "[Марку: ‘Всё ок, ты как?’] (10 сек)",
+                        "en": "[To Mark: ‘I’m fine, you?’] (10 сек)"
+                    },
+                    "timer": 10,
+                    "nextScene": 11,
+                    "effects": { "heart": 1, "relationships.mark": 1 }
+                },
+                {
+                    "id": "ignore",
+                    "text": {
+                        "ru": "[Пропустить]",
+                        "en": "[Ignore]"
+                    },
+                    "nextScene": 12
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_smile_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Марк",
+                "en": "Mark"
+            },
+            "text": {
+                "ru": "‘Рад, что ты в порядке. Увидимся?’",
+                "en": "‘Glad you’re okay. See you?’"
+            },
+            "second_playthrough_text": {
+                "ru": "‘Рад, что ты в порядке. Увидимся? Ты ведь знаешь, что я всегда жду твоего ответа, Ань.’",
+                "en": "‘Glad you’re okay. See you? You know I’m always waiting for your reply, Anya.’"
+            },
+            "sound": "sfx_message_sent",
+            "music": null,
+            "nextScene": null
+        },
+        {
+            "id": 12,
+            "background": "bg_street_dusk_end",
+            "characterLeft": "anna_thoughtful_street",
+            "characterRight": null,
+            "speaker": {
+                "ru": "Анна",
+                "en": "Anna"
+            },
+            "text": {
+                "ru": "Я убрала телефон. Тишина города обняла меня, но сердце стучало — куда я иду?",
+                "en": "I put the phone away. The city’s silence embraced me, but my heart pounded — where am I going?"
+            },
+            "second_playthrough_text": {
+                "ru": "Я убрала телефон. Тишина города обняла меня, но сердце стучало — ты ведь знаешь, куда я иду, да? И всё равно я иду туда снова.",
+                "en": "I put the phone away. The city’s silence embraced me, but my heart pounded — you know where I’m going, don’t you? And still, I’m heading there again."
+            },
+            "sound": "sfx_phone_pocket",
+            "music": "bgm_quiet_reflection",
+            "nextScene": null
+        }
+    ]
+}
