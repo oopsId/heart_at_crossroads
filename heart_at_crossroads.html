@@ -1558,7 +1558,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     });
 }
 
-     async function showScene(sceneId) {
+    async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes.find(s => s.id === sceneId);
     if (!scene) {
