@@ -540,10 +540,7 @@
     </style>
 </head>
 <body>
-     </div>
-        <div id="gallery-container" style="display: none;">
-        <!-- Дочерние элементы будут добавляться динамически -->
-       </div>
+    
 
     <div id="start-screen">
         <h1 id="title" data-ru="Сердце<br>на перекрёстке" data-en="Heart<br>at the Crossroads">
@@ -564,6 +561,12 @@
             <span id="language-icon">🇷🇺</span>
         </button>
     </div>
+   
+        </div>
+        <div id="gallery-container" style="display: none;">
+        <!-- Дочерние элементы будут добавляться динамически -->
+       </div>
+
     <div id="game-container">
         <div class="parallax-bg" id="background" style="display: none;"></div>
         <div class="character-left" id="character-left" style="display: none;"></div>
@@ -2587,6 +2590,9 @@ function handleChoices(scene, dialogueBox, overlay) {
     // Очищаем и добавляем тестовый контент
     galleryContainer.innerHTML = '';
     galleryContainer.innerHTML = '<div style="color: yellow; font-size: 50px; text-align: center; z-index: 1000001;">ТЕСТ</div>';
+   console.log('galleryContainer computed display:', window.getComputedStyle(galleryContainer).display);
+  console.log('galleryContainer computed z-index:', window.getComputedStyle(galleryContainer).zIndex);
+  console.log('galleryContainer innerHTML:', galleryContainer.innerHTML);
 }
 
 
