@@ -542,7 +542,7 @@
             "romance": {
                 title: "Романтика",
                 titleEn: "Romance",
-                cards: [                    { id: "card_sergey_and_wife", name: "Сергей и его жена", nameEn: "Sergey and his wife", unlock: "второе прохождение", unlockEn: "second playthrough" },                    { id: "card_anna_and_dima_final", name: "Анна и Дима: фото из финала", nameEn: "Anna and Dima: final photo", unlock: "второе прохождение", unlockEn: "second playthrough" },                    { id: "card_mark_childhood", name: "Марк в детстве", nameEn: "Mark as a child", unlock: "50 бриллиантов", unlockEn: "50 diamonds" },                    { id: "card_katya_and_anna_bff_birthday", name: "Катя и Анна: подруги на дне рожденья", nameEn: "Katya and Anna: friends at a birthday party", unlock: "50 бриллиантов", unlockEn: "50 diamonds" }                ],
+                cards: [                    { id: "card_sergey_and_wife", name: "Сергей и его жена", nameEn: "Sergey and his wife", unlock: "второе прохождение", unlockEn: "second playthrough" },                    { id: "card_anna_and_dima_final", name: "Анна и Дима: фото из финала", nameEn: "Anna and Dima: final photo", unlock: "второе прохождение", unlockEn: "second playthrough" },                    { id: "card_mark_childhood", name: "Марк в детстве", nameEn: "Mark as a child", unlock: "50", unlockEn: "50" },                    { id: "card_katya_and_anna_bff_birthday", name: "Катя и Анна: подруги на дне рожденья", nameEn: "Katya and Anna: friends at a birthday party", unlock: "50", unlockEn: "50" }                ],
                 style: "Прошлое остается навсегда",
                 styleEn: "The past remains forever"
             }
@@ -587,7 +587,7 @@
             crown: 0,
             heart: 0,
             leaf: 0,
-            diamonds: 10,
+            diamonds: 100,
             relationships: { mark: 0, lera: 0, vika: 0, sergey: 0, anna: 0, dima: 0, lesha: 0 },
             appearance: "style1",
             isAuthorized: false,
@@ -2116,50 +2116,59 @@ function handleChoices(scene, dialogueBox, overlay) {
                     cardElement.onclick = () => showCardDetail(card);
                 } else {
                     cardElement.style.filter = 'grayscale(1)';
-                    
-                    const lockIcon = document.createElement('div');
-                    lockIcon.innerHTML = `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92172 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>`;
-                    lockIcon.style.cssText = `margin-bottom: 1rem; opacity: 0.6;`;
 
-                    const cardTitle = document.createElement('div');
-                    cardTitle.textContent = isRussian ? card.name : card.nameEn;
-                    cardTitle.style.cssText = `
-                        color: #e0c18e; text-align: center; padding: 0 1rem; 
-                        margin-bottom: 0.5rem; font-weight: bold;
-                    `;
+        const lockIcon = document.createElement('div');
+        lockIcon.innerHTML = `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92172 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+        lockIcon.style.cssText = `margin-bottom: 1rem; opacity: 0.6;`;
 
-                    const unlockInfo = document.createElement('div');
-                    unlockInfo.textContent = isRussian ? `Разблокировка: ${card.unlock}` : `Unlock: ${card.unlockEn}`;
-                    unlockInfo.style.cssText = `
-                        color: #aaa; font-size: 0.9rem; text-align: center; padding: 0 1rem;
-                    `;
+        const cardTitle = document.createElement('div');
+        cardTitle.textContent = isRussian ? card.name : card.nameEn;
+        cardTitle.style.cssText = `
+            color: #e0c18e; text-align: center; padding: 0 1rem; 
+            margin-bottom: 0.5rem; font-weight: bold;
+        `;
 
-                    const unlockButton = document.createElement('button');
-                    unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
-                    unlockButton.style.cssText = `
-                        margin-top: 1rem; background: #4a3a1d; color: #e0c18e; 
-                        border: 1px solid #e0c18e; padding: 0.5rem 1rem; 
-                        border-radius: 4px; cursor: pointer; transition: background 0.3s;
-                    `;
-                    unlockButton.onmouseover = () => unlockButton.style.background = '#6a5a3d';
-                    unlockButton.onmouseout = () => unlockButton.style.background = '#4a3a1d';
-                    unlockButton.onclick = () => unlockCard(card);
+        const unlockInfo = document.createElement('div');
+        unlockInfo.style.cssText = `
+            color: #aaa; font-size: 0.9rem; text-align: center; padding: 0 1rem; 
+            display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+        `;
+        const costText = document.createElement('span');
+        costText.textContent = isRussian ? `Разблокировка: ${card.unlock}` : `Unlock: ${card.unlockEn}`;
+        const diamondIcon = document.createElement('img');
+        diamondIcon.src = '/heart_at_crossroads/assets/ui/diamonds.png';
+        diamondIcon.style.cssText = `
+            width: 16px; height: 16px; vertical-align: middle;
+        `;
+        unlockInfo.appendChild(costText);
+        unlockInfo.appendChild(diamondIcon);
 
-                    cardElement.appendChild(lockIcon);
-                    cardElement.appendChild(cardTitle);
-                    cardElement.appendChild(unlockInfo);
-                    if (card.unlock.includes("бриллиантов") || card.unlock.includes("diamonds")) {
-                        cardElement.appendChild(unlockButton);
-                    }
+        const unlockButton = document.createElement('button');
+        unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
+        unlockButton.style.cssText = `
+            margin-top: 1rem; background: #4a3a1d; color: #e0c18e; 
+            border: 1px solid #e0c18e; padding: 0.5rem 1rem; 
+            border-radius: 4px; cursor: pointer; transition: background 0.3s;
+        `;
+        unlockButton.onmouseover = () => unlockButton.style.background = '#6a5a3d';
+        unlockButton.onmouseout = () => unlockButton.style.background = '#4a3a1d';
+        unlockButton.onclick = () => unlockCard(card);
 
-                    gsap.to(lockIcon, { rotation: 5, duration: 1, repeat: -1, yoyo: true, ease: "sine.inOut" });
-                }
+        cardElement.appendChild(lockIcon);
+        cardElement.appendChild(cardTitle);
+        cardElement.appendChild(unlockInfo);
+        if (card.unlock !== "второе прохождение" && card.unlock !== "second playthrough") { // Показываем кнопку только для бриллиантов
+            cardElement.appendChild(unlockButton);
+        }
 
-                return cardElement;
-            }
+        gsap.to(lockIcon, { rotation: 5, duration: 1, repeat: -1, yoyo: true, ease: "sine.inOut" });
+    }
+
+    return cardElement;
+}
 
             function unlockCard(card) {
                 const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
