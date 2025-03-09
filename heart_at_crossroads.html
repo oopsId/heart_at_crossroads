@@ -2558,6 +2558,14 @@ function handleChoices(scene, dialogueBox, overlay) {
         return;
     }
 
+
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen) {
+        startScreen.style.display = 'none';
+        console.log('startScreen скрыт:', startScreen.style.display);
+    } else {
+        console.warn('Элемент #start-screen не найден в DOM');
+    }
     // Настраиваем galleryContainer
     galleryContainer.style.display = 'block';
     galleryContainer.style.background = 'red'; // Для отладки
