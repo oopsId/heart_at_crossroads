@@ -2548,17 +2548,14 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-                       function showSimpleGallery() {
+                      function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
 
-    // Явно объявляем galleryContainer
     const galleryContainer = document.getElementById('gallery-container');
     if (!galleryContainer) {
         console.error('Элемент #gallery-container не найден в DOM');
         return;
     }
-
-     
 
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
@@ -2567,26 +2564,21 @@ function handleChoices(scene, dialogueBox, overlay) {
     } else {
         console.warn('Элемент #start-screen не найден в DOM');
     }
-    // Настраиваем galleryContainer
+
     galleryContainer.style.display = 'block';
-    galleryContainer.style.background = 'red'; // Для отладки
-    galleryContainer.style.width = '100vw'; // Полная ширина
-    galleryContainer.style.height = '100vh'; // Полная высота
-    galleryContainer.style.position = 'fixed'; // Поверх всего
+    galleryContainer.style.background = 'red';
+    galleryContainer.style.width = '100vw';
+    galleryContainer.style.height = '100vh';
+    galleryContainer.style.position = 'fixed';
     galleryContainer.style.top = '0';
     galleryContainer.style.left = '0';
-    galleryContainer.style.zIndex = '100000';//test
-   
-    console.log('stats:', stats);
-    console.log('stats.memories:', stats.memories); 
+    galleryContainer.style.zIndex = '100000';
     console.log('galleryContainer styles:', galleryContainer.style.cssText);
 
-    // Создаем overlay для галереи
     const galleryDiv = document.createElement('div');
-   galleryDiv.style.zIndex = '100001'; //test
     galleryDiv.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-       background: transparent; z-index: 10; overflow-y: auto;
+        background: transparent; z-index: 10; overflow-y: auto;
     `;
 
     const galleryTitle = document.createElement('h2');
@@ -2624,10 +2616,14 @@ function handleChoices(scene, dialogueBox, overlay) {
         position: fixed; top: 10px; right: 10px; background: #333; 
         color: #e0c18e; border: 1px solid #e0c18e; padding: 5px 15px; cursor: pointer;
     `;
-    closeBtn.onclick = () => galleryDiv.remove();
+    closeBtn.onclick = () => {
+        console.log('Закрытие галереи');
+        galleryDiv.remove();
+        galleryContainer.style.display = 'none';
+        if (startScreen) startScreen.style.display = 'block';
+    };
     galleryDiv.appendChild(closeBtn);
 
-    // Добавляем galleryDiv в galleryContainer
     galleryContainer.appendChild(galleryDiv);
 }
 
