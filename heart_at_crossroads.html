@@ -2095,7 +2095,12 @@ function handleChoices(scene, dialogueBox, overlay) {
 
 
          function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+    console.log('switchSeries вызван для:', seriesKey);
     const seriesBtns = document.querySelectorAll('.series-btn');
+    if (!series) {
+        console.error('Серия не найдена:', seriesKey);
+        return;
+    }
     seriesBtns.forEach(btn => {
         btn.style.background = btn.dataset.series === seriesKey 
             ? 'linear-gradient(to bottom, #6a5a3d, #4a3a1d)' 
