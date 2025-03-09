@@ -2094,13 +2094,10 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-         function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
-    console.log('switchSeries вызван для:', seriesKey);
+        function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+    console.log('switchSeries вызван для:', seriesKey); // Логирование для отладки
+
     const seriesBtns = document.querySelectorAll('.series-btn');
-    if (!series) {
-        console.error('Серия не найдена:', seriesKey);
-        return;
-    }
     seriesBtns.forEach(btn => {
         btn.style.background = btn.dataset.series === seriesKey 
             ? 'linear-gradient(to bottom, #6a5a3d, #4a3a1d)' 
@@ -2108,8 +2105,15 @@ function handleChoices(scene, dialogueBox, overlay) {
     });
 
     cardsContainer.innerHTML = ''; // Очищаем контейнер карточек
+    console.log('Очищен cardsContainer');
 
     const series = cardSeries[seriesKey];
+    if (!series) {
+        console.error('Серия не найдена:', seriesKey);
+        return; // Выходим, если серия не существует
+    }
+
+    // Теперь series инициализирована, можно безопасно использовать её свойства
     const seriesTitle = document.createElement('div');
     seriesTitle.className = 'series-title';
     seriesTitle.style.cssText = `
@@ -2121,10 +2125,14 @@ function handleChoices(scene, dialogueBox, overlay) {
         ? `${series.title} - ${series.style} (${unlockedCount}/${series.cards.length})` 
         : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
     cardsContainer.appendChild(seriesTitle);
+    console.log('Добавлен seriesTitle:', seriesTitle.textContent);
 
     series.cards.forEach((card, index) => {
+        console.log('Создаём карточку:', card.id);
         const cardElement = createCardElement(card, seriesKey);
         cardsContainer.appendChild(cardElement);
+        console.log('Карточка добавлена в DOM:', cardElement);
+
         if (index === 0) {
             cardElement.classList.add('active');
             gsap.set(cardElement, { y: 0, zIndex: 100 });
