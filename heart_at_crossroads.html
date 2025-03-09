@@ -1956,6 +1956,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
             function showPremiumGallery() {
     console.log('showPremiumGallery вызван, stats.memories:', stats.memories);
+    console.log('stats.language:', stats.language, 'isRussian:', stats.language === "ru");
     if (!window.gsap) {
         console.error("GSAP не найден. Подключите библиотеку GSAP для анимаций.");
         return showSimpleGallery();
