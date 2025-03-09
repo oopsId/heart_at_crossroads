@@ -2548,7 +2548,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-                     function showSimpleGallery() {
+                    function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
 
     const galleryContainer = document.getElementById('gallery-container');
@@ -2565,7 +2565,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         console.warn('Элемент #start-screen не найден в DOM');
     }
 
-    // Применяем стили одним блоком для надёжности
+    // Полностью заменяем стили galleryContainer
     galleryContainer.style.cssText = `
         display: block;
         background: red !important;
@@ -2574,68 +2574,17 @@ function handleChoices(scene, dialogueBox, overlay) {
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 100000;
+        z-index: 1000000; /* Ещё выше */
         opacity: 1;
     `;
     console.log('galleryContainer styles:', galleryContainer.style.cssText);
 
-    // Тестовый фон для <body>
-    document.body.style.background = 'green'; // Оставляем для отладки
-    galleryContainer.innerHTML = '<div style="color: yellow; font-size: 50px;">ТЕСТ</div>';
-    const galleryDiv = document.createElement('div');
-    galleryDiv.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: transparent; z-index: 10; overflow-y: auto;
-    `;
+    // Тестовый фон для body
+    document.body.style.background = 'green';
 
-    const galleryTitle = document.createElement('h2');
-    galleryTitle.style.cssText = `
-        color: #e0c18e; text-align: center; margin: 20px 0; 
-        font-family: ${stats.language === "ru" ? 'GoodVibesCyr' : 'GreatVibes'}, cursive; font-size: 36px;
-    `;
-    galleryTitle.textContent = stats.language === "ru" ? "Коллекционные карточки" : "Collection Cards";
-    galleryDiv.appendChild(galleryTitle);
-
-    if (stats.memories?.length > 0) {
-        stats.memories.forEach(memory => {
-            const cardWrapper = document.createElement('div');
-            cardWrapper.style.cssText = 'display: inline-block; margin: 15px; position: relative;';
-            const img = document.createElement('img');
-            img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
-            img.style.cssText = 'display: block; max-width: 300px; border: 8px solid #e0c18e; border-radius: 5px;';
-            img.onerror = () => {
-                console.warn(`Воспоминание ${memory}.png не найдено`);
-                cardWrapper.remove();
-            };
-            cardWrapper.appendChild(img);
-            galleryDiv.appendChild(cardWrapper);
-        });
-    } else {
-        const noCardsMsg = document.createElement('p');
-        noCardsMsg.style.cssText = 'color: #e0c18e; text-align: center; margin: 50px 0;';
-        noCardsMsg.textContent = stats.language === "ru" ? "У вас пока нет открытых карточек" : "You don't have any unlocked cards yet";
-        galleryDiv.appendChild(noCardsMsg);
-    }
-
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
-    closeBtn.style.cssText = `
-        position: fixed; top: 10px; right: 10px; background: #333; 
-        color: #e0c18e; border: 1px solid #e0c18e; padding: 5px 15px; cursor: pointer;
-    `;
-    closeBtn.onclick = () => {
-        console.log('Закрытие галереи');
-        galleryDiv.remove();
-        galleryContainer.style.display = 'none';
-        if (startScreen) startScreen.style.display = 'block';
-        document.body.style.background = '#000'; // Возвращаем исходный фон
-    };
-    galleryDiv.appendChild(closeBtn);
-
-    galleryContainer.appendChild(galleryDiv);
-    console.log('galleryDiv добавлен:', galleryDiv.outerHTML);
+    // Добавляем простой тестовый контент
+    galleryContainer.innerHTML = '<div style="color: yellow; font-size: 50px; text-align: center; z-index: 1000001;">ТЕСТ</div>';
 }
-
 
 
 
