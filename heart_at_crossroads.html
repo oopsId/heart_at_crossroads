@@ -2550,7 +2550,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
                      function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
-   document.body.style.background = 'green';
+
     const galleryContainer = document.getElementById('gallery-container');
     if (!galleryContainer) {
         console.error('Элемент #gallery-container не найден в DOM');
@@ -2565,16 +2565,22 @@ function handleChoices(scene, dialogueBox, overlay) {
         console.warn('Элемент #start-screen не найден в DOM');
     }
 
-    galleryContainer.style.display = 'block';
-    galleryContainer.style.background = 'red !important'; // Убеждаемся, что красный фон приоритетен
-    galleryContainer.style.width = '100vw';
-    galleryContainer.style.height = '100vh';
-    galleryContainer.style.position = 'fixed';
-    galleryContainer.style.top = '0';
-    galleryContainer.style.left = '0';
-    galleryContainer.style.zIndex = '100000';
-    galleryContainer.style.opacity = '1'; // Переопределяем opacity: 0 из CSS
+    // Применяем стили одним блоком для надёжности
+    galleryContainer.style.cssText = `
+        display: block;
+        background: red !important;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100000;
+        opacity: 1;
+    `;
     console.log('galleryContainer styles:', galleryContainer.style.cssText);
+
+    // Тестовый фон для <body>
+    document.body.style.background = 'green'; // Оставляем для отладки
 
     const galleryDiv = document.createElement('div');
     galleryDiv.style.cssText = `
@@ -2622,12 +2628,16 @@ function handleChoices(scene, dialogueBox, overlay) {
         galleryDiv.remove();
         galleryContainer.style.display = 'none';
         if (startScreen) startScreen.style.display = 'block';
+        document.body.style.background = '#000'; // Возвращаем исходный фон
     };
     galleryDiv.appendChild(closeBtn);
 
     galleryContainer.appendChild(galleryDiv);
     console.log('galleryDiv добавлен:', galleryDiv.outerHTML);
 }
+
+
+
 
         async function loadFinals(endingId) {
             const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
