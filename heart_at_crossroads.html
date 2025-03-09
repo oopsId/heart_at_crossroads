@@ -1929,9 +1929,12 @@ function handleChoices(scene, dialogueBox, overlay) {
         box-shadow: 0 6px 15px rgba(224, 193, 142, 0.4);
     }
     .premium-card.active {
-        border: 2px solid #e0c18e;
-        box-shadow: 0 0 15px rgba(224, 193, 142, 0.7), 0 8px 25px rgba(0, 0, 0, 0.5);
-        z-index: 200 !important; /* Максимальный приоритет */
+        filter: brightness(1.2); /* Увеличение яркости */
+        box-shadow: 0 0 20px rgba(224, 193, 142, 0.8), 0 4px 15px rgba(0, 0, 0, 0.5); /* Свечение */
+        z-index: 100; /* Активная карточка поверх всех */
+    }
+    .premium-card {
+        transition: all 0.3s ease;
     }
     @media (max-width: 600px) {
         .cards-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
@@ -2029,42 +2032,49 @@ function handleChoices(scene, dialogueBox, overlay) {
     });
 
     function switchSeries(seriesKey) {
-        const seriesBtns = document.querySelectorAll('.series-btn');
-        seriesBtns.forEach(btn => {
-            btn.style.background = btn.dataset.series === seriesKey 
-                ? 'linear-gradient(to bottom, #6a5a3d, #4a3a1d)' 
-                : 'linear-gradient(to bottom, #3a3a3a, #202020)';
-        });
+    const seriesBtns = document.querySelectorAll('.series-btn');
+    seriesBtns.forEach(btn => {
+        btn.style.background = btn.dataset.series === seriesKey 
+            ? 'linear-gradient(to bottom, #6a5a3d, #4a3a1d)' 
+            : 'linear-gradient(to bottom, #3a3a3a, #202020)';
+    });
 
-        cardsContainer.innerHTML = '';
-        gsap.fromTo(cardsContainer, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+    cardsContainer.innerHTML = '';
+    gsap.fromTo(cardsContainer, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
 
-        const series = cardSeries[seriesKey];
-        const seriesTitle = document.createElement('div');
-        seriesTitle.className = 'series-title';
-        seriesTitle.style.cssText = `
-            grid-column: 1 / -1; color: #e0c18e; font-size: 2rem; 
-            margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        `;
-        const unlockedCount = series.cards.filter(card => stats.memories?.includes(card.id)).length;
-        seriesTitle.textContent = isRussian 
-            ? `${series.title} - ${series.style} (${unlockedCount}/${series.cards.length})` 
-            : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
-        cardsContainer.appendChild(seriesTitle);
+    const series = cardSeries[seriesKey];
+    const seriesTitle = document.createElement('div');
+    seriesTitle.className = 'series-title';
+    seriesTitle.style.cssText = `
+        grid-column: 1 / -1; color: #e0c18e; font-size: 2rem; 
+        margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    `;
+    const unlockedCount = series.cards.filter(card => stats.memories?.includes(card.id)).length;
+    seriesTitle.textContent = isRussian 
+        ? `${series.title} - ${series.style} (${unlockedCount}/${series.cards.length})` 
+        : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
+    cardsContainer.appendChild(seriesTitle);
 
-        series.cards.forEach((card, index) => {
-            const cardElement = createCardElement(card, seriesKey);
-            cardsContainer.appendChild(cardElement);
-            gsap.fromTo(cardElement, 
-                { opacity: 0, y: 20 }, 
-                { opacity: 1, y: 0, duration: 0.5, delay: 0.1 * index, ease: "back.out(1.2)" }
-            );
-        });
+    series.cards.forEach((card, index) => {
+        const cardElement = createCardElement(card, seriesKey);
+        cardsContainer.appendChild(cardElement);
+        // Устанавливаем начальное положение: первая активна, остальные "выглядывают"
+        if (index === 0) {
+            cardElement.classList.add('active');
+            gsap.set(cardElement, { y: 0, zIndex: 100 });
+        } else {
+            gsap.set(cardElement, { y: 20 * index, zIndex: 100 - index }); // "Ушки" сзади
+        }
+        gsap.fromTo(cardElement, 
+            { opacity: 0 }, 
+            { opacity: 1, duration: 0.5, delay: 0.1 * index, ease: "power2.out" }
+        );
+    });
 
-        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-    }
+    clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+}
 
-     function createCardElement(card, seriesKey) {
+   function createCardElement(card, seriesKey) {
     const isUnlocked = stats.memories?.includes(card.id);
     const cardElement = document.createElement('div');
     cardElement.className = 'premium-card';
@@ -2074,79 +2084,61 @@ function handleChoices(scene, dialogueBox, overlay) {
         border-radius: 10px; overflow: hidden; background: #222; 
         display: flex; flex-direction: column; justify-content: center; 
         align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
-        transition: transform 0.3s ease, z-index 0s; z-index: 1;
+        z-index: 1;
     `;
 
-    let clickCount = 0; // Счетчик кликов для карусели
-    let isFocused = false;
+    let clickCount = 0;
 
-    // Функции управления состоянием карточки
+    // Функции управления карточкой
     const slideUp = () => {
-        cardElement.style.zIndex = 50; // Средний приоритет для выдвижения
         gsap.to(cardElement, { 
-            y: -20, 
-            scale: 1.05, 
-            boxShadow: '0 8px 25px rgba(224, 193, 142, 0.3)', 
-            duration: 0.3 
+            y: -10, // Слегка вверх
+            duration: 0.3, 
+            ease: "power2.out" 
         });
     };
 
-    const setFocus = () => {
-        cardElement.classList.add('active'); // Подсветка активной карточки
-        cardElement.style.zIndex = 200; // Максимальный приоритет
+    const setActive = () => {
+        const currentActive = cardsContainer.querySelector('.premium-card.active');
+        if (currentActive && currentActive !== cardElement) {
+            currentActive.classList.remove('active');
+            gsap.to(currentActive, { 
+                y: 20, // Уходит назад
+                zIndex: 1, 
+                duration: 0.3, 
+                ease: "power2.in" 
+            });
+        }
+
+        cardElement.classList.add('active');
         gsap.to(cardElement, { 
-            y: 0, 
-            scale: 1.1, 
+            y: 0, // На передний план
+            zIndex: 100, 
             duration: 0.5, 
             ease: "power2.out" 
         });
 
-        // Перетасовка: перемещаем карточку в начало сетки
+        // Перестраиваем порядок в DOM
         const container = cardElement.parentElement;
         container.removeChild(cardElement);
-        container.insertBefore(cardElement, container.firstChild);
+        container.insertBefore(cardElement, container.firstChild.nextSibling); // После заголовка серии
     };
 
-    const resetPosition = () => {
-        cardElement.classList.remove('active');
-        cardElement.style.zIndex = 1;
-        clickCount = 0;
-        isFocused = false;
-        gsap.to(cardElement, { 
-            y: 0, 
-            scale: 1, 
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)', 
-            duration: 0.3 
-        });
-    };
-
-    // Обработчики событий
     const handleInteraction = (e) => {
         e.preventDefault();
+        if (cardElement.classList.contains('active')) return; // Ничего не делаем, если уже активна
+
         if (clickCount === 0) {
             slideUp();
             clickCount = 1;
-            isFocused = true;
         } else if (clickCount === 1) {
-            setFocus();
-            clickCount = 2;
+            setActive();
+            clickCount = 0;
         }
     };
 
-    cardElement.addEventListener('click', handleInteraction); // Для десктопа
-    cardElement.addEventListener('touchstart', handleInteraction); // Для мобильных
-
-    // Сброс при касании вне карточки
-    document.addEventListener('touchstart', (e) => {
-        if (isFocused && !cardElement.contains(e.target)) {
-            resetPosition();
-        }
-    });
-    document.addEventListener('click', (e) => {
-        if (isFocused && !cardElement.contains(e.target)) {
-            resetPosition();
-        }
-    });
+    cardElement.addEventListener('click', handleInteraction);
+    cardElement.addEventListener('touchstart', handleInteraction);
 
     if (isUnlocked) {
         const frameOverlay = document.createElement('div');
@@ -2210,8 +2202,8 @@ function handleChoices(scene, dialogueBox, overlay) {
         cardElement.appendChild(shineEffect);
         cardElement.appendChild(cardName);
         cardElement.onclick = (e) => {
-            if (clickCount === 2) {
-                showCardDetail(card); // Открытие детального вида только после фокуса
+            if (cardElement.classList.contains('active')) {
+                showCardDetail(card);
             }
         };
     } else {
@@ -2275,6 +2267,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     return cardElement;
 }
+
 
     function unlockCard(card) {
         const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
