@@ -2551,7 +2551,7 @@ function handleChoices(scene, dialogueBox, overlay) {
                        function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
 
-    // Определяем galleryContainer
+    // Явно объявляем galleryContainer
     const galleryContainer = document.getElementById('gallery-container');
     if (!galleryContainer) {
         console.error('Элемент #gallery-container не найден в DOM');
@@ -2614,11 +2614,9 @@ function handleChoices(scene, dialogueBox, overlay) {
     closeBtn.onclick = () => galleryDiv.remove();
     galleryDiv.appendChild(closeBtn);
 
-    // Добавляем galleryDiv в galleryContainer вместо document.body
+    // Добавляем galleryDiv в galleryContainer
     galleryContainer.appendChild(galleryDiv);
 }
-
-
 
         async function loadFinals(endingId) {
             const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
