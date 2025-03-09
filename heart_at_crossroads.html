@@ -2558,6 +2558,10 @@ function handleChoices(scene, dialogueBox, overlay) {
         return;
     }
 
+  galleryContainer.style.zIndex = '100000';
+  galleryDiv.style.zIndex = '100001';
+                             console.log('stats:', stats);
+console.log('stats.memories:', stats.memories);
 
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
