@@ -495,7 +495,7 @@
             pointer-events: none;
         }
 
-   #gallery-container {
+         #gallery-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -504,7 +504,7 @@
     background: rgba(0, 0, 0, 0.9);
     display: none;
     opacity: 0;
-    z-index: 6000; /* Меньше, чем у стартового экрана */
+    z-index: 2000; /* Меньше, чем у стартового экрана */
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
@@ -535,13 +535,10 @@
     gap: 20px;
     padding: 0 10px;
     data-gallery: true; /* Добавлен атрибут */
-    opacity: 1;
 }
     </style>
 </head>
 <body>
-    
-
     <div id="start-screen">
         <h1 id="title" data-ru="Сердце<br>на перекрёстке" data-en="Heart<br>at the Crossroads">
             <span>Сердце</span>
@@ -556,17 +553,17 @@
         <div id="password-form">
             <input type="text" id="password-input" placeholder="Введите пароль">
             <button id="password-submit" data-ru="Войти" data-en="Login">Войти</button>
+        </div>
         
         <button id="language-btn">
             <span id="language-icon">🇷🇺</span>
         </button>
     </div>
-   
-        </div>
-        <div id="gallery-container" style="display: none;">
+	
+	<div id="gallery-container" style="display: none;">
         <!-- Дочерние элементы будут добавляться динамически -->
        </div>
-
+	
     <div id="game-container">
         <div class="parallax-bg" id="background" style="display: none;"></div>
         <div class="character-left" id="character-left" style="display: none;"></div>
@@ -858,7 +855,6 @@
             e.preventDefault();
             console.log('handleShowGallery вызван');
             showPremiumGallery();
-            //showSimpleGallery();
                 }
 
             function handleLanguageSwitch(e) {
@@ -2058,8 +2054,6 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryContainer.appendChild(seriesSelector);
     galleryContainer.appendChild(cardsContainer);
     galleryContainer.appendChild(closeButton);
-    console.log('galleryContainer children:', galleryContainer.children.length);
-    galleryContainer.style.background = 'red'; // Если видите красный экран, проблема в дочерних элементах
 
     const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
     clickSound.load();
@@ -2553,47 +2547,54 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-                   function showSimpleGallery() {
-    console.log("Показываем простую галерею без GSAP");
+                       function showSimpleGallery() {
+            console.log("Показываем простую галерею без GSAP");
+            const galleryDiv = document.createElement('div');
+            galleryDiv.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;
+            `;
 
-    const galleryContainer = document.getElementById('gallery-container');
-    if (!galleryContainer) {
-        console.error('Элемент #gallery-container не найден в DOM');
-        return;
-    }
+            const galleryTitle = document.createElement('h2');
+            galleryTitle.style.cssText = `
+                color: #e0c18e; text-align: center; margin: 20px 0; 
+                font-family: ${stats.language === "ru" ? 'GoodVibesCyr' : 'GreatVibes'}, cursive; font-size: 36px;
+            `;
+            galleryTitle.textContent = stats.language === "ru" ? "Коллекционные карточки" : "Collection Cards";
+            galleryDiv.appendChild(galleryTitle);
 
-    const startScreen = document.getElementById('start-screen');
-    if (startScreen) {
-        startScreen.style.display = 'none';
-        console.log('startScreen скрыт:', startScreen.style.display);
-    } else {
-        console.warn('Элемент #start-screen не найден в DOM');
-    }
+            if (stats.memories?.length > 0) {
+                stats.memories.forEach(memory => {
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.style.cssText = 'display: inline-block; margin: 15px; position: relative;';
+                    const img = document.createElement('img');
+                    img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
+                    img.style.cssText = 'display: block; max-width: 300px; border: 8px solid #e0c18e; border-radius: 5px;';
+                    img.onerror = () => {
+                        console.warn(`Воспоминание ${memory}.png не найдено`);
+                        cardWrapper.remove();
+                    };
+                    cardWrapper.appendChild(img);
+                    galleryDiv.appendChild(cardWrapper);
+                });
+            } else {
+                const noCardsMsg = document.createElement('p');
+                noCardsMsg.style.cssText = 'color: #e0c18e; text-align: center; margin: 50px 0;';
+                noCardsMsg.textContent = stats.language === "ru" ? "У вас пока нет открытых карточек" : "You don't have any unlocked cards yet";
+                galleryDiv.appendChild(noCardsMsg);
+            }
 
-    // Устанавливаем стили galleryContainer
-    galleryContainer.style.cssText = `
-        display: block;
-        background: red !important;
-        width: 100vw;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000000;
-        opacity: 1;
-    `;
-    console.log('galleryContainer styles:', galleryContainer.style.cssText);
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
+            closeBtn.style.cssText = `
+                position: fixed; top: 10px; right: 10px; background: #333; 
+                color: #e0c18e; border: 1px solid #e0c18e; padding: 5px 15px; cursor: pointer;
+            `;
+            closeBtn.onclick = () => galleryDiv.remove();
+            galleryDiv.appendChild(closeBtn);
+            document.body.appendChild(galleryDiv);
+        }
 
-    // Устанавливаем зелёный фон для body
-    document.body.style.background = 'green';
-
-    // Очищаем и добавляем тестовый контент
-    galleryContainer.innerHTML = '';
-    galleryContainer.innerHTML = '<div style="color: yellow; font-size: 50px; text-align: center; z-index: 1000001;">ТЕСТ</div>';
-   console.log('galleryContainer computed display:', window.getComputedStyle(galleryContainer).display);
-  console.log('galleryContainer computed z-index:', window.getComputedStyle(galleryContainer).zIndex);
-  console.log('galleryContainer innerHTML:', galleryContainer.innerHTML);
-}
 
 
         async function loadFinals(endingId) {
