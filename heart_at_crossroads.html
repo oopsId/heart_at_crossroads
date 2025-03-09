@@ -2549,63 +2549,74 @@ function handleChoices(scene, dialogueBox, overlay) {
 
 
                        function showSimpleGallery() {
-            console.log("Показываем простую галерею без GSAP");
-             
-            galleryContainer.style.display = 'block';
-galleryContainer.style.background = 'red';
-galleryContainer.style.width = '100vw'; // Полная ширина
-galleryContainer.style.height = '100vh'; // Полная высота
-galleryContainer.style.position = 'fixed'; // Поверх всего
-galleryContainer.style.top = '0';
-galleryContainer.style.left = '0';
-galleryContainer.style.zIndex = '9999'; // Максимальный приоритет
-console.log('galleryContainer styles:', galleryContainer.style.cssText);
+    console.log("Показываем простую галерею без GSAP");
 
-            const galleryDiv = document.createElement('div');
-            galleryDiv.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;
-            `;
+    // Определяем galleryContainer
+    const galleryContainer = document.getElementById('gallery-container');
+    if (!galleryContainer) {
+        console.error('Элемент #gallery-container не найден в DOM');
+        return;
+    }
 
-            const galleryTitle = document.createElement('h2');
-            galleryTitle.style.cssText = `
-                color: #e0c18e; text-align: center; margin: 20px 0; 
-                font-family: ${stats.language === "ru" ? 'GoodVibesCyr' : 'GreatVibes'}, cursive; font-size: 36px;
-            `;
-            galleryTitle.textContent = stats.language === "ru" ? "Коллекционные карточки" : "Collection Cards";
-            galleryDiv.appendChild(galleryTitle);
+    // Настраиваем galleryContainer
+    galleryContainer.style.display = 'block';
+    galleryContainer.style.background = 'red'; // Для отладки
+    galleryContainer.style.width = '100vw'; // Полная ширина
+    galleryContainer.style.height = '100vh'; // Полная высота
+    galleryContainer.style.position = 'fixed'; // Поверх всего
+    galleryContainer.style.top = '0';
+    galleryContainer.style.left = '0';
+    galleryContainer.style.zIndex = '9999'; // Максимальный приоритет
+    console.log('galleryContainer styles:', galleryContainer.style.cssText);
 
-            if (stats.memories?.length > 0) {
-                stats.memories.forEach(memory => {
-                    const cardWrapper = document.createElement('div');
-                    cardWrapper.style.cssText = 'display: inline-block; margin: 15px; position: relative;';
-                    const img = document.createElement('img');
-                    img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
-                    img.style.cssText = 'display: block; max-width: 300px; border: 8px solid #e0c18e; border-radius: 5px;';
-                    img.onerror = () => {
-                        console.warn(`Воспоминание ${memory}.png не найдено`);
-                        cardWrapper.remove();
-                    };
-                    cardWrapper.appendChild(img);
-                    galleryDiv.appendChild(cardWrapper);
-                });
-            } else {
-                const noCardsMsg = document.createElement('p');
-                noCardsMsg.style.cssText = 'color: #e0c18e; text-align: center; margin: 50px 0;';
-                noCardsMsg.textContent = stats.language === "ru" ? "У вас пока нет открытых карточек" : "You don't have any unlocked cards yet";
-                galleryDiv.appendChild(noCardsMsg);
-            }
+    // Создаем overlay для галереи
+    const galleryDiv = document.createElement('div');
+    galleryDiv.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0, 0, 0, 0.9); z-index: 10; overflow-y: auto;
+    `;
 
-            const closeBtn = document.createElement('button');
-            closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
-            closeBtn.style.cssText = `
-                position: fixed; top: 10px; right: 10px; background: #333; 
-                color: #e0c18e; border: 1px solid #e0c18e; padding: 5px 15px; cursor: pointer;
-            `;
-            closeBtn.onclick = () => galleryDiv.remove();
-            galleryDiv.appendChild(closeBtn);
-            document.body.appendChild(galleryDiv);
-        }
+    const galleryTitle = document.createElement('h2');
+    galleryTitle.style.cssText = `
+        color: #e0c18e; text-align: center; margin: 20px 0; 
+        font-family: ${stats.language === "ru" ? 'GoodVibesCyr' : 'GreatVibes'}, cursive; font-size: 36px;
+    `;
+    galleryTitle.textContent = stats.language === "ru" ? "Коллекционные карточки" : "Collection Cards";
+    galleryDiv.appendChild(galleryTitle);
+
+    if (stats.memories?.length > 0) {
+        stats.memories.forEach(memory => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.style.cssText = 'display: inline-block; margin: 15px; position: relative;';
+            const img = document.createElement('img');
+            img.src = `/heart_at_crossroads/assets/memories/${memory}.png`;
+            img.style.cssText = 'display: block; max-width: 300px; border: 8px solid #e0c18e; border-radius: 5px;';
+            img.onerror = () => {
+                console.warn(`Воспоминание ${memory}.png не найдено`);
+                cardWrapper.remove();
+            };
+            cardWrapper.appendChild(img);
+            galleryDiv.appendChild(cardWrapper);
+        });
+    } else {
+        const noCardsMsg = document.createElement('p');
+        noCardsMsg.style.cssText = 'color: #e0c18e; text-align: center; margin: 50px 0;';
+        noCardsMsg.textContent = stats.language === "ru" ? "У вас пока нет открытых карточек" : "You don't have any unlocked cards yet";
+        galleryDiv.appendChild(noCardsMsg);
+    }
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = stats.language === "ru" ? "Закрыть" : "Close";
+    closeBtn.style.cssText = `
+        position: fixed; top: 10px; right: 10px; background: #333; 
+        color: #e0c18e; border: 1px solid #e0c18e; padding: 5px 15px; cursor: pointer;
+    `;
+    closeBtn.onclick = () => galleryDiv.remove();
+    galleryDiv.appendChild(closeBtn);
+
+    // Добавляем galleryDiv в galleryContainer вместо document.body
+    galleryContainer.appendChild(galleryDiv);
+}
 
 
 
