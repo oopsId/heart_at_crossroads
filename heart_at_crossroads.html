@@ -851,12 +851,65 @@
         });
 
         // Остальные функции
-        function showStartScreen() {
-            console.log('showStartScreen вызван');
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('language-btn').style.display = 'block';
-            document.getElementById('game-container').style.display = 'none';
-        }
+        function clearEventListeners(element, events) {
+        events.forEach(event => {
+        element.removeEventListener(event, element[event + 'Handler']);
+        element[event + 'Handler'] = null;
+       });
+       }
+
+    function showStartScreen() {
+    console.log('showStartScreen вызван');
+    const startScreen = document.getElementById('start-screen');
+    const gameContainer = document.getElementById('game-container');
+    const languageBtn = document.getElementById('language-btn');
+
+    // Очистка старых обработчиков с кнопок
+    const buttons = ['start-game', 'continue-game', 'show-password', 'gallery-btn', 'password-submit'];
+    buttons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) clearEventListeners(btn, ['click', 'touchstart']);
+    });
+
+    // Показываем стартовый экран
+    startScreen.style.display = 'flex';
+    languageBtn.style.display = 'block';
+    gameContainer.style.display = 'none';
+
+    // Повторная привязка обработчиков
+    const startGameBtn = document.getElementById('start-game');
+    const continueGameBtn = document.getElementById('continue-game');
+    const showPasswordBtn = document.getElementById('show-password');
+    const passwordSubmitBtn = document.getElementById('password-submit');
+    const galleryBtn = document.getElementById('gallery-btn');
+
+    addEventListeners(startGameBtn, ['click', 'touchstart'], (e) => {
+        e.preventDefault();
+        console.log('start-game clicked');
+        checkTempPassword(() => startNewGame());
+    });
+    addEventListeners(continueGameBtn, ['click', 'touchstart'], (e) => {
+        e.preventDefault();
+        console.log('continue-game clicked');
+        checkTempPassword(() => loadSession(() => startGame()));
+    });
+    addEventListeners(showPasswordBtn, ['click', 'touchstart'], (e) => {
+        e.preventDefault();
+        console.log('show-password clicked');
+        document.getElementById('password-form').style.display = 'flex';
+        document.querySelector('.start-buttons').style.display = 'none';
+    });
+    addEventListeners(passwordSubmitBtn, ['click', 'touchstart'], handlePasswordSubmit);
+    addEventListeners(galleryBtn, ['click', 'touchstart'], (e) => {
+        e.preventDefault();
+        console.log('gallery-btn clicked');
+        showPremiumGallery();
+    });
+
+    // Убедимся, что стили не блокируют взаимодействие
+    startScreen.style.pointerEvents = 'auto';
+    startScreen.style.zIndex = '5';
+}
 
         function resetGameState() {
             console.log('resetGameState вызван');
