@@ -2017,6 +2017,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryContainer.style.display = 'block';
     galleryContainer.setAttribute('data-gallery', 'true');
     startScreen.style.display = 'none'; // Скрываем стартовый экран
+    startScreen.style.zIndex = '-1'; // На случай, если display не сработал
 
     const galleryHeader = document.createElement('div');
     galleryHeader.className = 'gallery-header';
