@@ -2148,8 +2148,10 @@ function handleChoices(scene, dialogueBox, overlay) {
     clickSound.play().catch(err => console.warn("Ошибка звука:", err));
 }
 
-    function createCardElement(card, seriesKey, cardsContainer, isRussian) {
+   function createCardElement(card, seriesKey, cardsContainer, isRussian) {
     const isUnlocked = stats.memories?.includes(card.id);
+    console.log('createCardElement для:', card.id, 'isUnlocked:', isUnlocked);
+
     const cardElement = document.createElement('div');
     cardElement.className = 'premium-card';
     cardElement.dataset.cardId = card.id;
@@ -2221,19 +2223,19 @@ function handleChoices(scene, dialogueBox, overlay) {
         }
     };
 
-    cardElement.addEventListener('click', handleInteraction);
-    cardElement.addEventListener('touchstart', handleInteraction);
+    cardElement.addEventListener('click', handleInteraction, { passive: true });
+    cardElement.addEventListener('touchstart', handleInteraction, { passive: true });
 
     document.addEventListener('touchstart', (e) => {
         if (!cardElement.contains(e.target) && clickCount === 1) {
             resetPosition();
         }
-    });
+    }, { passive: true });
     document.addEventListener('click', (e) => {
         if (!cardElement.contains(e.target) && clickCount === 1) {
             resetPosition();
         }
-    });
+    }, { passive: true });
 
     if (isUnlocked) {
         const frameOverlay = document.createElement('div');
@@ -2267,6 +2269,8 @@ function handleChoices(scene, dialogueBox, overlay) {
             width: calc(100% - 16px); height: calc(100% - 16px); 
             object-fit: cover; border-radius: 6px; z-index: 1;
         `;
+        cardImg.onerror = () => console.error('Ошибка загрузки изображения:', cardImg.src);
+        cardImg.onload = () => console.log('Изображение загружено:', cardImg.src);
 
         const filmEffect = document.createElement('div');
         filmEffect.className = 'film-effect';
@@ -2298,11 +2302,13 @@ function handleChoices(scene, dialogueBox, overlay) {
         cardElement.appendChild(cardName);
     } else {
         const cardImg = document.createElement('img');
-        cardImg.src = './assets/memories/card_locked.png';
+        cardImg.src = '/heart_at_crossroads/assets/memories/card_locked.png'; // Исправленный путь
         cardImg.style.cssText = `
             width: calc(100% - 16px); height: calc(100% - 16px); 
             object-fit: cover; border-radius: 6px; filter: grayscale(1); z-index: 1;
         `;
+        cardImg.onerror = () => console.error('Ошибка загрузки изображения:', cardImg.src);
+        cardImg.onload = () => console.log('Изображение загружено:', cardImg.src);
 
         const lockIcon = document.createElement('div');
         lockIcon.innerHTML = `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2332,6 +2338,8 @@ function handleChoices(scene, dialogueBox, overlay) {
             const diamondIcon = document.createElement('img');
             diamondIcon.src = '/heart_at_crossroads/assets/ui/diamonds.png';
             diamondIcon.style.cssText = `width: 16px; height: 16px; vertical-align: middle;`;
+            diamondIcon.onerror = () => console.error('Ошибка загрузки иконки:', diamondIcon.src);
+            diamondIcon.onload = () => console.log('Иконка загружена:', diamondIcon.src);
             unlockInfo.appendChild(diamondIcon);
         }
 
