@@ -2032,6 +2032,12 @@ function handleChoices(scene, dialogueBox, overlay) {
     cardsContainer.className = 'cards-container';
     cardsContainer.setAttribute('data-gallery', 'true');
     
+    if (!cardsContainer) {
+        console.warn('cardsContainer не найден, создаем новый');
+        cardsContainer = document.createElement('div');
+        cardsContainer.className = 'cards-container';
+        galleryContainer.appendChild(cardsContainer);
+    }
     console.log('galleryContainer:', galleryContainer.style.display, galleryContainer.style.opacity);
     console.log('cardsContainer:', cardsContainer.style.display, cardsContainer.style.opacity);
  
