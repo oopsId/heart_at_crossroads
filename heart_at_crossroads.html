@@ -540,6 +540,11 @@
     </style>
 </head>
 <body>
+     </div>
+        <div id="gallery-container" style="display: none;">
+        <!-- Дочерние элементы будут добавляться динамически -->
+       </div>
+
     <div id="start-screen">
         <h1 id="title" data-ru="Сердце<br>на перекрёстке" data-en="Heart<br>at the Crossroads">
             <span>Сердце</span>
@@ -554,10 +559,7 @@
         <div id="password-form">
             <input type="text" id="password-input" placeholder="Введите пароль">
             <button id="password-submit" data-ru="Войти" data-en="Login">Войти</button>
-        </div>
-        <div id="gallery-container" style="display: none;">
-        <!-- Дочерние элементы будут добавляться динамически -->
-       </div>
+        
         <button id="language-btn">
             <span id="language-icon">🇷🇺</span>
         </button>
@@ -2548,7 +2550,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-                    function showSimpleGallery() {
+                   function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
 
     const galleryContainer = document.getElementById('gallery-container');
@@ -2565,7 +2567,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         console.warn('Элемент #start-screen не найден в DOM');
     }
 
-    // Полностью заменяем стили galleryContainer
+    // Устанавливаем стили galleryContainer
     galleryContainer.style.cssText = `
         display: block;
         background: red !important;
@@ -2574,18 +2576,18 @@ function handleChoices(scene, dialogueBox, overlay) {
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 1000000; /* Ещё выше */
+        z-index: 1000000;
         opacity: 1;
     `;
     console.log('galleryContainer styles:', galleryContainer.style.cssText);
 
-    // Тестовый фон для body
+    // Устанавливаем зелёный фон для body
     document.body.style.background = 'green';
 
-    // Добавляем простой тестовый контент
+    // Очищаем и добавляем тестовый контент
+    galleryContainer.innerHTML = '';
     galleryContainer.innerHTML = '<div style="color: yellow; font-size: 50px; text-align: center; z-index: 1000001;">ТЕСТ</div>';
 }
-
 
 
         async function loadFinals(endingId) {
