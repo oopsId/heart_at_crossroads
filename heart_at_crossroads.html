@@ -1894,7 +1894,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 }
 
-             function showPremiumGallery() {
+            function showPremiumGallery() {
     if (!window.gsap) {
         console.error("GSAP не найден. Подключите библиотеку GSAP для анимаций.");
         return showSimpleGallery();
@@ -1956,7 +1956,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     const galleryHeader = document.createElement('div');
     galleryHeader.className = 'premium-gallery-header';
     galleryHeader.style.cssText = `
-        color: #e0c18e; font-size: 3.5rem; margin: 1rem 0 0.5rem; /* Уменьшен отступ снизу */
+        color: #e0c18e; font-size: 3.5rem; margin: 1rem 0 0.5rem;
         font-weight: normal; text-shadow: 0 0 10px rgba(224, 193, 142, 0.5); 
         opacity: 0; transform: translateY(-20px);
     `;
@@ -1965,7 +1965,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     const seriesSelector = document.createElement('div');
     seriesSelector.className = 'series-selector';
     seriesSelector.style.cssText = `
-        display: flex; gap: 1rem; margin-bottom: 1rem; opacity: 0; /* Подняли выше */
+        display: flex; gap: 1rem; margin-bottom: 1rem; opacity: 0;
     `;
 
     Object.keys(cardSeries).forEach(seriesKey => {
@@ -1974,7 +1974,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         seriesButton.dataset.series = seriesKey;
         seriesButton.textContent = isRussian ? cardSeries[seriesKey].title : cardSeries[seriesKey].titleEn;
         seriesButton.style.cssText = `
-            background: linear-gradient(to bottom, #3a3a3a, #202020); 
+            background: linear-gradient(to bottom, ${seriesKey === 'romance' ? '#6a5a3d' : '#3a3a3a'}, ${seriesKey === 'romance' ? '#4a3a1d' : '#202020'}); 
             color: #e0c18e; border: 1px solid #e0c18e; 
             padding: 0.5rem 1.5rem; font-size: 1rem; cursor: pointer; 
             border-radius: 4px; transition: all 0.3s ease;
@@ -2023,11 +2023,11 @@ function handleChoices(scene, dialogueBox, overlay) {
             gsap.to(galleryHeader, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" });
             gsap.to(seriesSelector, { opacity: 1, duration: 0.8, delay: 0.2, ease: "power2.out" });
             gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.3, ease: "power2.out" });
-            switchSeries(Object.keys(cardSeries)[0]); // Загружаем первую серию
+            switchSeries('romance'); // Загружаем "Романтику" по умолчанию
         }
     });
-
-    function switchSeries(seriesKey) {
+}
+        function switchSeries(seriesKey) {
     const seriesBtns = document.querySelectorAll('.series-btn');
     seriesBtns.forEach(btn => {
         btn.style.background = btn.dataset.series === seriesKey 
@@ -2051,6 +2051,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
     cardsContainer.appendChild(seriesTitle);
 
+    // Добавляем все карточки серии
     series.cards.forEach((card, index) => {
         const cardElement = createCardElement(card, seriesKey);
         cardsContainer.appendChild(cardElement);
@@ -2058,16 +2059,17 @@ function handleChoices(scene, dialogueBox, overlay) {
             cardElement.classList.add('active');
             gsap.set(cardElement, { y: 0, zIndex: 100 });
         } else {
-            gsap.set(cardElement, { y: 10 * index, zIndex: 100 - index }); // Фиксированное смещение
+            gsap.set(cardElement, { y: 20, zIndex: 100 - index }); // Фиксированное смещение для "ушек"
         }
         gsap.fromTo(cardElement, 
-            { opacity: 0 }, 
-            { opacity: 1, duration: 0.5, delay: 0.1 * index, ease: "power2.out" }
+            { opacity: 0, y: 30 }, 
+            { opacity: 1, y: index === 0 ? 0 : 20, duration: 0.5, delay: 0.1 * index, ease: "power2.out" }
         );
     });
 
     clickSound.play().catch(err => console.warn("Ошибка звука:", err));
 }
+
 
    function createCardElement(card, seriesKey) {
     const isUnlocked = stats.memories?.includes(card.id);
@@ -2082,18 +2084,23 @@ function handleChoices(scene, dialogueBox, overlay) {
         z-index: 1;
     `;
 
-    const setActive = (e) => {
-        e.preventDefault();
-        if (cardElement.classList.contains('active')) {
-            if (isUnlocked) showCardDetail(card); // Открытие только для активной разблокированной
-            return;
-        }
+    let clickCount = 0;
 
+    const slideUp = () => {
+        gsap.to(cardElement, { 
+            y: -10, // Выдвигается вверх
+            zIndex: 50, 
+            duration: 0.3, 
+            ease: "power2.out" 
+        });
+    };
+
+    const setActive = () => {
         const currentActive = cardsContainer.querySelector('.premium-card.active');
-        if (currentActive) {
+        if (currentActive && currentActive !== cardElement) {
             currentActive.classList.remove('active');
             gsap.to(currentActive, { 
-                y: 10, // Уходит назад
+                y: 20, // Уходит назад
                 zIndex: 1, 
                 duration: 0.3, 
                 ease: "power2.in" 
@@ -2104,13 +2111,53 @@ function handleChoices(scene, dialogueBox, overlay) {
         gsap.to(cardElement, { 
             y: 0, // На передний план
             zIndex: 100, 
-            duration: 0.3, 
+            duration: 0.5, 
             ease: "power2.out" 
         });
     };
 
-    cardElement.addEventListener('click', setActive);
-    cardElement.addEventListener('touchstart', setActive);
+    const resetPosition = () => {
+        if (!cardElement.classList.contains('active')) {
+            gsap.to(cardElement, { 
+                y: 20, 
+                zIndex: 1, 
+                duration: 0.3, 
+                ease: "power2.in" 
+            });
+        }
+        clickCount = 0;
+    };
+
+    const handleInteraction = (e) => {
+        e.preventDefault();
+        if (cardElement.classList.contains('active')) {
+            if (isUnlocked) showCardDetail(card);
+            return;
+        }
+
+        if (clickCount === 0) {
+            slideUp();
+            clickCount = 1;
+        } else if (clickCount === 1) {
+            setActive();
+            clickCount = 0;
+        }
+    };
+
+    cardElement.addEventListener('click', handleInteraction);
+    cardElement.addEventListener('touchstart', handleInteraction);
+
+    // Сброс при касании вне карточки
+    document.addEventListener('touchstart', (e) => {
+        if (!cardElement.contains(e.target) && clickCount === 1) {
+            resetPosition();
+        }
+    });
+    document.addEventListener('click', (e) => {
+        if (!cardElement.contains(e.target) && clickCount === 1) {
+            resetPosition();
+        }
+    });
 
     if (isUnlocked) {
         const frameOverlay = document.createElement('div');
@@ -2234,7 +2281,6 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     return cardElement;
 }
-
 
     function unlockCard(card) {
         const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
