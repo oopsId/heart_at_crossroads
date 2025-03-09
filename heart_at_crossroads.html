@@ -2550,7 +2550,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
                      function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
-
+   document.body.style.background = 'green';
     const galleryContainer = document.getElementById('gallery-container');
     if (!galleryContainer) {
         console.error('Элемент #gallery-container не найден в DOM');
