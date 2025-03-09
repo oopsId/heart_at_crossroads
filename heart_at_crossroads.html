@@ -260,7 +260,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('backgrounds/start-bg.jpg') no-repeat center center fixed;
+    background: url('/heart_at_crossroads/assets/backgrounds/start_screen.png') no-repeat center center fixed;
     background-size: cover;
     z-index: 3000; /* Увеличено с 5 до 3000 */
     pointer-events: auto;
@@ -2009,12 +2009,14 @@ function handleChoices(scene, dialogueBox, overlay) {
     document.head.appendChild(styleElement);
 
     const galleryContainer = document.getElementById('gallery-container');
+    const startScreen = document.getElementById('start-screen'); // Добавляем
     if (!galleryContainer) {
         console.error('Контейнер #gallery-container не найден в HTML');
         return;
     }
     galleryContainer.style.display = 'block';
     galleryContainer.setAttribute('data-gallery', 'true');
+    startScreen.style.display = 'none'; // Скрываем стартовый экран
 
     const galleryHeader = document.createElement('div');
     galleryHeader.className = 'gallery-header';
@@ -2506,6 +2508,9 @@ function handleChoices(scene, dialogueBox, overlay) {
             onComplete: () => {
                 galleryContainer.innerHTML = ''; // Очищаем содержимое
                 galleryContainer.style.display = 'none';
+                startScreen.style.display = 'flex'; // Возвращаем стартовый экран
+                startScreen.style.pointerEvents = 'auto';
+                startScreen.style.zIndex = '3000';
             }
         });
     }
