@@ -1894,7 +1894,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 }
 
-            function showPremiumGallery() {
+             function showPremiumGallery() {
     if (!window.gsap) {
         console.error("GSAP не найден. Подключите библиотеку GSAP для анимаций.");
         return showSimpleGallery();
@@ -2023,11 +2023,11 @@ function handleChoices(scene, dialogueBox, overlay) {
             gsap.to(galleryHeader, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" });
             gsap.to(seriesSelector, { opacity: 1, duration: 0.8, delay: 0.2, ease: "power2.out" });
             gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.3, ease: "power2.out" });
-            switchSeries('romance'); // Загружаем "Романтику" по умолчанию
+            switchSeries('romance');
         }
     });
 }
-        function switchSeries(seriesKey) {
+          function switchSeries(seriesKey) {
     const seriesBtns = document.querySelectorAll('.series-btn');
     seriesBtns.forEach(btn => {
         btn.style.background = btn.dataset.series === seriesKey 
@@ -2051,7 +2051,6 @@ function handleChoices(scene, dialogueBox, overlay) {
         : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
     cardsContainer.appendChild(seriesTitle);
 
-    // Добавляем все карточки серии
     series.cards.forEach((card, index) => {
         const cardElement = createCardElement(card, seriesKey);
         cardsContainer.appendChild(cardElement);
@@ -2059,7 +2058,7 @@ function handleChoices(scene, dialogueBox, overlay) {
             cardElement.classList.add('active');
             gsap.set(cardElement, { y: 0, zIndex: 100 });
         } else {
-            gsap.set(cardElement, { y: 20, zIndex: 100 - index }); // Фиксированное смещение для "ушек"
+            gsap.set(cardElement, { y: 20, zIndex: 100 - index });
         }
         gsap.fromTo(cardElement, 
             { opacity: 0, y: 30 }, 
@@ -2070,8 +2069,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     clickSound.play().catch(err => console.warn("Ошибка звука:", err));
 }
 
-
-   function createCardElement(card, seriesKey) {
+    function createCardElement(card, seriesKey) {
     const isUnlocked = stats.memories?.includes(card.id);
     const cardElement = document.createElement('div');
     cardElement.className = 'premium-card';
@@ -2088,7 +2086,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     const slideUp = () => {
         gsap.to(cardElement, { 
-            y: -10, // Выдвигается вверх
+            y: -10, 
             zIndex: 50, 
             duration: 0.3, 
             ease: "power2.out" 
@@ -2100,7 +2098,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         if (currentActive && currentActive !== cardElement) {
             currentActive.classList.remove('active');
             gsap.to(currentActive, { 
-                y: 20, // Уходит назад
+                y: 20, 
                 zIndex: 1, 
                 duration: 0.3, 
                 ease: "power2.in" 
@@ -2109,7 +2107,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
         cardElement.classList.add('active');
         gsap.to(cardElement, { 
-            y: 0, // На передний план
+            y: 0, 
             zIndex: 100, 
             duration: 0.5, 
             ease: "power2.out" 
@@ -2147,7 +2145,6 @@ function handleChoices(scene, dialogueBox, overlay) {
     cardElement.addEventListener('click', handleInteraction);
     cardElement.addEventListener('touchstart', handleInteraction);
 
-    // Сброс при касании вне карточки
     document.addEventListener('touchstart', (e) => {
         if (!cardElement.contains(e.target) && clickCount === 1) {
             resetPosition();
@@ -2430,14 +2427,17 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 
     function closeGallery(galleryContainer) {
-        document.head.removeChild(styleElement);
-        gsap.to(galleryContainer, {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.in",
-            onComplete: () => galleryContainer.remove()
-        });
-    }
+    gsap.to(galleryContainer, {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+        onComplete: () => {
+            galleryContainer.remove();
+            document.querySelector('style')?.remove(); // Удаляем стили, чтобы не накапливались
+        }
+    });
+}
+
 }
 
 
