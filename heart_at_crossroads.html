@@ -2038,6 +2038,11 @@ function handleChoices(scene, dialogueBox, overlay) {
         cardsContainer.className = 'cards-container';
         galleryContainer.appendChild(cardsContainer);
     }
+    galleryContainer.style.display = 'block';
+    galleryContainer.style.opacity = '1';
+    startScreen.style.display = 'none';
+    cardsContainer.style.display = 'flex'; // Устанавливаем grid явно
+    cardsContainer.style.opacity = '1';
     console.log('galleryContainer:', galleryContainer.style.display, galleryContainer.style.opacity);
     console.log('cardsContainer:', cardsContainer.style.display, cardsContainer.style.opacity);
  
