@@ -250,19 +250,22 @@
             opacity: 0;
             transition: opacity 1s ease;
         }
-        #start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('/heart_at_crossroads/assets/backgrounds/start_screen.png') center/cover no-repeat #FFF5E6;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
-        }
+    #start-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('backgrounds/start-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    z-index: 3000; /* Увеличено с 5 до 3000 */
+    pointer-events: auto;
+    touch-action: auto;
+       }
         #start-screen h1 {
             color: #A67C52;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -491,6 +494,48 @@
             height: 400px;
             pointer-events: none;
         }
+
+         #gallery-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    opacity: 0;
+    z-index: 2000; /* Меньше, чем у стартового экрана */
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    data-gallery: true; /* Добавлен атрибут */
+}
+
+.gallery-header {
+    text-align: center;
+    color: #e0c18e;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    opacity: 0;
+    data-gallery: true; /* Добавлен атрибут */
+}
+
+.series-selector {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    opacity: 0;
+    data-gallery: true; /* Добавлен атрибут */
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0 10px;
+    data-gallery: true; /* Добавлен атрибут */
+}
     </style>
 </head>
 <body>
@@ -533,6 +578,10 @@
             <button id="stats">Статы</button>
         </div>
         <div id="particles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
+    </div>
+
+    <div id="gallery-container" style="display: none;">
+    <!-- Дочерние элементы будут добавляться динамически -->
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
@@ -864,51 +913,9 @@
     const gameContainer = document.getElementById('game-container');
     const languageBtn = document.getElementById('language-btn');
 
-    // Очистка старых обработчиков с кнопок
-    const buttons = ['start-game', 'continue-game', 'show-password', 'gallery-btn', 'password-submit'];
-    buttons.forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) clearEventListeners(btn, ['click', 'touchstart']);
-    });
-
-    // Показываем стартовый экран
     startScreen.style.display = 'flex';
     languageBtn.style.display = 'block';
     gameContainer.style.display = 'none';
-
-    // Повторная привязка обработчиков
-    const startGameBtn = document.getElementById('start-game');
-    const continueGameBtn = document.getElementById('continue-game');
-    const showPasswordBtn = document.getElementById('show-password');
-    const passwordSubmitBtn = document.getElementById('password-submit');
-    const galleryBtn = document.getElementById('gallery-btn');
-
-    addEventListeners(startGameBtn, ['click', 'touchstart'], (e) => {
-        e.preventDefault();
-        console.log('start-game clicked');
-        checkTempPassword(() => startNewGame());
-    });
-    addEventListeners(continueGameBtn, ['click', 'touchstart'], (e) => {
-        e.preventDefault();
-        console.log('continue-game clicked');
-        checkTempPassword(() => loadSession(() => startGame()));
-    });
-    addEventListeners(showPasswordBtn, ['click', 'touchstart'], (e) => {
-        e.preventDefault();
-        console.log('show-password clicked');
-        document.getElementById('password-form').style.display = 'flex';
-        document.querySelector('.start-buttons').style.display = 'none';
-    });
-    addEventListeners(passwordSubmitBtn, ['click', 'touchstart'], handlePasswordSubmit);
-    addEventListeners(galleryBtn, ['click', 'touchstart'], (e) => {
-        e.preventDefault();
-        console.log('gallery-btn clicked');
-        showPremiumGallery();
-    });
-
-    // Убедимся, что стили не блокируют взаимодействие
-    startScreen.style.pointerEvents = 'auto';
-    startScreen.style.zIndex = '5';
 }
 
         function resetGameState() {
@@ -1947,7 +1954,8 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 }
 
-             function showPremiumGallery() {
+            function showPremiumGallery() {
+    console.log('showPremiumGallery вызван, stats.memories:', stats.memories);
     if (!window.gsap) {
         console.error("GSAP не найден. Подключите библиотеку GSAP для анимаций.");
         return showSimpleGallery();
@@ -1955,6 +1963,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     const isRussian = stats.language === "ru";
 
+    // Добавляем стили для карточек
     const styleElement = document.createElement('style');
     styleElement.textContent = `
         .premium-gallery-container * { box-sizing: border-box; }
@@ -1996,53 +2005,26 @@ function handleChoices(scene, dialogueBox, overlay) {
     `;
     document.head.appendChild(styleElement);
 
-    const galleryContainer = document.createElement('div');
-    galleryContainer.className = 'premium-gallery-container';
-    galleryContainer.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: radial-gradient(ellipse at center, rgba(40, 40, 40, 0.98), rgba(0, 0, 0, 0.98));
-        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-        z-index: 1000; display: flex; flex-direction: column; align-items: center; 
-        overflow: hidden; opacity: 0;
-    `;
+    const galleryContainer = document.getElementById('gallery-container');
+    if (!galleryContainer) {
+        console.error('Контейнер #gallery-container не найден в HTML');
+        return;
+    }
+    galleryContainer.style.display = 'block';
+    galleryContainer.setAttribute('data-gallery', 'true');
 
     const galleryHeader = document.createElement('div');
-    galleryHeader.className = 'premium-gallery-header';
-    galleryHeader.style.cssText = `
-        color: #e0c18e; font-size: 3.5rem; margin: 1rem 0 0.5rem;
-        font-weight: normal; text-shadow: 0 0 10px rgba(224, 193, 142, 0.5); 
-        opacity: 0; transform: translateY(-20px);
-    `;
+    galleryHeader.className = 'gallery-header';
     galleryHeader.textContent = isRussian ? "Коллекционные карточки" : "Collection Cards";
+    galleryHeader.setAttribute('data-gallery', 'true');
 
     const seriesSelector = document.createElement('div');
     seriesSelector.className = 'series-selector';
-    seriesSelector.style.cssText = `
-        display: flex; gap: 1rem; margin-bottom: 1rem; opacity: 0;
-    `;
-
-    Object.keys(cardSeries).forEach(seriesKey => {
-        const seriesButton = document.createElement('button');
-        seriesButton.className = 'series-btn';
-        seriesButton.dataset.series = seriesKey;
-        seriesButton.textContent = isRussian ? cardSeries[seriesKey].title : cardSeries[seriesKey].titleEn;
-        seriesButton.style.cssText = `
-            background: linear-gradient(to bottom, ${seriesKey === 'romance' ? '#6a5a3d' : '#3a3a3a'}, ${seriesKey === 'romance' ? '#4a3a1d' : '#202020'}); 
-            color: #e0c18e; border: 1px solid #e0c18e; 
-            padding: 0.5rem 1.5rem; font-size: 1rem; cursor: pointer; 
-            border-radius: 4px; transition: all 0.3s ease;
-        `;
-        seriesButton.onclick = () => switchSeries(seriesKey);
-        seriesSelector.appendChild(seriesButton);
-    });
+    seriesSelector.setAttribute('data-gallery', 'true');
 
     const cardsContainer = document.createElement('div');
     cardsContainer.className = 'cards-container';
-    cardsContainer.style.cssText = `
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-        gap: 2rem; width: 80%; max-width: 1200px; padding: 2rem; 
-        overflow-y: auto; max-height: 70vh; -webkit-overflow-scrolling: touch;
-    `;
+    cardsContainer.setAttribute('data-gallery', 'true');
 
     const closeButton = document.createElement('button');
     closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2055,18 +2037,38 @@ function handleChoices(scene, dialogueBox, overlay) {
         align-items: center; justify-content: center; border-radius: 50%; 
         transition: background 0.3s;
     `;
+    closeButton.setAttribute('data-gallery', 'true');
     closeButton.onmouseover = () => closeButton.style.background = 'rgba(224, 193, 142, 0.2)';
     closeButton.onmouseout = () => closeButton.style.background = 'transparent';
-    closeButton.onclick = () => closeGallery(galleryContainer);
 
+    galleryContainer.innerHTML = '';
     galleryContainer.appendChild(galleryHeader);
     galleryContainer.appendChild(seriesSelector);
     galleryContainer.appendChild(cardsContainer);
     galleryContainer.appendChild(closeButton);
-    document.body.appendChild(galleryContainer);
 
     const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
     clickSound.load();
+
+    Object.keys(cardSeries).forEach(seriesKey => {
+        const seriesButton = document.createElement('button');
+        seriesButton.className = 'series-btn';
+        seriesButton.dataset.series = seriesKey;
+        seriesButton.textContent = isRussian ? cardSeries[seriesKey].title : cardSeries[seriesKey].titleEn;
+        seriesButton.style.cssText = `
+            background: linear-gradient(to bottom, ${seriesKey === 'romance' ? '#6a5a3d' : '#3a3a3a'}, ${seriesKey === 'romance' ? '#4a3a1d' : '#202020'}); 
+            color: #e0c18e; border: 1px solid #e0c18e; 
+            padding: 0.5rem 1.5rem; font-size: 1rem; cursor: pointer; 
+            border-radius: 4px; transition: all 0.3s ease;
+        `;
+        seriesButton.setAttribute('data-gallery', 'true');
+        seriesSelector.appendChild(seriesButton);
+
+        addEventListeners(seriesButton, ['click', 'touchstart'], () => {
+            switchSeries(seriesKey, cardsContainer, clickSound, isRussian);
+            clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+        });
+    });
 
     gsap.to(galleryContainer, {
         opacity: 1,
@@ -2076,11 +2078,18 @@ function handleChoices(scene, dialogueBox, overlay) {
             gsap.to(galleryHeader, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" });
             gsap.to(seriesSelector, { opacity: 1, duration: 0.8, delay: 0.2, ease: "power2.out" });
             gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.3, ease: "power2.out" });
-            switchSeries('romance');
+            switchSeries('romance', cardsContainer, clickSound, isRussian); // Передаём параметры
         }
     });
+
+    addEventListeners(closeButton, ['click', 'touchstart'], () => {
+        closeGallery();
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    });
 }
-          function switchSeries(seriesKey) {
+
+
+         function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
     const seriesBtns = document.querySelectorAll('.series-btn');
     seriesBtns.forEach(btn => {
         btn.style.background = btn.dataset.series === seriesKey 
@@ -2088,8 +2097,7 @@ function handleChoices(scene, dialogueBox, overlay) {
             : 'linear-gradient(to bottom, #3a3a3a, #202020)';
     });
 
-    cardsContainer.innerHTML = '';
-    gsap.fromTo(cardsContainer, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+    cardsContainer.innerHTML = ''; // Очищаем контейнер карточек
 
     const series = cardSeries[seriesKey];
     const seriesTitle = document.createElement('div');
@@ -2122,7 +2130,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     clickSound.play().catch(err => console.warn("Ошибка звука:", err));
 }
 
-    function createCardElement(card, seriesKey) {
+    function createCardElement(card, seriesKey, cardsContainer, isRussian) {
     const isUnlocked = stats.memories?.includes(card.id);
     const cardElement = document.createElement('div');
     cardElement.className = 'premium-card';
@@ -2332,165 +2340,178 @@ function handleChoices(scene, dialogueBox, overlay) {
     return cardElement;
 }
 
-    function unlockCard(card) {
-        const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
-        if (stats.diamonds >= cost) {
-            const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
-            gsap.to(cardElement || cardsContainer, {
-                scale: 1.2,
-                rotationY: 180,
-                duration: 0.8,
-                ease: "back.out(1.7)",
-                onComplete: () => {
-                    stats.diamonds -= cost;
-                    stats.memories = stats.memories || [];
-                    stats.memories.push(card.id);
-                    updateDiamondsDisplay();
-                    saveSession();
-                    switchSeries(Object.keys(cardSeries).find(key => cardSeries[key].cards.includes(card)));
-                    unlockSound.play().catch(err => console.warn("Ошибка звука разблокировки:", err));
-                    showUnlockNotification(card);
-                }
-            });
-        } else {
-            alert(isRussian ? "Недостаточно бриллиантов!" : "Not enough diamonds!");
-        }
-    }
-
-    function showUnlockNotification(card) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(20, 20, 20, 0.9); border: 1px solid #e0c18e;
-            border-radius: 15px; padding: 20px; color: white; text-align: center;
-            z-index: 2000; max-width: 300px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            opacity: 0; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        `;
-        
-        notification.innerHTML = `
-            <div style="font-size: 1.5rem; color: #e0c18e; margin-bottom: 10px;">
-                ${isRussian ? 'Карта разблокирована!' : 'Card Unlocked!'}
-            </div>
-            <div style="font-size: 1.2rem; margin-bottom: 15px;">
-                ${isRussian ? card.name : card.nameEn}
-            </div>
-            <img src="/heart_at_crossroads/assets/memories/${card.id}.png" alt="Card" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
-            <button style="
-                background: linear-gradient(to bottom, #e0c18e, #a37e33);
-                color: #111; border: none; padding: 10px 20px; border-radius: 30px;
-                font-weight: bold; cursor: pointer;
-            ">${isRussian ? 'Супер!' : 'Awesome!'}</button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        gsap.to(notification, {
-            opacity: 1,
-            duration: 0.5,
-            ease: "power2.out",
+   function unlockCard(card, cardsContainer, clickSound, isRussian) {
+    const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
+    if (stats.diamonds >= cost) {
+        const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
+        gsap.to(cardElement || cardsContainer, {
+            scale: 1.2,
+            rotationY: 180,
+            duration: 0.8,
+            ease: "back.out(1.7)",
             onComplete: () => {
-                const closeBtn = notification.querySelector('button');
-                closeBtn.onclick = () => {
-                    gsap.to(notification, {
-                        opacity: 0,
-                        duration: 0.3,
-                        ease: "power2.in",
-                        onComplete: () => document.body.removeChild(notification)
-                    });
-                };
+                stats.diamonds -= cost;
+                stats.memories = stats.memories || [];
+                stats.memories.push(card.id);
+                updateDiamondsDisplay();
+                saveSession();
+                switchSeries(
+                    Object.keys(cardSeries).find(key => cardSeries[key].cards.includes(card)),
+                    cardsContainer,
+                    clickSound,
+                    isRussian
+                );
+                unlockSound.play().catch(err => console.warn("Ошибка звука разблокировки:", err));
+                showUnlockNotification(card);
             }
         });
+    } else {
+        alert(isRussian ? "Недостаточно бриллиантов!" : "Not enough diamonds!");
     }
+}
 
-    function showCardDetail(card) {
-        // Оставляем вашу текущую реализацию без изменений
-        const overlay = document.createElement('div');
-        overlay.className = 'card-detail-overlay';
-        overlay.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.9); display: flex; 
-            justify-content: center; align-items: center; z-index: 2000; opacity: 0;
-        `;
-
-        const detailContainer = document.createElement('div');
-        detailContainer.className = 'card-detail-container';
-        detailContainer.style.cssText = `
-            position: relative; width: 80%; max-width: 800px; max-height: 90vh; 
-            display: flex; flex-direction: column; align-items: center; transform: scale(0.9);
-        `;
-
-        const cardImage = document.createElement('img');
-        cardImage.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
-        cardImage.style.cssText = `
-            max-width: 100%; max-height: 80vh; object-fit: contain; 
-            border: 8px solid transparent; border-image: linear-gradient(45deg, #e6d2b5, #d4b468) 1; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-        `;
-
-        const detailCardWrapper = document.createElement('div');
-        detailCardWrapper.style.cssText = `
-            position: relative; display: inline-block; margin-bottom: 1rem; 
-            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
-        `;
-
-        const filmEffectDetail = document.createElement('div');
-        filmEffectDetail.style.cssText = `
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            opacity: 0.3; pointer-events: none; mix-blend-mode: overlay; z-index: 3;
-        `;
-        filmEffectDetail.innerHTML = svgDecorations.filmScratch;
-
-        const cardTitle = document.createElement('div');
-        cardTitle.className = 'card-detail-title';
-        cardTitle.textContent = isRussian ? card.name : card.nameEn;
-        cardTitle.style.cssText = `
-            color: #e0c18e; font-size: 2.5rem; margin-top: 1.5rem; 
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        `;
-
-        const closeDetailBtn = document.createElement('button');
-        closeDetailBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
-        closeDetailBtn.style.cssText = `
-            position: absolute; top: -40px; right: -40px; background: transparent; 
-            border: none; color: #e0c18e; font-size: 1.5rem; cursor: pointer; 
-            width: 40px; height: 40px; display: flex; align-items: center; 
-            justify-content: center; border-radius: 50%; transition: background 0.3s;
-        `;
-        closeDetailBtn.onmouseover = () => closeDetailBtn.style.background = 'rgba(224, 193, 142, 0.2)';
-        closeDetailBtn.onmouseout = () => closeDetailBtn.style.background = 'transparent';
-        closeDetailBtn.onclick = () => gsap.to(overlay, { opacity: 0, duration: 0.3, onComplete: () => overlay.remove() });
-
-        detailCardWrapper.appendChild(cardImage);
-        detailCardWrapper.appendChild(filmEffectDetail);
-        detailContainer.appendChild(detailCardWrapper);
-        detailContainer.appendChild(cardTitle);
-        detailContainer.appendChild(closeDetailBtn);
-        overlay.appendChild(detailContainer);
-        document.body.appendChild(overlay);
-
-        gsap.to(overlay, { opacity: 1, duration: 0.3, ease: "power2.out" });
-        gsap.to(detailContainer, { scale: 1, duration: 0.5, ease: "back.out(1.7)" });
-        overlay.onclick = (e) => {
-            if (e.target === overlay) gsap.to(overlay, { opacity: 0, duration: 0.3, onComplete: () => overlay.remove() });
-        };
-
-        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-    }
-
-    function closeGallery(galleryContainer) {
-    gsap.to(galleryContainer, {
-        opacity: 0,
+   function showUnlockNotification(card, isRussian) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: rgba(20, 20, 20, 0.9); border: 1px solid #e0c18e;
+        border-radius: 15px; padding: 20px; color: white; text-align: center;
+        z-index: 2000; max-width: 300px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        opacity: 0; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    `;
+    
+    notification.innerHTML = `
+        <div style="font-size: 1.5rem; color: #e0c18e; margin-bottom: 10px;">
+            ${isRussian ? 'Карта разблокирована!' : 'Card Unlocked!'}
+        </div>
+        <div style="font-size: 1.2rem; margin-bottom: 15px;">
+            ${isRussian ? card.name : card.nameEn}
+        </div>
+        <img src="/heart_at_crossroads/assets/memories/${card.id}.png" alt="Card" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
+        <button style="
+            background: linear-gradient(to bottom, #e0c18e, #a37e33);
+            color: #111; border: none; padding: 10px 20px; border-radius: 30px;
+            font-weight: bold; cursor: pointer;
+        ">${isRussian ? 'Супер!' : 'Awesome!'}</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    gsap.to(notification, {
+        opacity: 1,
         duration: 0.5,
-        ease: "power2.in",
+        ease: "power2.out",
         onComplete: () => {
-            galleryContainer.remove();
-            document.querySelector('style')?.remove(); // Удаляем стили, чтобы не накапливались
+            const closeBtn = notification.querySelector('button');
+            closeBtn.onclick = () => {
+                gsap.to(notification, {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.in",
+                    onComplete: () => document.body.removeChild(notification)
+                });
+            };
         }
     });
 }
 
+      function showCardDetail(card, isRussian, clickSound) {
+    const overlay = document.createElement('div');
+    overlay.className = 'card-detail-overlay';
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0, 0, 0, 0.9); display: flex; 
+        justify-content: center; align-items: center; z-index: 2000; opacity: 0;
+    `;
+
+    const detailContainer = document.createElement('div');
+    detailContainer.className = 'card-detail-container';
+    detailContainer.style.cssText = `
+        position: relative; width: 80%; max-width: 800px; max-height: 90vh; 
+        display: flex; flex-direction: column; align-items: center; transform: scale(0.9);
+    `;
+
+    const cardImage = document.createElement('img');
+    cardImage.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
+    cardImage.style.cssText = `
+        max-width: 100%; max-height: 80vh; object-fit: contain; 
+        border: 8px solid transparent; border-image: linear-gradient(45deg, #e6d2b5, #d4b468) 1; 
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    `;
+
+    const detailCardWrapper = document.createElement('div');
+    detailCardWrapper.style.cssText = `
+        position: relative; display: inline-block; margin-bottom: 1rem; 
+        filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+    `;
+
+    const filmEffectDetail = document.createElement('div');
+    filmEffectDetail.style.cssText = `
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        opacity: 0.3; pointer-events: none; mix-blend-mode: overlay; z-index: 3;
+    `;
+    filmEffectDetail.innerHTML = svgDecorations.filmScratch;
+
+    const cardTitle = document.createElement('div');
+    cardTitle.className = 'card-detail-title';
+    cardTitle.textContent = isRussian ? card.name : card.nameEn;
+    cardTitle.style.cssText = `
+        color: #e0c18e; font-size: 2.5rem; margin-top: 1.5rem; 
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    `;
+
+    const closeDetailBtn = document.createElement('button');
+    closeDetailBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    closeDetailBtn.style.cssText = `
+        position: absolute; top: -40px; right: -40px; background: transparent; 
+        border: none; color: #e0c18e; font-size: 1.5rem; cursor: pointer; 
+        width: 40px; height: 40px; display: flex; align-items: center; 
+        justify-content: center; border-radius: 50%; transition: background 0.3s;
+    `;
+    closeDetailBtn.onmouseover = () => closeDetailBtn.style.background = 'rgba(224, 193, 142, 0.2)';
+    closeDetailBtn.onmouseout = () => closeDetailBtn.style.background = 'transparent';
+    closeDetailBtn.onclick = () => gsap.to(overlay, { opacity: 0, duration: 0.3, onComplete: () => overlay.remove() });
+
+    detailCardWrapper.appendChild(cardImage);
+    detailCardWrapper.appendChild(filmEffectDetail);
+    detailContainer.appendChild(detailCardWrapper);
+    detailContainer.appendChild(cardTitle);
+    detailContainer.appendChild(closeDetailBtn);
+    overlay.appendChild(detailContainer);
+    document.body.appendChild(overlay);
+
+    gsap.to(overlay, { opacity: 1, duration: 0.3, ease: "power2.out" });
+    gsap.to(detailContainer, { scale: 1, duration: 0.5, ease: "back.out(1.7)" });
+    overlay.onclick = (e) => {
+        if (e.target === overlay) gsap.to(overlay, { opacity: 0, duration: 0.3, onComplete: () => overlay.remove() });
+    };
+
+    clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+}
+         function closeGallery() {
+    console.log('closeGallery вызван');
+    const galleryContainer = document.getElementById('gallery-container');
+    const startScreen = document.getElementById('start-screen');
+
+    if (galleryContainer) {
+        gsap.to(galleryContainer, {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.in",
+            onComplete: () => {
+                galleryContainer.innerHTML = ''; // Очищаем содержимое
+                galleryContainer.style.display = 'none';
+            }
+        });
+    }
+
+    if (startScreen) {
+        startScreen.style.display = 'flex';
+        startScreen.style.pointerEvents = 'auto';
+        startScreen.style.zIndex = '3000';
+    }
 }
 
 
