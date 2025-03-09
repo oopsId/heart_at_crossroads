@@ -535,6 +535,7 @@
     gap: 20px;
     padding: 0 10px;
     data-gallery: true; /* Добавлен атрибут */
+    opacity: 1;
 }
     </style>
 </head>
@@ -2051,6 +2052,8 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryContainer.appendChild(seriesSelector);
     galleryContainer.appendChild(cardsContainer);
     galleryContainer.appendChild(closeButton);
+    console.log('galleryContainer children:', galleryContainer.children.length);
+    galleryContainer.style.background = 'red'; // Если видите красный экран, проблема в дочерних элементах
 
     const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
     clickSound.load();
