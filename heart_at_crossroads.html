@@ -1928,11 +1928,11 @@ function handleChoices(scene, dialogueBox, overlay) {
             transform: translateX(-50%) scale(1.05);
             box-shadow: 0 6px 15px rgba(224, 193, 142, 0.4);
         }
-        @media (max-width: 600px) {
-            .cards-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-            .premium-gallery-header { font-size: 2.5rem; }
-            .series-title { font-size: 1.5rem; }
-        }
+       @media (max-width: 600px) {
+    .cards-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .premium-gallery-header { font-size: 2.5rem; }
+    .series-title { font-size: 1.5rem; }
+       }
     `;
     document.head.appendChild(styleElement);
 
@@ -1979,10 +1979,10 @@ function handleChoices(scene, dialogueBox, overlay) {
     const cardsContainer = document.createElement('div');
     cardsContainer.className = 'cards-container';
     cardsContainer.style.cssText = `
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-        gap: 2rem; width: 80%; max-width: 1200px; padding: 2rem; 
-        overflow-y: auto; max-height: 70vh;
-    `;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    gap: 2rem; width: 80%; max-width: 1200px; padding: 2rem; 
+    overflow-y: auto; max-height: 70vh; -webkit-overflow-scrolling: touch;
+`;
 
     const closeButton = document.createElement('button');
     closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2058,147 +2058,172 @@ function handleChoices(scene, dialogueBox, overlay) {
         clickSound.play().catch(err => console.warn("Ошибка звука:", err));
     }
 
-    function createCardElement(card, seriesKey) {
-        const isUnlocked = stats.memories?.includes(card.id);
-        const cardElement = document.createElement('div');
-        cardElement.className = 'premium-card';
-        cardElement.dataset.cardId = card.id; // Добавляем идентификатор для анимации
-        cardElement.style.cssText = `
-            position: relative; width: 100%; aspect-ratio: 3/4; 
-            border-radius: 10px; overflow: hidden; background: #222; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
-            transition: transform 0.3s ease;
+     function createCardElement(card, seriesKey) {
+    const isUnlocked = stats.memories?.includes(card.id);
+    const cardElement = document.createElement('div');
+    cardElement.className = 'premium-card';
+    cardElement.dataset.cardId = card.id;
+    cardElement.style.cssText = `
+        position: relative; width: 100%; aspect-ratio: 3/4; 
+        border-radius: 10px; overflow: hidden; background: #222; 
+        display: flex; flex-direction: column; justify-content: center; 
+        align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+        transition: transform 0.3s ease; z-index: 1; /* Базовый z-index */
+    `;
+
+    // Обработчик взаимодействия (для десктопа и мобильных)
+    const bringToFront = () => {
+        if (isUnlocked) {
+            // Поднимаем карточку выше всех
+            cardElement.style.zIndex = 10;
+            gsap.to(cardElement, { 
+                scale: 1.05, 
+                boxShadow: '0 8px 25px rgba(224, 193, 142, 0.3)', 
+                duration: 0.3 
+            });
+        }
+    };
+
+    const resetPosition = () => {
+        if (isUnlocked) {
+            // Возвращаем карточку на исходный слой
+            cardElement.style.zIndex = 1;
+            gsap.to(cardElement, { 
+                scale: 1, 
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)', 
+                duration: 0.3 
+            });
+        }
+    };
+
+    // Добавляем события для десктопа и мобильных
+    cardElement.addEventListener('mouseover', bringToFront);
+    cardElement.addEventListener('mouseout', resetPosition);
+    cardElement.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Предотвращаем прокрутку при касании
+        bringToFront();
+    });
+    cardElement.addEventListener('touchend', resetPosition);
+
+    if (isUnlocked) {
+        const frameOverlay = document.createElement('div');
+        frameOverlay.className = 'card-frame';
+        frameOverlay.style.cssText = `
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 2;
+        `;
+        frameOverlay.innerHTML = `
+            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <filter id="paperTexture_${card.id}" x="0%" y="0%" width="100%" height="100%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" stitchTiles="stitch" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0.85, 0 0 0 0 0.75, 0 0 0 0 0.55, 0 0 0 0.15 0" />
+                </filter>
+                <rect x="0" y="0" width="100" height="100" fill="none" stroke="url(#frameGradient_${card.id})" stroke-width="6" />
+                <rect x="0" y="0" width="100" height="100" filter="url(#paperTexture_${card.id})" opacity="0.1" />
+                <defs>
+                    <linearGradient id="frameGradient_${card.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e6d2b5" />
+                        <stop offset="50%" stop-color="#d4b468" />
+                        <stop offset="100%" stop-color="#e6d2b5" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            ${svgDecorations.rosePetal}
         `;
 
-        cardElement.onmouseover = () => {
-            if (isUnlocked) {
-                gsap.to(cardElement, { scale: 1.05, boxShadow: '0 8px 25px rgba(224, 193, 142, 0.3)', duration: 0.3 });
-            }
-        };
-        cardElement.onmouseout = () => {
-            gsap.to(cardElement, { scale: 1, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)', duration: 0.3 });
-        };
+        const cardImg = document.createElement('img');
+        cardImg.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
+        cardImg.style.cssText = `
+            width: calc(100% - 16px); height: calc(100% - 16px); 
+            object-fit: cover; border-radius: 6px; z-index: 1;
+        `;
 
-        if (isUnlocked) {
-            const frameOverlay = document.createElement('div');
-            frameOverlay.className = 'card-frame';
-            frameOverlay.style.cssText = `
-                position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                pointer-events: none; z-index: 2;
-            `;
-            frameOverlay.innerHTML = `
-                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <filter id="paperTexture_${card.id}" x="0%" y="0%" width="100%" height="100%">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" stitchTiles="stitch" />
-                        <feColorMatrix type="matrix" values="0 0 0 0 0.85, 0 0 0 0 0.75, 0 0 0 0 0.55, 0 0 0 0.15 0" />
-                    </filter>
-                    <rect x="0" y="0" width="100" height="100" fill="none" stroke="url(#frameGradient_${card.id})" stroke-width="6" />
-                    <rect x="0" y="0" width="100" height="100" filter="url(#paperTexture_${card.id})" opacity="0.1" />
-                    <defs>
-                        <linearGradient id="frameGradient_${card.id}" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#e6d2b5" />
-                            <stop offset="50%" stop-color="#d4b468" />
-                            <stop offset="100%" stop-color="#e6d2b5" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                ${svgDecorations.rosePetal}
-            `;
+        const filmEffect = document.createElement('div');
+        filmEffect.className = 'film-effect';
+        filmEffect.style.cssText = `
+            position: absolute; top: 8px; left: 8px; 
+            width: calc(100% - 16px); height: calc(100% - 16px); 
+            z-index: 2; pointer-events: none; opacity: 0.4; 
+            mix-blend-mode: overlay; border-radius: 6px; overflow: hidden;
+        `;
+        filmEffect.innerHTML = svgDecorations.filmScratch;
 
-            const cardImg = document.createElement('img');
-            cardImg.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
-            cardImg.style.cssText = `
-                width: calc(100% - 16px); height: calc(100% - 16px); 
-                object-fit: cover; border-radius: 6px; z-index: 1;
-            `;
+        const cardName = document.createElement('div');
+        cardName.className = 'card-name';
+        cardName.style.cssText = `
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            background: linear-gradient(transparent, rgba(0,0,0,0.8)); 
+            color: #f5e6c9; padding: 1.5rem 0.5rem 0.5rem; font-size: 1.2rem; 
+            text-align: center; z-index: 3;
+        `;
+        cardName.textContent = isRussian ? card.name : card.nameEn;
 
-            const filmEffect = document.createElement('div');
-            filmEffect.className = 'film-effect';
-            filmEffect.style.cssText = `
-                position: absolute; top: 8px; left: 8px; 
-                width: calc(100% - 16px); height: calc(100% - 16px); 
-                z-index: 2; pointer-events: none; opacity: 0.4; 
-                mix-blend-mode: overlay; border-radius: 6px; overflow: hidden;
-            `;
-            filmEffect.innerHTML = svgDecorations.filmScratch;
+        const shineEffect = document.createElement('div');
+        shineEffect.className = 'card-shine-effect';
 
-            const cardName = document.createElement('div');
-            cardName.className = 'card-name';
-            cardName.style.cssText = `
-                position: absolute; bottom: 0; left: 0; width: 100%; 
-                background: linear-gradient(transparent, rgba(0,0,0,0.8)); 
-                color: #f5e6c9; padding: 1.5rem 0.5rem 0.5rem; font-size: 1.2rem; 
-                text-align: center; z-index: 3;
-            `;
-            cardName.textContent = isRussian ? card.name : card.nameEn;
+        cardElement.appendChild(cardImg);
+        cardElement.appendChild(filmEffect);
+        cardElement.appendChild(frameOverlay);
+        cardElement.appendChild(shineEffect);
+        cardElement.appendChild(cardName);
+        cardElement.onclick = () => showCardDetail(card);
+    } else {
+        const cardImg = document.createElement('img');
+        cardImg.src = '/heart_at_crossroads/assets/memories/card_locked.png';
+        cardImg.style.cssText = `
+            width: calc(100% - 16px); height: calc(100% - 16px); 
+            object-fit: cover; border-radius: 6px; filter: grayscale(1); z-index: 1;
+        `;
 
-            const shineEffect = document.createElement('div');
-            shineEffect.className = 'card-shine-effect';
-            
-            cardElement.appendChild(cardImg);
-            cardElement.appendChild(filmEffect);
-            cardElement.appendChild(frameOverlay);
-            cardElement.appendChild(shineEffect);
-            cardElement.appendChild(cardName);
-            cardElement.onclick = () => showCardDetail(card);
-        } else {
-            const cardImg = document.createElement('img');
-            cardImg.src = '/heart_at_crossroads/assets/memories/card_locked.png';
-            cardImg.style.cssText = `
-                width: calc(100% - 16px); height: calc(100% - 16px); 
-                object-fit: cover; border-radius: 6px; filter: grayscale(1); z-index: 1;
-            `;
+        const lockIcon = document.createElement('div');
+        lockIcon.innerHTML = `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92172 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+        lockIcon.style.cssText = `position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.6; z-index: 2;`;
 
-            const lockIcon = document.createElement('div');
-            lockIcon.innerHTML = `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92172 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>`;
-            lockIcon.style.cssText = `position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.6; z-index: 2;`;
+        const cardTitle = document.createElement('div');
+        cardTitle.textContent = isRussian ? card.name : card.nameEn;
+        cardTitle.style.cssText = `
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            color: #e0c18e; text-align: center; padding: 0 1rem; font-weight: bold; z-index: 2;
+        `;
 
-            const cardTitle = document.createElement('div');
-            cardTitle.textContent = isRussian ? card.name : card.nameEn;
-            cardTitle.style.cssText = `
-                position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
-                color: #e0c18e; text-align: center; padding: 0 1rem; font-weight: bold; z-index: 2;
-            `;
-
-            const unlockInfo = document.createElement('div');
-            unlockInfo.style.cssText = `
-                position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
-                color: #aaa; font-size: 0.9rem; text-align: center; padding: 0 1rem; 
-                display: flex; align-items: center; justify-content: center; gap: 0.3rem; z-index: 2;
-            `;
-            const costText = document.createElement('span');
-            const isDiamondCost = !isNaN(parseInt(card.unlock));
-            costText.textContent = isRussian ? `Разблокировка: ${card.unlock}` : `Unlock: ${card.unlockEn}`;
-            unlockInfo.appendChild(costText);
-            if (isDiamondCost) {
-                const diamondIcon = document.createElement('img');
-                diamondIcon.src = '/heart_at_crossroads/assets/ui/diamonds.png';
-                diamondIcon.style.cssText = `width: 16px; height: 16px; vertical-align: middle;`;
-                unlockInfo.appendChild(diamondIcon);
-            }
-
-            const unlockButton = document.createElement('button');
-            unlockButton.className = 'card-unlock-button';
-            unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
-            unlockButton.onclick = () => unlockCard(card);
-
-            cardElement.appendChild(cardImg);
-            cardElement.appendChild(lockIcon);
-            cardElement.appendChild(cardTitle);
-            cardElement.appendChild(unlockInfo);
-            if (isDiamondCost) {
-                cardElement.appendChild(unlockButton);
-            }
-
-            gsap.to(lockIcon, { rotation: 5, duration: 1, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        const unlockInfo = document.createElement('div');
+        unlockInfo.style.cssText = `
+            position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
+            color: #aaa; font-size: 0.9rem; text-align: center; padding: 0 1rem; 
+            display: flex; align-items: center; justify-content: center; gap: 0.3rem; z-index: 2;
+        `;
+        const costText = document.createElement('span');
+        const isDiamondCost = !isNaN(parseInt(card.unlock));
+        costText.textContent = isRussian ? `Разблокировка: ${card.unlock}` : `Unlock: ${card.unlockEn}`;
+        unlockInfo.appendChild(costText);
+        if (isDiamondCost) {
+            const diamondIcon = document.createElement('img');
+            diamondIcon.src = '/heart_at_crossroads/assets/ui/diamonds.png';
+            diamondIcon.style.cssText = `width: 16px; height: 16px; vertical-align: middle;`;
+            unlockInfo.appendChild(diamondIcon);
         }
 
-        return cardElement;
+        const unlockButton = document.createElement('button');
+        unlockButton.className = 'card-unlock-button';
+        unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
+        unlockButton.onclick = () => unlockCard(card);
+
+        cardElement.appendChild(cardImg);
+        cardElement.appendChild(lockIcon);
+        cardElement.appendChild(cardTitle);
+        cardElement.appendChild(unlockInfo);
+        if (isDiamondCost) {
+            cardElement.appendChild(unlockButton);
+        }
+
+        gsap.to(lockIcon, { rotation: 5, duration: 1, repeat: -1, yoyo: true, ease: "sine.inOut" });
     }
+
+    return cardElement;
+}
 
     function unlockCard(card) {
         const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
