@@ -2548,7 +2548,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-                      function showSimpleGallery() {
+                     function showSimpleGallery() {
     console.log("Показываем простую галерею без GSAP");
 
     const galleryContainer = document.getElementById('gallery-container');
@@ -2566,13 +2566,14 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 
     galleryContainer.style.display = 'block';
-    galleryContainer.style.background = 'red';
+    galleryContainer.style.background = 'red !important'; // Убеждаемся, что красный фон приоритетен
     galleryContainer.style.width = '100vw';
     galleryContainer.style.height = '100vh';
     galleryContainer.style.position = 'fixed';
     galleryContainer.style.top = '0';
     galleryContainer.style.left = '0';
     galleryContainer.style.zIndex = '100000';
+    galleryContainer.style.opacity = '1'; // Переопределяем opacity: 0 из CSS
     console.log('galleryContainer styles:', galleryContainer.style.cssText);
 
     const galleryDiv = document.createElement('div');
@@ -2625,6 +2626,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryDiv.appendChild(closeBtn);
 
     galleryContainer.appendChild(galleryDiv);
+    console.log('galleryDiv добавлен:', galleryDiv.outerHTML);
 }
 
         async function loadFinals(endingId) {
