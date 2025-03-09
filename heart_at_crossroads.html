@@ -1904,36 +1904,42 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     // Добавляем стили
     const styleElement = document.createElement('style');
-    styleElement.textContent = `
-        .premium-gallery-container * { box-sizing: border-box; }
-        .premium-gallery-header, .series-title, .card-name, .card-detail-title {
-            font-family: ${isRussian ? 'GoodVibesCyr' : 'GreatVibes'}, cursive;
-        }
-        .card-shine-effect {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
-            pointer-events: none; z-index: 5;
-        }
-        .card-unlock-button {
-            position: absolute; bottom: 15px; left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to bottom, #e0c18e, #a37e33);
-            color: #111; border: none; padding: 10px 20px;
-            border-radius: 30px; font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease; cursor: pointer;
-            z-index: 2;
-        }
-        .card-unlock-button:hover, .card-unlock-button:active {
-            transform: translateX(-50%) scale(1.05);
-            box-shadow: 0 6px 15px rgba(224, 193, 142, 0.4);
-        }
-       @media (max-width: 600px) {
-    .cards-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-    .premium-gallery-header { font-size: 2.5rem; }
-    .series-title { font-size: 1.5rem; }
-       }
-    `;
+     styleElement.textContent = `
+    .premium-gallery-container * { box-sizing: border-box; }
+    .premium-gallery-header, .series-title, .card-name, .card-detail-title {
+        font-family: ${isRussian ? 'GoodVibesCyr' : 'GreatVibes'}, cursive;
+    }
+    .card-shine-effect {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
+        pointer-events: none; z-index: 5;
+    }
+    .card-unlock-button {
+        position: absolute; bottom: 15px; left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom, #e0c18e, #a37e33);
+        color: #111; border: none; padding: 10px 20px;
+        border-radius: 30px; font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease; cursor: pointer;
+        z-index: 2;
+    }
+    .card-unlock-button:hover, .card-unlock-button:active {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 6px 15px rgba(224, 193, 142, 0.4);
+    }
+    .premium-card.active {
+        border: 2px solid #e0c18e;
+        box-shadow: 0 0 15px rgba(224, 193, 142, 0.7), 0 8px 25px rgba(0, 0, 0, 0.5);
+        z-index: 200 !important; /* Максимальный приоритет */
+    }
+    @media (max-width: 600px) {
+        .cards-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        .premium-gallery-header { font-size: 2.5rem; }
+        .series-title { font-size: 1.5rem; }
+    }
+`;
+
     document.head.appendChild(styleElement);
 
     const galleryContainer = document.createElement('div');
@@ -2068,42 +2074,79 @@ function handleChoices(scene, dialogueBox, overlay) {
         border-radius: 10px; overflow: hidden; background: #222; 
         display: flex; flex-direction: column; justify-content: center; 
         align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
-        transition: transform 0.3s ease; z-index: 1; /* Базовый z-index */
+        transition: transform 0.3s ease, z-index 0s; z-index: 1;
     `;
 
-    // Обработчик взаимодействия (для десктопа и мобильных)
-    const bringToFront = () => {
-        if (isUnlocked) {
-            // Поднимаем карточку выше всех
-            cardElement.style.zIndex = 10;
-            gsap.to(cardElement, { 
-                scale: 1.05, 
-                boxShadow: '0 8px 25px rgba(224, 193, 142, 0.3)', 
-                duration: 0.3 
-            });
-        }
+    let clickCount = 0; // Счетчик кликов для карусели
+    let isFocused = false;
+
+    // Функции управления состоянием карточки
+    const slideUp = () => {
+        cardElement.style.zIndex = 50; // Средний приоритет для выдвижения
+        gsap.to(cardElement, { 
+            y: -20, 
+            scale: 1.05, 
+            boxShadow: '0 8px 25px rgba(224, 193, 142, 0.3)', 
+            duration: 0.3 
+        });
+    };
+
+    const setFocus = () => {
+        cardElement.classList.add('active'); // Подсветка активной карточки
+        cardElement.style.zIndex = 200; // Максимальный приоритет
+        gsap.to(cardElement, { 
+            y: 0, 
+            scale: 1.1, 
+            duration: 0.5, 
+            ease: "power2.out" 
+        });
+
+        // Перетасовка: перемещаем карточку в начало сетки
+        const container = cardElement.parentElement;
+        container.removeChild(cardElement);
+        container.insertBefore(cardElement, container.firstChild);
     };
 
     const resetPosition = () => {
-        if (isUnlocked) {
-            // Возвращаем карточку на исходный слой
-            cardElement.style.zIndex = 1;
-            gsap.to(cardElement, { 
-                scale: 1, 
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)', 
-                duration: 0.3 
-            });
+        cardElement.classList.remove('active');
+        cardElement.style.zIndex = 1;
+        clickCount = 0;
+        isFocused = false;
+        gsap.to(cardElement, { 
+            y: 0, 
+            scale: 1, 
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)', 
+            duration: 0.3 
+        });
+    };
+
+    // Обработчики событий
+    const handleInteraction = (e) => {
+        e.preventDefault();
+        if (clickCount === 0) {
+            slideUp();
+            clickCount = 1;
+            isFocused = true;
+        } else if (clickCount === 1) {
+            setFocus();
+            clickCount = 2;
         }
     };
 
-    // Добавляем события для десктопа и мобильных
-    cardElement.addEventListener('mouseover', bringToFront);
-    cardElement.addEventListener('mouseout', resetPosition);
-    cardElement.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Предотвращаем прокрутку при касании
-        bringToFront();
+    cardElement.addEventListener('click', handleInteraction); // Для десктопа
+    cardElement.addEventListener('touchstart', handleInteraction); // Для мобильных
+
+    // Сброс при касании вне карточки
+    document.addEventListener('touchstart', (e) => {
+        if (isFocused && !cardElement.contains(e.target)) {
+            resetPosition();
+        }
     });
-    cardElement.addEventListener('touchend', resetPosition);
+    document.addEventListener('click', (e) => {
+        if (isFocused && !cardElement.contains(e.target)) {
+            resetPosition();
+        }
+    });
 
     if (isUnlocked) {
         const frameOverlay = document.createElement('div');
@@ -2166,7 +2209,11 @@ function handleChoices(scene, dialogueBox, overlay) {
         cardElement.appendChild(frameOverlay);
         cardElement.appendChild(shineEffect);
         cardElement.appendChild(cardName);
-        cardElement.onclick = () => showCardDetail(card);
+        cardElement.onclick = (e) => {
+            if (clickCount === 2) {
+                showCardDetail(card); // Открытие детального вида только после фокуса
+            }
+        };
     } else {
         const cardImg = document.createElement('img');
         cardImg.src = '/heart_at_crossroads/assets/memories/card_locked.png';
@@ -2209,7 +2256,11 @@ function handleChoices(scene, dialogueBox, overlay) {
         const unlockButton = document.createElement('button');
         unlockButton.className = 'card-unlock-button';
         unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
-        unlockButton.onclick = () => unlockCard(card);
+        unlockButton.style.zIndex = '3';
+        unlockButton.onclick = (e) => {
+            e.stopPropagation();
+            unlockCard(card);
+        };
 
         cardElement.appendChild(cardImg);
         cardElement.appendChild(lockIcon);
