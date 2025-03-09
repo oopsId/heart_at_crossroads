@@ -2017,7 +2017,6 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryContainer.style.display = 'block';
     galleryContainer.setAttribute('data-gallery', 'true');
     startScreen.style.display = 'none'; // Скрываем стартовый экран
-    startScreen.style.zIndex = '-1'; // На случай, если display не сработал
 
     const galleryHeader = document.createElement('div');
     galleryHeader.className = 'gallery-header';
@@ -2031,21 +2030,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     const cardsContainer = document.createElement('div');
     cardsContainer.className = 'cards-container';
     cardsContainer.setAttribute('data-gallery', 'true');
-    
-    if (!cardsContainer) {
-        console.warn('cardsContainer не найден, создаем новый');
-        cardsContainer = document.createElement('div');
-        cardsContainer.className = 'cards-container';
-        galleryContainer.appendChild(cardsContainer);
-    }
-    galleryContainer.style.display = 'block';
-    galleryContainer.style.opacity = '1';
-    startScreen.style.display = 'none';
-    cardsContainer.style.display = 'flex'; // Устанавливаем grid явно
-    cardsContainer.style.opacity = '1';
-    console.log('galleryContainer:', galleryContainer.style.display, galleryContainer.style.opacity);
-    console.log('cardsContainer:', cardsContainer.style.display, cardsContainer.style.opacity);
- 
+
     const closeButton = document.createElement('button');
     closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2109,41 +2094,60 @@ function handleChoices(scene, dialogueBox, overlay) {
 }
 
 
-       function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
-    console.log('switchSeries вызван для:', seriesKey);
-    cardsContainer.innerHTML = ''; // Очищаем
+        function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+    console.log('switchSeries вызван для:', seriesKey); // Логирование для отладки
+
+    const seriesBtns = document.querySelectorAll('.series-btn');
+    seriesBtns.forEach(btn => {
+        btn.style.background = btn.dataset.series === seriesKey 
+            ? 'linear-gradient(to bottom, #6a5a3d, #4a3a1d)' 
+            : 'linear-gradient(to bottom, #3a3a3a, #202020)';
+    });
+
+    cardsContainer.innerHTML = ''; // Очищаем контейнер карточек
     console.log('Очищен cardsContainer');
 
     const series = cardSeries[seriesKey];
     if (!series) {
         console.error('Серия не найдена:', seriesKey);
-        return;
+        return; // Выходим, если серия не существует
     }
 
+    // Теперь series инициализирована, можно безопасно использовать её свойства
     const seriesTitle = document.createElement('div');
     seriesTitle.className = 'series-title';
-    const unlockedCount = stats.memories?.filter(card => series.cards.some(c => c.id === card)).length || 0;
+    seriesTitle.style.cssText = `
+        grid-column: 1 / -1; color: #e0c18e; font-size: 2rem; 
+        margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    `;
+    const unlockedCount = series.cards.filter(card => stats.memories?.includes(card.id)).length;
     seriesTitle.textContent = isRussian 
-        ? `${series.title} - ${series.style} (${unlockedCount}/${series.cards.length})`
+        ? `${series.title} - ${series.style} (${unlockedCount}/${series.cards.length})` 
         : `${series.titleEn} - ${series.styleEn} (${unlockedCount}/${series.cards.length})`;
     cardsContainer.appendChild(seriesTitle);
     console.log('Добавлен seriesTitle:', seriesTitle.textContent);
 
-    series.cards.forEach((card) => {
+    series.cards.forEach((card, index) => {
         console.log('Создаём карточку:', card.id);
         const cardElement = createCardElement(card, seriesKey);
-        cardElement.style.opacity = '1'; // Принудительно видим
-        cardElement.style.transform = 'translate(0, 0)';
         cardsContainer.appendChild(cardElement);
         console.log('Карточка добавлена в DOM:', cardElement);
+
+        if (index === 0) {
+            cardElement.classList.add('active');
+            gsap.set(cardElement, { y: 0, zIndex: 100 });
+        } else {
+            gsap.set(cardElement, { y: 20, zIndex: 100 - index });
+        }
+        gsap.fromTo(cardElement, 
+            { opacity: 0, y: 30 }, 
+            { opacity: 1, y: index === 0 ? 0 : 20, duration: 0.5, delay: 0.1 * index, ease: "power2.out" }
+        );
     });
 
-    cardsContainer.style.display = 'grid';
-    cardsContainer.style.opacity = '1';
-    console.log('Карточки добавлены, общее количество:', cardsContainer.children.length);
-
     clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-} 
+}
+
    function createCardElement(card, seriesKey, cardsContainer, isRussian) {
     const isUnlocked = stats.memories?.includes(card.id);
     console.log('createCardElement для:', card.id, 'isUnlocked:', isUnlocked);
