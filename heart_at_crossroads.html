@@ -2237,7 +2237,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     if (!series) return;
 
     cardsContainer.innerHTML = '';
-    cardsContainer.innerHTML = seriesTitle.outerHTML; // Добавляем seriesTitle обратно
+    //cardsContainer.innerHTML = seriesTitle.outerHTML; // Добавляем seriesTitle обратно
 
     series.cards.forEach((card, index) => {
         const cardElement = createCardElement(card, seriesKey, cardsContainer, isRussian);
