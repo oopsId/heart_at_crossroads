@@ -2108,14 +2108,12 @@ function handleChoices(scene, dialogueBox, overlay) {
         galleryContainer.setAttribute('data-gallery', 'true');
         startScreen.style.display = 'none';
 
-        // Применяем шрифт в зависимости от языка
-        document.querySelectorAll('.gallery-header, .series-title, .card-name').forEach(el => {
-            el.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-        });
-
+        // Применяем шрифты
+        const fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
         galleryContainer.innerHTML = '';
         const galleryHeader = document.createElement('div');
         galleryHeader.className = 'gallery-header';
+        galleryHeader.style.fontFamily = fontFamily;
         galleryHeader.textContent = isRussian ? "Коллекционные карточки" : "Collection Cards";
 
         const seriesSelector = document.createElement('div');
@@ -2180,7 +2178,7 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 
 
-         function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+          function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
         console.log('switchSeries вызван для:', seriesKey);
         const series = cardSeries[seriesKey];
         if (!series) return;
@@ -2197,9 +2195,10 @@ function handleChoices(scene, dialogueBox, overlay) {
         const seriesTitle = document.createElement('div');
         seriesTitle.className = 'series-title';
         seriesTitle.style.cssText = `
-            color: #e0c18e; font-size: 2rem; margin-bottom: 1rem;
+            color: #e0c18e; font-size: 1.5rem; margin-bottom: 1rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); text-align: center;
         `;
+        seriesTitle.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
         const unlockedCount = series.cards.filter(card => stats.memories?.includes(card.id)).length;
         seriesTitle.textContent = isRussian 
             ? `${series.title} (${unlockedCount}/${series.cards.length})`
@@ -2229,21 +2228,38 @@ function handleChoices(scene, dialogueBox, overlay) {
                     if (tapCount === 0) {
                         cardElement.classList.remove('front');
                         cardElement.classList.add('peek');
+                        gsap.to(cardElement, {
+                            height: 116, // Треть высоты
+                            top: `${20 + (index * 20) - 50}px`,
+                            rotation: 5,
+                            duration: 0.3,
+                            ease: "power2.out"
+                        });
                         tapCount = 1;
                     } else {
                         const currentFront = cardsContainer.querySelector('.front');
                         if (currentFront) {
                             currentFront.classList.remove('front');
-                            currentFront.style.top = `${20 + (index * 20)}px`;
-                            currentFront.style.zIndex = 100 - index;
-                            currentFront.style.height = '50px';
-                            currentFront.style.opacity = '0.7';
+                            gsap.to(currentFront, {
+                                top: `${20 + (index * 20)}px`,
+                                height: 50,
+                                opacity: 0.7,
+                                zIndex: 100 - index,
+                                duration: 0.5,
+                                ease: "power2.in"
+                            });
                         }
                         cardElement.classList.remove('peek');
                         cardElement.classList.add('front');
-                        cardElement.style.top = '50px';
-                        cardElement.style.height = '350px';
-                        cardElement.style.zIndex = 100;
+                        gsap.to(cardElement, {
+                            top: 50,
+                            height: 350,
+                            opacity: 1,
+                            zIndex: 100,
+                            rotation: 0,
+                            duration: 0.5,
+                            ease: "power2.out"
+                        });
                         tapCount = 0;
                     }
                 } else if (stats.memories?.includes(card.id)) {
@@ -2254,7 +2270,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         });
     }
 
-       function createCardElement(card, seriesKey, cardsContainer, isRussian) {
+        function createCardElement(card, seriesKey, cardsContainer, isRussian) {
         const isUnlocked = stats.memories?.includes(card.id);
         const cardElement = document.createElement('div');
         cardElement.className = 'premium-card';
@@ -2275,6 +2291,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
             const cardName = document.createElement('div');
             cardName.className = 'card-name';
+            cardName.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
             cardName.textContent = isRussian ? card.name : card.nameEn;
             cardElement.appendChild(cardName);
         } else {
@@ -2285,13 +2302,18 @@ function handleChoices(scene, dialogueBox, overlay) {
 
             const unlockText = document.createElement('div');
             unlockText.className = 'unlock-text';
-            unlockText.textContent = isRussian ? `Разблокировка: ${card.unlock}` : `Unlock: ${card.unlockEn}`;
+            unlockText.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+            const diamondIcon = `<img src="/heart_at_crossroads/assets/ui/diamonds.png" style="width: 16px; height: 16px; vertical-align: middle;">`;
+            unlockText.innerHTML = isRussian 
+                ? `Разблокировка: ${card.unlock} ${diamondIcon}` 
+                : `Unlock: ${card.unlockEn} ${diamondIcon}`;
             cardElement.appendChild(unlockText);
 
             const unlockButton = document.createElement('button');
             unlockButton.className = 'card-unlock-button';
+            unlockButton.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
             unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
-            unlockButton.style.cssText = 'position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);';
+            unlockButton.style.cssText = 'position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);';
             unlockButton.onclick = (e) => {
                 e.stopPropagation();
                 unlockCard(card, cardsContainer, clickSound, isRussian);
@@ -2331,8 +2353,8 @@ function handleChoices(scene, dialogueBox, overlay) {
             alert(isRussian ? "Недостаточно бриллиантов!" : "Not enough diamonds!");
         }
     }
-     
-         function showUnlockNotification(card, isRussian) {
+
+    function showUnlockNotification(card, isRussian) {
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2342,10 +2364,10 @@ function handleChoices(scene, dialogueBox, overlay) {
             opacity: 0;
         `;
         notification.innerHTML = `
-            <div style="font-size: 1.5rem; color: #8C6F4A; margin-bottom: 10px;">
+            <div style="font-size: 1.5rem; color: #8C6F4A; margin-bottom: 10px; font-family: ${isRussian ? 'GoodVibesCyr' : 'GreatVibes'}, cursive;">
                 ${isRussian ? 'Карта разблокирована!' : 'Card Unlocked!'}
             </div>
-            <div style="font-size: 1.2rem; margin-bottom: 15px;">
+            <div style="font-size: 1.2rem; margin-bottom: 15px; font-family: ${isRussian ? 'GoodVibesCyr' : 'GreatVibes'}, cursive;">
                 ${isRussian ? card.name : card.nameEn}
             </div>
             <img src="/heart_at_crossroads/assets/memories/${card.id}.png" alt="Card" style="width: 100%; border-radius: 5px; margin-bottom: 15px;">
@@ -2353,6 +2375,7 @@ function handleChoices(scene, dialogueBox, overlay) {
                 background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
                 color: #F5E6C9; border: none; padding: 10px 20px; border-radius: 20px;
                 font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                font-family: ${isRussian ? 'GoodVibesCyr' : 'GreatVibes'}, cursive;
             ">${isRussian ? 'Супер!' : 'Awesome!'}</button>
         `;
         document.body.appendChild(notification);
@@ -2374,13 +2397,13 @@ function handleChoices(scene, dialogueBox, overlay) {
             }
         });
     }
-
-       function showCardDetail(card, isRussian, clickSound) {
+     
+         function showCardDetail(card, isRussian, clickSound) {
         const detailContainer = document.createElement('div');
         detailContainer.className = 'card-detail';
         detailContainer.style.cssText = `
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 250px; height: 350px; background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
+            width: 300px; height: 350px; background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
             border-radius: 5px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); z-index: 3000;
         `;
 
@@ -2390,6 +2413,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         detailContainer.appendChild(img);
 
         const name = document.createElement('div');
+        name.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
         name.textContent = isRussian ? card.name : card.nameEn;
         name.style.cssText = 'position: absolute; bottom: 0; width: 100%; text-align: center; padding: 5px; color: #333;';
         detailContainer.appendChild(name);
@@ -2399,7 +2423,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
         addEventListeners(detailContainer, ['click', 'touchstart'], () => {
             document.body.removeChild(detailContainer);
-            document.getElementById('gallery-container').style.background = 'linear-gradient(to bottom, #D9C2A7, #BFA78A)';
+            document.getElementById('gallery-container').style.background = "url('/heart_at_crossroads/assets/images/shoebox_texture.png') center / cover no-repeat";
             clickSound.play().catch(err => console.warn("Ошибка звука:", err));
         });
     }
