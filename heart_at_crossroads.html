@@ -543,13 +543,14 @@
     .cards-container {
     position: relative;
     height: 600px;
-    width: 100%; /* Полная ширина контейнера */
-    max-width: 500px; /* Ограничение максимальной ширины */
+    width: 100%;
+    max-width: 500px;
     margin: 0 auto;
-    perspective: 1000px;
-    display: flex; /* Добавляем flex для центрирования */
-    justify-content: center; /* Центрируем содержимое */
-    align-items: flex-start;
+    perspective: 1000px; /* Перспектива для 3D */
+    transform-style: preserve-3d; /* Сохраняем 3D-пространство */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Центрируем по вертикали */
 }
 
 .premium-card {
@@ -564,7 +565,7 @@
     transform-origin: center;
     cursor: pointer;
     overflow: hidden;
-    /* Убираем left: 50% и transform: translateX(-50%) */
+    transform-style: preserve-3d; /* Поддержка 3D для дочерних элементов */
 }
 
     .premium-card:not(.front) {
@@ -2237,89 +2238,72 @@ function handleChoices(scene, dialogueBox, overlay) {
     if (!series) return;
 
     cardsContainer.innerHTML = '';
-    //cardsContainer.innerHTML = seriesTitle.outerHTML; // Добавляем seriesTitle обратно
+
+    // Параметры для Flip 3D
+    const cardCount = series.cards.length;
+    const zStep = 100; // Шаг по оси Z между карточками
+    const angleStep = 10; // Угол наклона между карточками
 
     series.cards.forEach((card, index) => {
-        const cardElement = createCardElement(card, seriesKey, cardsContainer, isRussian);
+        const cardElement = createCardElement(card, seriesKey, cardsContainer, clickSound, isRussian);
         const isUnlocked = stats.memories?.includes(card.id);
 
-        // Начальная укладка колоды
-        cardElement.style.top = `${index * 52.5}px`; // 15% от высоты 350px = 52.5px
-        cardElement.style.zIndex = series.cards.length - index; // Задние ниже
-        if (index === 0) {
-            cardElement.classList.add('front');
-            cardElement.style.height = '350px';
-        } else {
-            cardElement.style.height = '50px'; // Корешки видны
-            cardElement.style.opacity = '0.7';
-        }
+        // Начальная позиция в 3D-пространстве
+        const zPosition = (cardCount - 1 - index) * zStep; // Задние карточки дальше
+        const rotateY = (cardCount - 1 - index) * angleStep; // Наклон по Y
 
+        gsap.set(cardElement, {
+            z: zPosition,
+            rotateY: rotateY,
+            opacity: 1 - index * 0.2, // Задние карточки чуть прозрачнее
+            scale: 1 - index * 0.05, // Задние карточки чуть меньше
+        });
+
+        cardElement.style.zIndex = cardCount - index; // Передняя карточка сверху
         cardsContainer.appendChild(cardElement);
 
-        let tapCount = 0;
-
+        // Обработчик клика для переключения
         addEventListeners(cardElement, ['click', 'touchstart'], (e) => {
             e.preventDefault();
-            const currentFront = cardsContainer.querySelector('.front');
+            const currentZ = gsap.getProperty(cardElement, "z");
 
-            if (currentFront === cardElement) {
-                // Тап по активной карточке — показываем деталь
+            if (currentZ === 0) {
+                // Если карточка спереди
                 if (isUnlocked) {
+                    // Только разблокированные показывают детали
                     showCardDetail(card, isRussian, clickSound);
                 }
-            } else if (!cardElement.classList.contains('peek')) {
-                // Первый тап по корешку — выдвигаем на половину
-                if (currentFront) {
-                    gsap.to(currentFront, {
-                        height: '50px',
-                        opacity: 0.7,
-                        duration: 0.5,
-                        ease: "power2.in"
+                // Заблокированные карточки можно листать, но детали не открываются
+            } else {
+                // Перемещаем любую карточку вперед
+                series.cards.forEach((otherCard, otherIndex) => {
+                    const otherElement = cardsContainer.querySelector(`[data-card-id="${otherCard.id}"]`);
+                    const newIndex = otherElement === cardElement ? 0 : otherIndex + 1;
+                    const newZ = (cardCount - 1 - newIndex) * zStep;
+                    const newRotateY = (cardCount - 1 - newIndex) * angleStep;
+
+                    gsap.to(otherElement, {
+                        z: newZ,
+                        rotateY: newRotateY,
+                        opacity: 1 - newIndex * 0.2,
+                        scale: 1 - newIndex * 0.05,
+                        zIndex: cardCount - newIndex,
+                        duration: 0.8,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            if (otherElement === cardElement) {
+                                otherElement.style.zIndex = cardCount; // Передняя карточка сверху
+                            }
+                        }
                     });
-                    currentFront.classList.remove('front');
-                }
-                cardElement.classList.add('peek');
-                gsap.to(cardElement, {
-                    top: `${index * 52.5 - 175}px`, // Половина высоты 350px
-                    height: '175px',
-                    opacity: 1,
-                    zIndex: 100,
-                    duration: 0.5,
-                    ease: "power2.out"
                 });
-                tapCount = 1;
-            } else if (tapCount === 1 && cardElement.classList.contains('peek')) {
-                // Второй тап — меняем местами с верхней
-                const oldFront = cardsContainer.querySelector('.premium-card:not(.peek)') || currentFront;
-                if (oldFront) {
-                    gsap.to(oldFront, {
-                        top: `${(series.cards.length - 1) * 52.5}px`,
-                        height: '50px',
-                        opacity: 0.7,
-                        zIndex: 1,
-                        duration: 0.5,
-                        ease: "power2.in"
-                    });
-                }
-                cardElement.classList.remove('peek');
-                cardElement.classList.add('front');
-                gsap.to(cardElement, {
-                    top: '0px',
-                    height: '350px',
-                    opacity: 1,
-                    zIndex: 100,
-                    duration: 0.5,
-                    ease: "power2.out"
-                });
-                tapCount = 0;
+                clickSound.play().catch(err => console.warn("Ошибка звука:", err));
             }
-            clickSound.play().catch(err => console.warn("Ошибка звука:", err));
         });
     });
 }
 
-// Предотвращаем случайную разблокировку
-function createCardElement(card, seriesKey, cardsContainer, isRussian) {
+function createCardElement(card, seriesKey, cardsContainer, clickSound, isRussian) {
     const isUnlocked = stats.memories?.includes(card.id);
     const cardElement = document.createElement('div');
     cardElement.className = 'premium-card';
@@ -2361,7 +2345,7 @@ function createCardElement(card, seriesKey, cardsContainer, isRussian) {
         unlockButton.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
         unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
         unlockButton.onclick = (e) => {
-            e.stopPropagation(); // Предотвращаем срабатывание клика по карточке
+            e.stopPropagation(); // Предотвращаем срабатывание перелистывания
             unlockCard(card, cardsContainer, clickSound, isRussian);
         };
         cardElement.appendChild(unlockButton);
@@ -2371,30 +2355,51 @@ function createCardElement(card, seriesKey, cardsContainer, isRussian) {
 }
 
     function unlockCard(card, cardsContainer, clickSound, isRussian) {
-        const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0) || 0;
-        if (stats.diamonds >= cost) {
-            const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
-            gsap.to(cardElement || cardsContainer, {
-                scale: 1.2,
-                rotationY: 180,
-                duration: 0.8,
-                ease: "back.out(1.7)",
-                onComplete: () => {
-                    stats.diamonds -= cost;
-                    stats.memories = stats.memories || [];
-                    stats.memories.push(card.id);
-                    updateDiamondsDisplay();
-                    saveSession();
-                    switchSeries('romance', cardsContainer, clickSound, isRussian);
-                    unlockSound.play().catch(err => console.warn("Ошибка звука разблокировки:", err));
-                    showUnlockNotification(card, isRussian);
-                }
-            });
-        } else {
-            alert(isRussian ? "Недостаточно бриллиантов!" : "Not enough diamonds!");
-        }
-    }
+    const unlockCost = card.unlock; // Количество бриллиантов для разблокировки
+    const hasEnoughDiamonds = stats.diamonds >= unlockCost; // Предполагаем, что stats.diamonds хранит бриллианты
+    const isSecondPlaythrough = stats.playthroughs > 1; // Предполагаем, что stats.playthroughs отслеживает прохождения
 
+    if (hasEnoughDiamonds || isSecondPlaythrough) {
+        if (hasEnoughDiamonds) {
+            stats.diamonds -= unlockCost; // Списываем бриллианты
+            console.log(`Потрачено ${unlockCost} бриллиантов`);
+        } else {
+            console.log("Разблокировано за второе прохождение");
+        }
+
+        // Добавляем карточку в разблокированные
+        if (!stats.memories) stats.memories = [];
+        stats.memories.push(card.id);
+
+        // Обновляем карточку в галерее
+        const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
+        cardElement.classList.remove('locked');
+        cardElement.innerHTML = ''; // Очищаем содержимое
+
+        const cardImg = document.createElement('img');
+        cardImg.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
+        cardImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+        cardElement.appendChild(cardImg);
+
+        const shineEffect = document.createElement('div');
+        shineEffect.className = 'card-shine-effect';
+        cardElement.appendChild(shineEffect);
+
+        const cardName = document.createElement('div');
+        cardName.className = 'card-name';
+        cardName.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+        cardName.textContent = isRussian ? card.name : card.nameEn;
+        cardElement.appendChild(cardName);
+
+        // Проигрываем звук разблокировки
+        const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_card_unlock.mp3');
+        unlockSound.play().catch(err => console.warn("Ошибка звука:", err));
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    } else {
+        console.log("Недостаточно бриллиантов или не второе прохождение");
+        // Здесь можно добавить уведомление для пользователя
+    }
+}
     function showUnlockNotification(card, isRussian) {
         const notification = document.createElement('div');
         notification.style.cssText = `
