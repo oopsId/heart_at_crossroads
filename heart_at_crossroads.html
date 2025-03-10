@@ -496,14 +496,16 @@
         }
 
 
-    #gallery-container {
+   #gallery-container {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, #D9C2A7, #BFA78A), radial-gradient(circle, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.05));
-        background-blend-mode: overlay;
+        background-image: url('/heart_at_crossroads/assets/backgrounds/shoebox_texture.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         border: 2px solid #8C6F4A;
         box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         display: none;
@@ -533,6 +535,7 @@
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         opacity: 0;
+        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
     }
 
     .series-selector {
@@ -557,14 +560,14 @@
     .cards-container {
         position: relative;
         height: 600px;
-        width: 300px;
+        width: 400px; /* Увеличиваем ширину контейнера */
         margin: 0 auto;
         perspective: 1000px;
     }
 
     .premium-card {
         position: absolute;
-        width: 250px;
+        width: 300px; /* Увеличиваем ширину карточек */
         height: 350px;
         background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
         border: none;
@@ -588,13 +591,13 @@
         transform: translateX(-50%) translateY(0);
         height: 350px;
         opacity: 1;
-        background: linear-gradient(to bottom, #FFF8E1, #FCE4B5);
-        filter: brightness(1.3);
-        box-shadow: 0 6px 20px rgba(255, 215, 130, 0.5);
+        background: linear-gradient(to bottom, #FFF5E1, #F5D7A8); /* Тёплая подсветка */
+        filter: brightness(1.2);
+        box-shadow: 0 6px 20px rgba(245, 215, 168, 0.5);
     }
 
     .premium-card.peek {
-        height: 200px;
+        height: 116px; /* Примерно треть от 350px */
         transform: translateX(-50%) translateY(-50px) rotate(5deg);
         opacity: 1;
         z-index: 90;
@@ -613,10 +616,12 @@
         padding: 5px;
         color: #333;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
     }
 
     .premium-card.locked .unlock-text {
         color: #777;
+        font-size: 0.9rem; /* Уменьшаем шрифт */
     }
 
     .card-shine-effect {
@@ -632,19 +637,20 @@
 
     .card-unlock-button {
         position: absolute;
-        bottom: 40px;
+        bottom: 20px; /* Опускаем ниже */
         left: 50%;
         transform: translateX(-50%);
         background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
         color: #F5E6C9;
         border: none;
-        padding: 10px 20px;
+        padding: 8px 16px; /* Уменьшаем кнопку */
         border-radius: 20px;
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         cursor: pointer;
         z-index: 2;
+        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
     }
 
     .card-unlock-button:hover, .card-unlock-button:active {
@@ -659,6 +665,10 @@
         transform: translate(-50%, -50%) scale(1.5);
         z-index: 3000;
         transition: transform 0.4s ease-out;
+    }
+
+    .series-title {
+        font-size: 1.5rem; /* Уменьшаем шрифт */
     }
 
     </style>
