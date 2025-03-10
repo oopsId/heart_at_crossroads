@@ -495,15 +495,16 @@
             pointer-events: none;
         }
 
-         #gallery-container {
+
+    #gallery-container {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, #A68A64, #8C6F4A); /* Коробка из-под обуви */
-        border: 2px solid #5A3F2A; /* Потёртые края */
-        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); /* Тень внутри */
+        background: linear-gradient(to bottom, #A68A64, #8C6F4A);
+        border: 2px solid #5A3F2A;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         display: none;
         opacity: 0;
         z-index: 2000;
@@ -511,10 +512,9 @@
         padding: 20px;
         box-sizing: border-box;
         position: relative;
-        data-gallery: true; /* Добавлен атрибут */
-}
+    }
 
-        #gallery-container::after {
+    #gallery-container::after {
         content: '';
         position: absolute;
         top: -2px;
@@ -523,46 +523,37 @@
         height: calc(100% + 4px);
         border: 2px dashed #5A3F2A;
         pointer-events: none;
-        data-gallery: true; /* Добавлен атрибут */
     }
 
-       .gallery-header {
+    .gallery-header {
         color: #F5E6C9;
         font-size: 2rem;
         text-align: center;
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         opacity: 0;
-        data-gallery: true; /* Добавлен атрибут */
     }
 
-       .series-selector {
+    .series-selector {
         display: flex;
         justify-content: center;
         gap: 10px;
         margin-bottom: 30px;
         opacity: 0;
-        data-gallery: true; /* Добавлен атрибут */
     }
 
-       .series-btn {
-        background: linear-gradient(to bottom, #3A3A3A, #202020);
-        color: #E0C18E;
-        border: 1px solid #E0C18E;
+    .series-btn {
+        background: linear-gradient(to bottom, #3a3a3a, #202020);
+        color: #e0c18e;
+        border: 1px solid #e0c18e;
         padding: 0.5rem 1.5rem;
         font-size: 1rem;
         cursor: pointer;
         border-radius: 4px;
         transition: all 0.3s ease;
-        data-gallery: true; /* Добавлен атрибут */
-        }
-
-        .series-btn:hover {
-        background: linear-gradient(to bottom, #4A4A4A, #303030);
-        data-gallery: true; /* Добавлен атрибут */
     }
 
-       .cards-container {
+    .cards-container {
         position: relative;
         height: 500px;
         width: 300px;
@@ -574,7 +565,7 @@
         position: absolute;
         width: 250px;
         height: 350px;
-        background: linear-gradient(to bottom, #F5E6C9, #E6D7A8); /* Полароид */
+        background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
         border: 10px solid #F5E6C9;
         border-bottom-width: 30px;
         border-radius: 5px;
@@ -597,6 +588,8 @@
         transform: translateX(-50%) translateY(0);
         height: 350px;
         opacity: 1;
+        background: linear-gradient(to bottom, #FFF8E1, #F5E6C9); /* Подсветка всей площади */
+        filter: brightness(1.2);
     }
 
     .premium-card.peek {
@@ -626,6 +619,39 @@
         color: #777;
     }
 
+    .card-shine-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .card-unlock-button {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
+        color: #F5E6C9;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .card-unlock-button:hover, .card-unlock-button:active {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 6px 15px rgba(90, 63, 42, 0.4);
+    }
+
     .card-detail {
         position: fixed;
         top: 50%;
@@ -634,6 +660,7 @@
         z-index: 3000;
         transition: transform 0.4s ease-out;
     }
+
     </style>
 </head>
 <body>
