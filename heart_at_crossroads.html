@@ -515,6 +515,9 @@
         padding: 20px;
         box-sizing: border-box;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     #gallery-container::after {
@@ -530,44 +533,24 @@
 
     .gallery-header {
         color: #F5E6C9;
-        font-size: 2rem;
+        font-size: 3rem; /* Увеличиваем в 1.5 раза (было 2rem) */
         text-align: center;
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         opacity: 0;
-        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
-    }
-
-    .series-selector {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 30px;
-        opacity: 0;
-    }
-
-    .series-btn {
-        background: linear-gradient(to bottom, #3a3a3a, #202020);
-        color: #e0c18e;
-        border: 1px solid #e0c18e;
-        padding: 0.5rem 1.5rem;
-        font-size: 1rem;
-        cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.3s ease;
     }
 
     .cards-container {
         position: relative;
         height: 600px;
-        width: 400px; /* Увеличиваем ширину контейнера */
+        width: 500px; /* Увеличиваем ширину контейнера для равномерного распределения */
         margin: 0 auto;
         perspective: 1000px;
     }
 
     .premium-card {
         position: absolute;
-        width: 300px; /* Увеличиваем ширину карточек */
+        width: 350px; /* Увеличиваем ширину карточек */
         height: 350px;
         background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
         border: none;
@@ -577,6 +560,8 @@
         transform-origin: center;
         cursor: pointer;
         overflow: hidden;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .premium-card:not(.front) {
@@ -588,17 +573,15 @@
 
     .premium-card.front {
         z-index: 100;
-        transform: translateX(-50%) translateY(0);
         height: 350px;
         opacity: 1;
-        background: linear-gradient(to bottom, #FFF5E1, #F5D7A8); /* Тёплая подсветка */
+        background: linear-gradient(to bottom, #FFF5E1, #F5D7A8);
         filter: brightness(1.2);
         box-shadow: 0 6px 20px rgba(245, 215, 168, 0.5);
     }
 
     .premium-card.peek {
-        height: 116px; /* Примерно треть от 350px */
-        transform: translateX(-50%) translateY(-50px) rotate(5deg);
+        height: 175px; /* Половина высоты */
         opacity: 1;
         z-index: 90;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
@@ -616,12 +599,12 @@
         padding: 5px;
         color: #333;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
+        font-size: 1.2rem;
     }
 
     .premium-card.locked .unlock-text {
         color: #777;
-        font-size: 0.9rem; /* Уменьшаем шрифт */
+        font-size: 0.9rem;
     }
 
     .card-shine-effect {
@@ -637,20 +620,19 @@
 
     .card-unlock-button {
         position: absolute;
-        bottom: 20px; /* Опускаем ниже */
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
         background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
         color: #F5E6C9;
         border: none;
-        padding: 8px 16px; /* Уменьшаем кнопку */
+        padding: 8px 16px;
         border-radius: 20px;
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         cursor: pointer;
         z-index: 2;
-        font-family: 'GreatVibes', cursive; /* По умолчанию английский */
     }
 
     .card-unlock-button:hover, .card-unlock-button:active {
@@ -668,9 +650,44 @@
     }
 
     .series-title {
-        font-size: 1.5rem; /* Уменьшаем шрифт */
+        font-size: 1.5rem;
     }
 
+    .camera-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        margin-top: 20px;
+    }
+
+    .camera-btn svg {
+        width: 60px;
+        height: 60px;
+    }
+
+    .camera-flash {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+        border-radius: 50%;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .camera-btn span {
+        position: absolute;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #e0c18e;
+        font-size: 2.25rem; /* Увеличиваем в 1.5 раза (было 1.5rem) */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
     </style>
 </head>
 <body>
