@@ -2086,7 +2086,6 @@ function handleChoices(scene, dialogueBox, overlay) {
 
            function showPremiumGallery() {
         console.log('showPremiumGallery вызван, stats.memories:', stats.memories);
-        console.log('stats.language:', stats.language, 'isRussian:', stats.language === "ru");
         if (!window.gsap) {
             console.error("GSAP не найден, fallback на простую галерею.");
             return showSimpleGallery();
@@ -2099,23 +2098,22 @@ function handleChoices(scene, dialogueBox, overlay) {
         galleryContainer.setAttribute('data-gallery', 'true');
         startScreen.style.display = 'none';
 
-        // Очищаем контейнер
-        galleryContainer.innerHTML = '';
+        // Применяем шрифт в зависимости от языка
+        document.querySelectorAll('.gallery-header, .series-title, .card-name').forEach(el => {
+            el.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+        });
 
-        // Заголовок галереи
+        galleryContainer.innerHTML = '';
         const galleryHeader = document.createElement('div');
         galleryHeader.className = 'gallery-header';
         galleryHeader.textContent = isRussian ? "Коллекционные карточки" : "Collection Cards";
 
-        // Селектор серий
         const seriesSelector = document.createElement('div');
         seriesSelector.className = 'series-selector';
 
-        // Контейнер карточек
         const cardsContainer = document.createElement('div');
         cardsContainer.className = 'cards-container';
 
-        // Кнопка закрытия
         const closeButton = document.createElement('button');
         closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2130,19 +2128,16 @@ function handleChoices(scene, dialogueBox, overlay) {
         closeButton.onmouseover = () => closeButton.style.background = 'rgba(224, 193, 142, 0.2)';
         closeButton.onmouseout = () => closeButton.style.background = 'transparent';
 
-        // Собираем структуру
         galleryContainer.appendChild(galleryHeader);
         galleryContainer.appendChild(seriesSelector);
         galleryContainer.appendChild(cardsContainer);
         galleryContainer.appendChild(closeButton);
 
-        // Звуки
         const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
         clickSound.load();
-        const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_unlock.mp3'); // Предполагаемый путь
+        const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_unlock.mp3');
         unlockSound.load();
 
-        // Добавляем кнопки серий
         Object.keys(cardSeries).forEach(seriesKey => {
             const seriesButton = document.createElement('button');
             seriesButton.className = 'series-btn';
@@ -2156,7 +2151,6 @@ function handleChoices(scene, dialogueBox, overlay) {
             });
         });
 
-        // Анимация появления
         gsap.to(galleryContainer, {
             opacity: 1,
             duration: 0.5,
@@ -2176,12 +2170,11 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 
 
-       function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+         function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
         console.log('switchSeries вызван для:', seriesKey);
         const series = cardSeries[seriesKey];
         if (!series) return;
 
-        // Подсветка активной серии
         const seriesBtns = document.querySelectorAll('.series-btn');
         seriesBtns.forEach(btn => {
             btn.style.background = btn.dataset.series === seriesKey 
@@ -2191,7 +2184,6 @@ function handleChoices(scene, dialogueBox, overlay) {
 
         cardsContainer.innerHTML = '';
 
-        // Заголовок серии
         const seriesTitle = document.createElement('div');
         seriesTitle.className = 'series-title';
         seriesTitle.style.cssText = `
@@ -2213,7 +2205,7 @@ function handleChoices(scene, dialogueBox, overlay) {
                 cardElement.classList.add('front');
                 cardElement.style.top = '50px';
             } else {
-                cardElement.style.top = `${20 + (index * 10)}px`;
+                cardElement.style.top = `${20 + (index * 20)}px`;
                 cardElement.style.zIndex = 100 - index;
             }
 
@@ -2232,7 +2224,7 @@ function handleChoices(scene, dialogueBox, overlay) {
                         const currentFront = cardsContainer.querySelector('.front');
                         if (currentFront) {
                             currentFront.classList.remove('front');
-                            currentFront.style.top = `${20 + (index * 10)}px`;
+                            currentFront.style.top = `${20 + (index * 20)}px`;
                             currentFront.style.zIndex = 100 - index;
                             currentFront.style.height = '50px';
                             currentFront.style.opacity = '0.7';
@@ -2252,7 +2244,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         });
     }
 
- function createCardElement(card, seriesKey, cardsContainer, isRussian) {
+       function createCardElement(card, seriesKey, cardsContainer, isRussian) {
         const isUnlocked = stats.memories?.includes(card.id);
         const cardElement = document.createElement('div');
         cardElement.className = 'premium-card';
@@ -2289,6 +2281,7 @@ function handleChoices(scene, dialogueBox, overlay) {
             const unlockButton = document.createElement('button');
             unlockButton.className = 'card-unlock-button';
             unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
+            unlockButton.style.cssText = 'position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);';
             unlockButton.onclick = (e) => {
                 e.stopPropagation();
                 unlockCard(card, cardsContainer, clickSound, isRussian);
@@ -2299,8 +2292,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         return cardElement;
     }
 
-
-     function unlockCard(card, cardsContainer, clickSound, isRussian) {
+           function unlockCard(card, cardsContainer, clickSound, isRussian) {
         const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0);
         if (stats.diamonds >= cost) {
             const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
@@ -2329,18 +2321,18 @@ function handleChoices(scene, dialogueBox, overlay) {
             alert(isRussian ? "Недостаточно бриллиантов!" : "Not enough diamonds!");
         }
     }
-
-      function showUnlockNotification(card, isRussian) {
+     
+         function showUnlockNotification(card, isRussian) {
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: linear-gradient(to bottom, #A68A64, #8C6F4A); border: 2px dashed #5A3F2A;
+            background: linear-gradient(to bottom, #D9C2A7, #BFA78A); border: 2px dashed #8C6F4A;
             border-radius: 10px; padding: 20px; color: #333; text-align: center;
             z-index: 2000; max-width: 300px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             opacity: 0;
         `;
         notification.innerHTML = `
-            <div style="font-size: 1.5rem; color: #5A3F2A; margin-bottom: 10px;">
+            <div style="font-size: 1.5rem; color: #8C6F4A; margin-bottom: 10px;">
                 ${isRussian ? 'Карта разблокирована!' : 'Card Unlocked!'}
             </div>
             <div style="font-size: 1.2rem; margin-bottom: 15px;">
@@ -2379,8 +2371,7 @@ function handleChoices(scene, dialogueBox, overlay) {
         detailContainer.style.cssText = `
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 250px; height: 350px; background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
-            border: 10px solid #F5E6C9; border-bottom-width: 30px; border-radius: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); z-index: 3000;
+            border-radius: 5px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); z-index: 3000;
         `;
 
         const img = document.createElement('img');
@@ -2398,7 +2389,7 @@ function handleChoices(scene, dialogueBox, overlay) {
 
         addEventListeners(detailContainer, ['click', 'touchstart'], () => {
             document.body.removeChild(detailContainer);
-            document.getElementById('gallery-container').style.background = 'linear-gradient(to bottom, #A68A64, #8C6F4A)';
+            document.getElementById('gallery-container').style.background = 'linear-gradient(to bottom, #D9C2A7, #BFA78A)';
             clickSound.play().catch(err => console.warn("Ошибка звука:", err));
         });
     }
