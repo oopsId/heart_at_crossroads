@@ -540,32 +540,32 @@
         opacity: 0;
     }
 
-    .cards-container {
+   .cards-container {
     position: relative;
-    height: 600px;
+    height: 600px; /* Фиксированная высота, достаточная для всех карточек */
     width: 100%;
     max-width: 500px;
     margin: 0 auto;
-    perspective: 1000px; /* Перспектива для 3D */
-    transform-style: preserve-3d; /* Сохраняем 3D-пространство */
+    perspective: 1000px;
+    transform-style: preserve-3d;
     display: flex;
     justify-content: center;
-    align-items: center; /* Центрируем по вертикали */
+    align-items: center;
+    overflow: visible; /* Убираем обрезку карточек */
 }
 
-.premium-card {
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease-out;
-    transform-origin: center;
-    cursor: pointer;
-    overflow: hidden;
-    transform-style: preserve-3d; /* Поддержка 3D для дочерних элементов */
+.cards-container {
+    position: relative;
+    height: 600px;
+    width: 100%;
+    max-width: 500px; /* Ограничение ширины контейнера */
+    margin: 0 auto;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
 }
 
     .premium-card:not(.front) {
