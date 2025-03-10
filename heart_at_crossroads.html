@@ -2126,6 +2126,10 @@ function handleChoices(scene, dialogueBox, overlay) {
     const fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
     const galleryContainer = document.getElementById('gallery-container');
     const startScreen = document.getElementById('start-screen');
+    
+    // Отключаем прокрутку страницы
+    document.body.style.overflow = 'hidden';
+    
     galleryContainer.style.display = 'flex';
     galleryContainer.setAttribute('data-gallery', 'true');
     startScreen.style.display = 'none';
@@ -2175,6 +2179,23 @@ function handleChoices(scene, dialogueBox, overlay) {
     const cardsContainer = document.createElement('div');
     cardsContainer.className = 'cards-container';
 
+    // Кнопки переключения
+    const prevButton = document.createElement('button');
+    prevButton.textContent = '<';
+    prevButton.style.cssText = `
+        position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+        background: #8C6F4A; color: #F5E6C9; border: none; padding: 10px 15px;
+        border-radius: 50%; font-size: 1.5rem; cursor: pointer;
+    `;
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = '>';
+    nextButton.style.cssText = `
+        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+        background: #8C6F4A; color: #F5E6C9; border: none; padding: 10px 15px;
+        border-radius: 50%; font-size: 1.5rem; cursor: pointer;
+    `;
+
     // Кнопка закрытия
     const closeButton = document.createElement('button');
     closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2195,14 +2216,14 @@ function handleChoices(scene, dialogueBox, overlay) {
     galleryContainer.appendChild(subHeader);
     galleryContainer.appendChild(seriesTitle);
     galleryContainer.appendChild(seriesButton);
+    galleryContainer.appendChild(prevButton);
+    galleryContainer.appendChild(nextButton);
     galleryContainer.appendChild(cardsContainer);
     galleryContainer.appendChild(closeButton);
 
     // Звуки
     const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
     clickSound.load();
-    const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_unlock.mp3');
-    unlockSound.load();
 
     // Анимация появления
     gsap.to(galleryContainer, {
@@ -2214,10 +2235,38 @@ function handleChoices(scene, dialogueBox, overlay) {
             gsap.to(subHeader, { opacity: 1, y: 0, duration: 0.8, delay: 0.1, ease: "back.out(1.7)" });
             gsap.to(seriesTitle, { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "back.out(1.7)" });
             gsap.to(seriesButton, { opacity: 1, duration: 0.8, delay: 0.3, ease: "power2.out" });
+            gsap.to(prevButton, { opacity: 1, duration: 0.5, delay: 0.4, ease: "power2.out" });
+            gsap.to(nextButton, { opacity: 1, duration: 0.5, delay: 0.4, ease: "power2.out" });
             gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.4, ease: "power2.out" });
             switchSeries('romance', cardsContainer, clickSound, isRussian);
         }
     });
+
+    // Логика переключения карточек
+    let currentFrontIndex = 0;
+    const cardCount = cardSeries['romance'].cards.length;
+
+    function updateCards() {
+        cardSeries['romance'].cards.forEach((card, index) => {
+            const cardElement = cardsContainer.querySelector(`[data-card-id="${card.id}"]`);
+            const relativeIndex = (index - currentFrontIndex + cardCount) % cardCount;
+            const zStep = 150;
+            const angleStep = 15;
+            const screenWidth = window.innerWidth;
+            const cardWidth = 250;
+            const maxVisibleWidth = Math.min(screenWidth - 20, 500);
+
+            gsap.to(cardElement, {
+                z: relativeIndex * zStep,
+                rotateY: relativeIndex * angleStep,
+                opacity: 1 - relativeIndex * 0.2,
+                scale: Math.min(1 - relativeIndex * 0.05, maxVisibleWidth / cardWidth),
+                zIndex: cardCount - relativeIndex,
+                duration: 0.8,
+                ease: "power2.inOut"
+            });
+        });
+    }
 
     // Обработчики событий
     addEventListeners(seriesButton, ['click', 'touchstart'], () => {
@@ -2225,11 +2274,24 @@ function handleChoices(scene, dialogueBox, overlay) {
         clickSound.play().catch(err => console.warn("Ошибка звука:", err));
     });
 
+    addEventListeners(prevButton, ['click', 'touchstart'], () => {
+        currentFrontIndex = (currentFrontIndex - 1 + cardCount) % cardCount;
+        updateCards();
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    });
+
+    addEventListeners(nextButton, ['click', 'touchstart'], () => {
+        currentFrontIndex = (currentFrontIndex + 1) % cardCount;
+        updateCards();
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    });
+
     addEventListeners(closeButton, ['click', 'touchstart'], () => {
+        document.body.style.overflow = ''; // Восстанавливаем прокрутку
         closeGallery();
         clickSound.play().catch(err => console.warn("Ошибка звука:", err));
     });
-}   
+}
 
 
    function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
@@ -2238,67 +2300,34 @@ function handleChoices(scene, dialogueBox, overlay) {
     if (!series) return;
 
     cardsContainer.innerHTML = '';
-
-    // Параметры для Flip 3D
     const cardCount = series.cards.length;
-    const zStep = 100; // Шаг по оси Z между карточками
-    const angleStep = 10; // Угол наклона между карточками
+    const zStep = 150; // Увеличенное расстояние для удобного тапа
+    const angleStep = 15; // Увеличенный угол для видимости
+    const screenWidth = window.innerWidth;
+    const cardWidth = 250; // Уменьшенная ширина карточек
+    const maxVisibleWidth = Math.min(screenWidth - 20, 500); // Ограничение по ширине экрана
 
     series.cards.forEach((card, index) => {
         const cardElement = createCardElement(card, seriesKey, cardsContainer, clickSound, isRussian);
-        const isUnlocked = stats.memories?.includes(card.id);
-
-        // Начальная позиция в 3D-пространстве
-        const zPosition = (cardCount - 1 - index) * zStep; // Задние карточки дальше
-        const rotateY = (cardCount - 1 - index) * angleStep; // Наклон по Y
+        const zPosition = index * zStep;
+        const rotateY = index * angleStep;
 
         gsap.set(cardElement, {
             z: zPosition,
             rotateY: rotateY,
-            opacity: 1 - index * 0.2, // Задние карточки чуть прозрачнее
-            scale: 1 - index * 0.05, // Задние карточки чуть меньше
+            opacity: 1 - index * 0.2,
+            scale: Math.min(1 - index * 0.05, maxVisibleWidth / cardWidth),
         });
 
-        cardElement.style.zIndex = cardCount - index; // Передняя карточка сверху
+        cardElement.style.zIndex = cardCount - index;
         cardsContainer.appendChild(cardElement);
 
-        // Обработчик клика для переключения
         addEventListeners(cardElement, ['click', 'touchstart'], (e) => {
             e.preventDefault();
-            const currentZ = gsap.getProperty(cardElement, "z");
-
-            if (currentZ === 0) {
-                // Если карточка спереди
-                if (isUnlocked) {
-                    // Только разблокированные показывают детали
-                    showCardDetail(card, isRussian, clickSound);
-                }
-                // Заблокированные карточки можно листать, но детали не открываются
-            } else {
-                // Перемещаем любую карточку вперед
-                series.cards.forEach((otherCard, otherIndex) => {
-                    const otherElement = cardsContainer.querySelector(`[data-card-id="${otherCard.id}"]`);
-                    const newIndex = otherElement === cardElement ? 0 : otherIndex + 1;
-                    const newZ = (cardCount - 1 - newIndex) * zStep;
-                    const newRotateY = (cardCount - 1 - newIndex) * angleStep;
-
-                    gsap.to(otherElement, {
-                        z: newZ,
-                        rotateY: newRotateY,
-                        opacity: 1 - newIndex * 0.2,
-                        scale: 1 - newIndex * 0.05,
-                        zIndex: cardCount - newIndex,
-                        duration: 0.8,
-                        ease: "power2.inOut",
-                        onComplete: () => {
-                            if (otherElement === cardElement) {
-                                otherElement.style.zIndex = cardCount; // Передняя карточка сверху
-                            }
-                        }
-                    });
-                });
-                clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+            if (stats.memories?.includes(card.id)) {
+                showCardDetail(card, isRussian, clickSound);
             }
+            // Заблокированные карточки можно листать кнопками, но не открывать
         });
     });
 }
