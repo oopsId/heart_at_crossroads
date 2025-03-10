@@ -502,13 +502,14 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, #A68A64, #8C6F4A);
-        border: 2px solid #5A3F2A;
+        background: linear-gradient(to bottom, #D9C2A7, #BFA78A), radial-gradient(circle, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.05));
+        background-blend-mode: overlay;
+        border: 2px solid #8C6F4A;
         box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         display: none;
         opacity: 0;
         z-index: 2000;
-        overflow-y: auto;
+        overflow: hidden;
         padding: 20px;
         box-sizing: border-box;
         position: relative;
@@ -521,7 +522,7 @@
         left: -2px;
         width: calc(100% + 4px);
         height: calc(100% + 4px);
-        border: 2px dashed #5A3F2A;
+        border: 2px dashed #8C6F4A;
         pointer-events: none;
     }
 
@@ -555,7 +556,7 @@
 
     .cards-container {
         position: relative;
-        height: 500px;
+        height: 600px;
         width: 300px;
         margin: 0 auto;
         perspective: 1000px;
@@ -566,8 +567,7 @@
         width: 250px;
         height: 350px;
         background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
-        border: 10px solid #F5E6C9;
-        border-bottom-width: 30px;
+        border: none;
         border-radius: 5px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         transition: all 0.3s ease-out;
@@ -579,7 +579,7 @@
     .premium-card:not(.front) {
         height: 50px;
         opacity: 0.7;
-        background: linear-gradient(to bottom, #E0C18E, #666);
+        background: linear-gradient(to bottom, #E0C18E, #BFA78A);
         border-top: 2px solid #FFF;
     }
 
@@ -588,8 +588,9 @@
         transform: translateX(-50%) translateY(0);
         height: 350px;
         opacity: 1;
-        background: linear-gradient(to bottom, #FFF8E1, #F5E6C9); /* Подсветка всей площади */
-        filter: brightness(1.2);
+        background: linear-gradient(to bottom, #FFF8E1, #FCE4B5);
+        filter: brightness(1.3);
+        box-shadow: 0 6px 20px rgba(255, 215, 130, 0.5);
     }
 
     .premium-card.peek {
@@ -601,8 +602,7 @@
     }
 
     .premium-card.locked {
-        filter: grayscale(1) brightness(0.8);
-        background: rgba(0, 0, 0, 0.5);
+        background: linear-gradient(to bottom, rgba(245, 230, 201, 0.7), rgba(230, 215, 168, 0.7));
     }
 
     .premium-card .card-name, .premium-card .unlock-text {
@@ -632,7 +632,7 @@
 
     .card-unlock-button {
         position: absolute;
-        bottom: 15px;
+        bottom: 40px;
         left: 50%;
         transform: translateX(-50%);
         background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
