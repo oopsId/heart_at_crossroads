@@ -541,28 +541,31 @@
     }
 
     .cards-container {
-        position: relative;
-        height: 600px;
-        width: 500px; /* Увеличиваем ширину контейнера для равномерного распределения */
-        margin: 0 auto;
-        perspective: 1000px;
-    }
+    position: relative;
+    height: 600px;
+    width: 100%; /* Полная ширина контейнера */
+    max-width: 500px; /* Ограничение максимальной ширины */
+    margin: 0 auto;
+    perspective: 1000px;
+    display: flex; /* Добавляем flex для центрирования */
+    justify-content: center; /* Центрируем содержимое */
+    align-items: flex-start;
+}
 
-    .premium-card {
-        position: absolute;
-        width: 350px; /* Увеличиваем ширину карточек */
-        height: 350px;
-        background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
-        border: none;
-        border-radius: 5px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        transition: all 0.3s ease-out;
-        transform-origin: center;
-        cursor: pointer;
-        overflow: hidden;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+.premium-card {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: linear-gradient(to bottom, #F5E6C9, #E6D7A8);
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease-out;
+    transform-origin: center;
+    cursor: pointer;
+    overflow: hidden;
+    /* Убираем left: 50% и transform: translateX(-50%) */
+}
 
     .premium-card:not(.front) {
         height: 50px;
@@ -2111,259 +2114,261 @@ function handleChoices(scene, dialogueBox, overlay) {
     }
 }
 
-           function showPremiumGallery() {
-        console.log('showPremiumGallery вызван, stats.memories:', stats.memories);
-        if (!window.gsap) {
-            console.error("GSAP не найден, fallback на простую галерею.");
-            return showSimpleGallery();
-        }
-
-        const isRussian = stats.language === "ru";
-        const fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-        const galleryContainer = document.getElementById('gallery-container');
-        const startScreen = document.getElementById('start-screen');
-        galleryContainer.style.display = 'flex';
-        galleryContainer.setAttribute('data-gallery', 'true');
-        startScreen.style.display = 'none';
-
-        galleryContainer.innerHTML = '';
-        const galleryHeader = document.createElement('div');
-        galleryHeader.className = 'gallery-header';
-        galleryHeader.style.fontFamily = fontFamily;
-        galleryHeader.textContent = isRussian ? "Коллекционные карточки" : "Collection Cards";
-
-        const cardsContainer = document.createElement('div');
-        cardsContainer.className = 'cards-container';
-
-        const cameraButton = document.createElement('button');
-        cameraButton.className = 'camera-btn';
-        cameraButton.innerHTML = `
-            <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="20" width="80" height="40" rx="5" fill="#3a3a3a"/>
-                <rect x="25" y="10" width="50" height="10" rx="2" fill="#3a3a3a"/>
-                <circle cx="70" cy="40" r="15" fill="#202020"/>
-                <circle cx="70" cy="40" r="5" fill="#e0c18e"/>
-            </svg>
-            <span style="font-family: ${fontFamily};">${isRussian ? "Романтика" : "Romance"}</span>
-            <div class="camera-flash"></div>
-        `;
-
-        galleryContainer.appendChild(galleryHeader);
-        galleryContainer.appendChild(cardsContainer);
-        galleryContainer.appendChild(cameraButton);
-
-        const closeButton = document.createElement('button');
-        closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
-        closeButton.style.cssText = `
-            position: absolute; top: 1rem; right: 1rem; background: transparent;
-            border: none; color: #e0c18e; font-size: 1.5rem; cursor: pointer;
-            opacity: 0; width: 40px; height: 40px; display: flex;
-            align-items: center; justify-content: center; border-radius: 50%;
-            transition: background 0.3s;
-        `;
-        closeButton.onmouseover = () => closeButton.style.background = 'rgba(224, 193, 142, 0.2)';
-        closeButton.onmouseout = () => closeButton.style.background = 'transparent';
-        galleryContainer.appendChild(closeButton);
-
-        const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
-        clickSound.load();
-        const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_unlock.mp3');
-        unlockSound.load();
-
-        gsap.to(galleryContainer, {
-            opacity: 1,
-            duration: 0.5,
-            ease: "power2.out",
-            onComplete: () => {
-                gsap.to(galleryHeader, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" });
-                gsap.to(cameraButton, { opacity: 1, duration: 0.8, delay: 0.2, ease: "power2.out" });
-                gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.3, ease: "power2.out" });
-                switchSeries('romance', cardsContainer, clickSound, isRussian);
-            }
-        });
-
-        addEventListeners(cameraButton, ['click', 'touchstart'], () => {
-            switchSeries('romance', cardsContainer, clickSound, isRussian);
-            clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-            const flash = cameraButton.querySelector('.camera-flash');
-            gsap.to(flash, {
-                opacity: 1,
-                scale: 1.5,
-                duration: 0.2,
-                ease: "power2.out",
-                onComplete: () => gsap.to(flash, { opacity: 0, scale: 1, duration: 0.3, ease: "power2.in" })
-            });
-        });
-
-        addEventListeners(closeButton, ['click', 'touchstart'], () => {
-            closeGallery();
-            clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-        });
+        function showPremiumGallery() {
+    console.log('showPremiumGallery вызван, stats.memories:', stats.memories);
+    if (!window.gsap) {
+        console.error("GSAP не найден, fallback на простую галерею.");
+        return showSimpleGallery();
     }
 
-    function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
-        console.log('switchSeries вызван для:', seriesKey);
-        const series = cardSeries[seriesKey];
-        if (!series) return;
+    const isRussian = stats.language === "ru";
+    const fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+    const galleryContainer = document.getElementById('gallery-container');
+    const startScreen = document.getElementById('start-screen');
+    galleryContainer.style.display = 'flex';
+    galleryContainer.setAttribute('data-gallery', 'true');
+    startScreen.style.display = 'none';
 
-        cardsContainer.innerHTML = '';
+    galleryContainer.innerHTML = '';
 
-        const seriesTitle = document.createElement('div');
-        seriesTitle.className = 'series-title';
-        seriesTitle.style.cssText = `
-            color: #e0c18e; font-size: 1.5rem; margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); text-align: center;
-        `;
-        seriesTitle.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-        const unlockedCount = series.cards.filter(card => stats.memories?.includes(card.id)).length;
-        seriesTitle.textContent = isRussian 
-            ? `${series.title} (${unlockedCount}/${series.cards.length})`
-            : `${series.titleEn} (${unlockedCount}/${series.cards.length})`;
-        cardsContainer.appendChild(seriesTitle);
+    // Заголовок "Коллекционные карточки"
+    const galleryHeader = document.createElement('div');
+    galleryHeader.className = 'gallery-header';
+    galleryHeader.style.fontFamily = fontFamily;
+    galleryHeader.textContent = isRussian ? "Коллекционные карточки" : "Collection Cards";
 
-        series.cards.forEach((card, index) => {
-            const cardElement = createCardElement(card, seriesKey, cardsContainer, isRussian);
-            if (index === 0) {
-                cardElement.classList.add('front');
-                cardElement.style.top = '50px';
-            } else {
-                cardElement.style.top = `${20 + (index * 20)}px`;
-                cardElement.style.zIndex = 100 - index;
-            }
-            cardsContainer.appendChild(cardElement);
+    // Подзаголовок "Прошлое остается навсегда"
+    const subHeader = document.createElement('div');
+    subHeader.style.cssText = `
+        color: #F5E6C9; font-size: 2rem; text-align: center; 
+        margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    `;
+    subHeader.style.fontFamily = fontFamily;
+    subHeader.textContent = isRussian ? "Прошлое остается навсегда" : "The past remains forever";
 
-            let tapCount = 0;
+    // Надпись "Серия: Романтика 0/4"
+    const seriesTitle = document.createElement('div');
+    seriesTitle.className = 'series-title';
+    seriesTitle.style.cssText = `
+        color: #e0c18e; font-size: 1.5rem; margin-bottom: 1rem; 
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); text-align: center;
+    `;
+    seriesTitle.style.fontFamily = fontFamily;
+    const unlockedCount = cardSeries["romance"].cards.filter(card => stats.memories?.includes(card.id)).length;
+    seriesTitle.textContent = isRussian 
+        ? `Серия: Романтика ${unlockedCount}/4`
+        : `Series: Romance ${unlockedCount}/4`;
 
-            addEventListeners(cardElement, ['click', 'touchstart'], (e) => {
-                e.preventDefault();
-                const currentFront = cardsContainer.querySelector('.front');
-                if (index === 0 && currentFront === cardElement) {
-                    // Тап по активной передней карточке — укрупнение
+    // Кнопка переключения серий "Романтика"
+    const seriesButton = document.createElement('button');
+    seriesButton.style.cssText = `
+        background: linear-gradient(to bottom, #8C6F4A, #5A3F2A);
+        color: #F5E6C9; border: none; padding: 8px 16px; border-radius: 20px;
+        font-weight: bold; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px; cursor: pointer;
+    `;
+    seriesButton.style.fontFamily = fontFamily;
+    seriesButton.textContent = isRussian ? "Романтика" : "Romance";
+
+    // Контейнер для карточек
+    const cardsContainer = document.createElement('div');
+    cardsContainer.className = 'cards-container';
+
+    // Кнопка закрытия
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#e0c18e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    closeButton.style.cssText = `
+        position: absolute; top: 1rem; right: 1rem; background: transparent;
+        border: none; color: #e0c18e; font-size: 1.5rem; cursor: pointer;
+        opacity: 0; width: 40px; height: 40px; display: flex;
+        align-items: center; justify-content: center; border-radius: 50%;
+        transition: background 0.3s;
+    `;
+    closeButton.onmouseover = () => closeButton.style.background = 'rgba(224, 193, 142, 0.2)';
+    closeButton.onmouseout = () => closeButton.style.background = 'transparent';
+
+    // Сборка элементов
+    galleryContainer.appendChild(galleryHeader);
+    galleryContainer.appendChild(subHeader);
+    galleryContainer.appendChild(seriesTitle);
+    galleryContainer.appendChild(seriesButton);
+    galleryContainer.appendChild(cardsContainer);
+    galleryContainer.appendChild(closeButton);
+
+    // Звуки
+    const clickSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_camera_click.mp3');
+    clickSound.load();
+    const unlockSound = new Audio('/heart_at_crossroads/assets/sounds/sfx_unlock.mp3');
+    unlockSound.load();
+
+    // Анимация появления
+    gsap.to(galleryContainer, {
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+        onComplete: () => {
+            gsap.to(galleryHeader, { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" });
+            gsap.to(subHeader, { opacity: 1, y: 0, duration: 0.8, delay: 0.1, ease: "back.out(1.7)" });
+            gsap.to(seriesTitle, { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "back.out(1.7)" });
+            gsap.to(seriesButton, { opacity: 1, duration: 0.8, delay: 0.3, ease: "power2.out" });
+            gsap.to(closeButton, { opacity: 1, duration: 0.5, delay: 0.4, ease: "power2.out" });
+            switchSeries('romance', cardsContainer, clickSound, isRussian);
+        }
+    });
+
+    // Обработчики событий
+    addEventListeners(seriesButton, ['click', 'touchstart'], () => {
+        switchSeries('romance', cardsContainer, clickSound, isRussian);
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    });
+
+    addEventListeners(closeButton, ['click', 'touchstart'], () => {
+        closeGallery();
+        clickSound.play().catch(err => console.warn("Ошибка звука:", err));
+    });
+}   
+
+
+   function switchSeries(seriesKey, cardsContainer, clickSound, isRussian) {
+    console.log('switchSeries вызван для:', seriesKey);
+    const series = cardSeries[seriesKey];
+    if (!series) return;
+
+    cardsContainer.innerHTML = '';
+    cardsContainer.innerHTML = seriesTitle.outerHTML; // Добавляем seriesTitle обратно
+
+    series.cards.forEach((card, index) => {
+        const cardElement = createCardElement(card, seriesKey, cardsContainer, isRussian);
+        const isUnlocked = stats.memories?.includes(card.id);
+
+        // Начальная укладка колоды
+        cardElement.style.top = `${index * 52.5}px`; // 15% от высоты 350px = 52.5px
+        cardElement.style.zIndex = series.cards.length - index; // Задние ниже
+        if (index === 0) {
+            cardElement.classList.add('front');
+            cardElement.style.height = '350px';
+        } else {
+            cardElement.style.height = '50px'; // Корешки видны
+            cardElement.style.opacity = '0.7';
+        }
+
+        cardsContainer.appendChild(cardElement);
+
+        let tapCount = 0;
+
+        addEventListeners(cardElement, ['click', 'touchstart'], (e) => {
+            e.preventDefault();
+            const currentFront = cardsContainer.querySelector('.front');
+
+            if (currentFront === cardElement) {
+                // Тап по активной карточке — показываем деталь
+                if (isUnlocked) {
                     showCardDetail(card, isRussian, clickSound);
-                } else if (currentFront && index !== 0 && !cardElement.classList.contains('peek')) {
-                    // Тап по корешку при активной передней
-                    currentFront.classList.remove('front');
+                }
+            } else if (!cardElement.classList.contains('peek')) {
+                // Первый тап по корешку — выдвигаем на половину
+                if (currentFront) {
                     gsap.to(currentFront, {
-                        top: '50px',
-                        height: 50,
+                        height: '50px',
                         opacity: 0.7,
                         duration: 0.5,
                         ease: "power2.in"
                     });
-                    cardElement.classList.add('front');
-                    cardElement.classList.add('peek');
-                    gsap.to(cardElement, {
-                        top: `${20 + (index * 20) - 50}px`,
-                        height: 175,
-                        opacity: 1,
-                        zIndex: 100,
-                        duration: 0.5,
-                        ease: "power2.out"
-                    });
-                    tapCount = 1;
-                } else if (tapCount === 1 && cardElement.classList.contains('peek')) {
-                    // Второй тап по выдвинутой карточке
-                    const oldFront = cardsContainer.querySelector('.premium-card:not(.peek)');
+                    currentFront.classList.remove('front');
+                }
+                cardElement.classList.add('peek');
+                gsap.to(cardElement, {
+                    top: `${index * 52.5 - 175}px`, // Половина высоты 350px
+                    height: '175px',
+                    opacity: 1,
+                    zIndex: 100,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+                tapCount = 1;
+            } else if (tapCount === 1 && cardElement.classList.contains('peek')) {
+                // Второй тап — меняем местами с верхней
+                const oldFront = cardsContainer.querySelector('.premium-card:not(.peek)') || currentFront;
+                if (oldFront) {
                     gsap.to(oldFront, {
-                        top: `${20 + (series.cards.length - 1) * 20}px`,
-                        zIndex: 100 - series.cards.length,
+                        top: `${(series.cards.length - 1) * 52.5}px`,
+                        height: '50px',
+                        opacity: 0.7,
+                        zIndex: 1,
                         duration: 0.5,
                         ease: "power2.in"
                     });
-                    cardElement.classList.remove('peek');
-                    gsap.to(cardElement, {
-                        top: '50px',
-                        height: 350,
-                        opacity: 1,
-                        zIndex: 100,
-                        duration: 0.5,
-                        ease: "power2.out"
-                    });
-                    tapCount = 0;
-                } else if (currentFront && index === 0 && cardElement !== currentFront) {
-                    // Тап по передней при выдвинутой
-                    const peeked = cardsContainer.querySelector('.peek');
-                    if (peeked) {
-                        peeked.classList.remove('front');
-                        peeked.classList.remove('peek');
-                        gsap.to(peeked, {
-                            top: `${20 + (series.cards.indexOf(cardSeries[seriesKey].cards.find(c => c.id === peeked.dataset.cardId)) * 20)}px`,
-                            height: 50,
-                            opacity: 0.7,
-                            duration: 0.5,
-                            ease: "power2.in"
-                        });
-                    }
-                    cardElement.classList.add('front');
-                    gsap.to(cardElement, {
-                        top: '50px',
-                        height: 350,
-                        opacity: 1,
-                        zIndex: 100,
-                        duration: 0.5,
-                        ease: "power2.out"
-                    });
                 }
-                clickSound.play().catch(err => console.warn("Ошибка звука:", err));
-            });
+                cardElement.classList.remove('peek');
+                cardElement.classList.add('front');
+                gsap.to(cardElement, {
+                    top: '0px',
+                    height: '350px',
+                    opacity: 1,
+                    zIndex: 100,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+                tapCount = 0;
+            }
+            clickSound.play().catch(err => console.warn("Ошибка звука:", err));
         });
+    });
+}
+
+// Предотвращаем случайную разблокировку
+function createCardElement(card, seriesKey, cardsContainer, isRussian) {
+    const isUnlocked = stats.memories?.includes(card.id);
+    const cardElement = document.createElement('div');
+    cardElement.className = 'premium-card';
+    cardElement.dataset.cardId = card.id;
+    if (!isUnlocked) cardElement.classList.add('locked');
+
+    if (isUnlocked) {
+        const cardImg = document.createElement('img');
+        cardImg.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
+        cardImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+        cardElement.appendChild(cardImg);
+
+        const shineEffect = document.createElement('div');
+        shineEffect.className = 'card-shine-effect';
+        cardElement.appendChild(shineEffect);
+
+        const cardName = document.createElement('div');
+        cardName.className = 'card-name';
+        cardName.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+        cardName.textContent = isRussian ? card.name : card.nameEn;
+        cardElement.appendChild(cardName);
+    } else {
+        const lockImg = document.createElement('img');
+        lockImg.src = '/heart_at_crossroads/assets/memories/card_locked.png';
+        lockImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+        cardElement.appendChild(lockImg);
+
+        const unlockText = document.createElement('div');
+        unlockText.className = 'unlock-text';
+        unlockText.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+        const diamondIcon = `<img src="/heart_at_crossroads/assets/ui/diamonds.png" style="width: 16px; height: 16px; vertical-align: middle;">`;
+        unlockText.innerHTML = isRussian 
+            ? `Разблокировка: ${card.unlock} ${diamondIcon}` 
+            : `Unlock: ${card.unlockEn} ${diamondIcon}`;
+        cardElement.appendChild(unlockText);
+
+        const unlockButton = document.createElement('button');
+        unlockButton.className = 'card-unlock-button';
+        unlockButton.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
+        unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
+        unlockButton.onclick = (e) => {
+            e.stopPropagation(); // Предотвращаем срабатывание клика по карточке
+            unlockCard(card, cardsContainer, clickSound, isRussian);
+        };
+        cardElement.appendChild(unlockButton);
     }
 
-    function createCardElement(card, seriesKey, cardsContainer, isRussian) {
-        const isUnlocked = stats.memories?.includes(card.id);
-        const cardElement = document.createElement('div');
-        cardElement.className = 'premium-card';
-        cardElement.dataset.cardId = card.id;
-        if (!isUnlocked) cardElement.classList.add('locked');
-
-        if (isUnlocked) {
-            const cardImg = document.createElement('img');
-            cardImg.src = `/heart_at_crossroads/assets/memories/${card.id}.png`;
-            cardImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-            cardImg.onerror = () => console.error('Ошибка загрузки изображения:', cardImg.src);
-            cardImg.onload = () => console.log('Изображение загружено:', cardImg.src);
-            cardElement.appendChild(cardImg);
-
-            const shineEffect = document.createElement('div');
-            shineEffect.className = 'card-shine-effect';
-            cardElement.appendChild(shineEffect);
-
-            const cardName = document.createElement('div');
-            cardName.className = 'card-name';
-            cardName.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-            cardName.textContent = isRussian ? card.name : card.nameEn;
-            cardElement.appendChild(cardName);
-        } else {
-            const lockImg = document.createElement('img');
-            lockImg.src = '/heart_at_crossroads/assets/memories/card_locked.png';
-            lockImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-            cardElement.appendChild(lockImg);
-
-            const unlockText = document.createElement('div');
-            unlockText.className = 'unlock-text';
-            unlockText.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-            const diamondIcon = `<img src="/heart_at_crossroads/assets/ui/diamonds.png" style="width: 16px; height: 16px; vertical-align: middle;">`;
-            unlockText.innerHTML = isRussian 
-                ? `Разблокировка: ${card.unlock} ${diamondIcon}` 
-                : `Unlock: ${card.unlockEn} ${diamondIcon}`;
-            cardElement.appendChild(unlockText);
-
-            const unlockButton = document.createElement('button');
-            unlockButton.className = 'card-unlock-button';
-            unlockButton.style.fontFamily = isRussian ? 'GoodVibesCyr, cursive' : 'GreatVibes, cursive';
-            unlockButton.textContent = isRussian ? "Разблокировать" : "Unlock";
-            unlockButton.style.cssText = 'position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);';
-            unlockButton.onclick = (e) => {
-                e.stopPropagation();
-                unlockCard(card, cardsContainer, clickSound, isRussian);
-            };
-            cardElement.appendChild(unlockButton);
-        }
-
-        return cardElement;
-    }
+    return cardElement;
+}
 
     function unlockCard(card, cardsContainer, clickSound, isRussian) {
         const cost = parseInt(card.unlock.match(/\d+/)?.[0] || 0) || 0;
