@@ -2301,10 +2301,10 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     cardsContainer.innerHTML = '';
     const cardCount = series.cards.length;
-    const zStep = 150; // Увеличенное расстояние для удобного тапа
-    const angleStep = 15; // Увеличенный угол для видимости
+    const zStep = 220; // Увеличенное расстояние для удобного тапа
+    const angleStep = 20; // Увеличенный угол для видимости
     const screenWidth = window.innerWidth;
-    const cardWidth = 250; // Уменьшенная ширина карточек
+    const cardWidth = 350; // Уменьшенная ширина карточек
     const maxVisibleWidth = Math.min(screenWidth - 20, 500); // Ограничение по ширине экрана
 
     series.cards.forEach((card, index) => {
@@ -2316,7 +2316,7 @@ function handleChoices(scene, dialogueBox, overlay) {
             z: zPosition,
             rotateY: rotateY,
             opacity: 1 - index * 0.2,
-            scale: Math.min(1 - index * 0.05, maxVisibleWidth / cardWidth),
+            scale: Math.min(1 - index * 0.03, maxVisibleWidth / cardWidth),
         });
 
         cardElement.style.zIndex = cardCount - index;
