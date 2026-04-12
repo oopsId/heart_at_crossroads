@@ -1813,12 +1813,19 @@ function handleChoices(scene, dialogueBox, overlay) {
     });
 }
 
-    async function showScene(sceneId) {
+   async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes.find(s => s.id === sceneId);
+
     if (!scene) {
         console.error('Сцена не найдена:', sceneId);
         return;
+    }
+
+    const hasTimedChoices = Array.isArray(scene.choices) && scene.choices.some(c => c.timer);
+    if (hasTimedChoices) {
+        console.log(`[showScene] Сцена ${sceneId} с таймером, сразу передаём в showSceneWithTimer`);
+        return showSceneWithTimer(scene);
     }
 
     const progressElement = document.getElementById('progress');
@@ -1828,66 +1835,86 @@ function handleChoices(scene, dialogueBox, overlay) {
 
     const dialogueBox = document.querySelector('.dialogue-box');
     const dialogueElement = document.getElementById('dialogue-text');
+
     let displayText = scene.text[stats.language];
     if (stats.completionCount >= 1 && scene.second_playthrough_text) {
         displayText = scene.second_playthrough_text[stats.language];
     }
-    console.log(`[showScene] Текст для отображения: ${displayText}`);
 
     const newBackground = scene.background || 'none';
     const shouldFade = currentBackground !== newBackground || sceneId === scriptData.scenes.length - 1;
 
+    const goToNextChapter = () => {
+        currentChapter++;
+        currentScene = 0;
+        loadChapter(currentChapter).then(success => {
+            if (success) {
+                showScene(currentScene);
+            } else {
+                console.warn(`Не удалось загрузить главу ${currentChapter}`);
+                showStartScreen();
+            }
+        });
+    };
+
     const applyScene = async () => {
-        console.log('[applyScene] Применяем сцену');
+        console.log('[applyScene] Применяем обычную сцену');
+
         currentBackground = await setupBackground(newBackground, stats.language);
         await setupCharacters(scene, stats.language, stats);
 
-        const overlay = createOverlayIfNeeded(sceneId, displayText, scene.choices && scene.choices.some(c => c.timer));
         clearDialogueHandlers(dialogueBox);
         dialogueBox.style.pointerEvents = 'none';
 
-        console.log('[applyScene] Запускаем typeText');
+        const overlay = createOverlayIfNeeded(sceneId, displayText, false);
+
+        if (scene.sound) {
+            playSound(scene.sound);
+        }
+
+        if (scene.music) {
+            playMusic(scene.music);
+        } else if (window.currentMusic) {
+            window.currentMusic.pause();
+            window.currentMusic.currentTime = 0;
+            window.currentMusic = null;
+        }
+
         typeText(displayText, dialogueElement, () => {
             console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
-            console.log(`[showScene] Проверка: scene.id=${sceneId}, totalScenes=${totalScenes}, nextScene=${scene.nextScene}`);
             dialogueBox.style.pointerEvents = 'auto';
-            handleChoices(scene, dialogueBox, overlay);
-            handleNextScene(scene, dialogueBox, overlay);
-            handleChapterEnd(scene);
 
-            // Проверка на конец главы или ветки
-            if (!scene.choices && scene.nextScene === null) {
-                console.log(`[showScene] nextScene === null, считаем концом главы`);
-                currentChapter++;
-                currentScene = 0;
-                loadChapter(currentChapter).then(success => {
-                    if (success) {
-                        console.log(`[showScene] Успешно перешли к главе ${currentChapter}, сцена ${currentScene}`);
-                        showScene(currentScene);
-                    } else {
-                        console.warn(`[showScene] Не удалось загрузить главу ${currentChapter}`);
-                        showStartScreen();
-                    }
-                });
-            } else if (!scene.choices && scene.nextScene === undefined) {
-                console.warn(`[showScene] Нет choices/nextScene для сцены ${sceneId}, но nextScene не null`);
-                if (sceneId === scriptData.scenes.length - 1) {
-                    console.log(`[showScene] Это последняя сцена, завершаем главу`);
-                    currentChapter++;
-                    currentScene = 0;
-                    loadChapter(currentChapter).then(success => {
-                        if (success) showScene(currentScene);
-                    });
-                } else {
-                    console.log(`[showScene] Принудительный переход к следующей сцене`);
-                    addTapHandler(dialogueBox, () => {
-                        if (overlay) overlay.remove();
-                        currentScene = sceneId + 1;
-                        saveSession();
-                        showScene(currentScene);
-                    });
-                }
+            if (scene.choices && scene.choices.length > 0) {
+                handleChoices(scene, dialogueBox, overlay);
+                return;
             }
+
+            if (scene.nextScene !== null && scene.nextScene !== undefined) {
+                handleNextScene(scene, dialogueBox, overlay);
+                return;
+            }
+
+            if (sceneId === totalScenes - 1) {
+                goToNextChapter();
+                return;
+            }
+
+            const handleFallbackNext = (e) => {
+                e.preventDefault();
+                console.log(`[showScene] fallback переход к сцене ${sceneId + 1}`);
+
+                if (overlay) overlay.remove();
+
+                dialogueBox.removeEventListener('touchstart', handleFallbackNext, { passive: false });
+                dialogueBox.removeEventListener('click', handleFallbackNext);
+
+                currentScene = sceneId + 1;
+                saveSession();
+                showScene(currentScene);
+            };
+
+            dialogueBox.addEventListener('touchstart', handleFallbackNext, { passive: false });
+            dialogueBox.addEventListener('click', handleFallbackNext);
         });
     };
 
