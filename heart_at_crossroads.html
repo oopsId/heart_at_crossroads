@@ -812,27 +812,33 @@
 
         function playSound(sound) {
             if (sound) {
-                const audio = new Audio(`/heart_at_crossroads/assets/sounds/${sound}`);
-                audio.play()
-                    .catch(error => {
-                        console.error(`Ошибка воспроизведения звука ${sound}:`, error);
-                        showErrorMessage(stats.language === "ru" ? `Звук ${sound} не найден` : `Sound ${sound} not found`);
-                    });
-            }
+            const fileName = /\.(mp3|wav|ogg|m4a)$/i.test(sound) ? sound : `${sound}.mp3`;
+            const audio = new Audio(`/heart_at_crossroads/assets/sounds/${fileName}`);
+            audio.play()
+            .catch(error => {
+            console.error(`Ошибка воспроизведения звука ${sound}:`, error);
+            showErrorMessage(stats.language === "ru" ? `Звук ${sound} не найден` : `Sound ${sound} not found`);
+            });
+             }
+         }
+
+      function playMusic(music) {
+        if (music) {
+        if (window.currentMusic) {
+            window.currentMusic.pause();
+            window.currentMusic.currentTime = 0;
         }
 
-        function playMusic(music) {
-            if (music) {
-                if (window.currentMusic) window.currentMusic.pause();
-                window.currentMusic = new Audio(`/heart_at_crossroads/assets/sounds/${music}`);
-                window.currentMusic.loop = true;
-                window.currentMusic.play()
-                    .catch(error => {
-                        console.error(`Ошибка воспроизведения музыки ${music}:`, error);
-                        showErrorMessage(stats.language === "ru" ? `Музыка ${music} не найдена` : `Music ${music} not found`);
-                    });
-            }
-        }
+        const fileName = /\.(mp3|wav|ogg|m4a)$/i.test(music) ? music : `${music}.mp3`;
+        window.currentMusic = new Audio(`/heart_at_crossroads/assets/sounds/${fileName}`);
+        window.currentMusic.loop = true;
+        window.currentMusic.play()
+            .catch(error => {
+                console.error(`Ошибка воспроизведения музыки ${music}:`, error);
+                showErrorMessage(stats.language === "ru" ? `Музыка ${music} не найдена` : `Sound ${music} not found`);
+            });
+       }
+    }
 
         function showErrorMessage(message) {
             const errorDiv = document.createElement('div');
