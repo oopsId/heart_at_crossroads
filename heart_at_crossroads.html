@@ -2662,12 +2662,24 @@ function createCardElement(card, seriesKey, cardsContainer, clickSound, isRussia
             document.body.appendChild(galleryDiv);
         }
 
+       function normalizeEndingId(endingId) {
+        const map = {
+        "Свобода с Димой": "freedom_with_dima",
+        "Тишина с Марком": "silence_with_mark",
+        "Вершина с Сергеем": "summit_with_sergey",
+        "Дружба превыше всего": "friendship_above_all",
+        "Одинокий путь": "lonely_path",
+        "Новый старт": "new_start"
+        };
 
+         return map[endingId] || endingId;
+       }
 
         async function loadFinals(endingId) {
             const response = await fetch('/heart_at_crossroads/assets/data/finals.json');
             const finalsData = await response.json();
-            const ending = finalsData.endings.find(e => e.id === endingId);
+           const normalizedEndingId = normalizeEndingId(endingId);
+           const ending = finalsData.endings.find(e => e.id === normalizedEndingId);
             if (ending && checkRequirements(ending.requirements)) {
                 showEnding(ending);
             } else {
