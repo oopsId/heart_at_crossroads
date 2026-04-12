@@ -852,8 +852,7 @@
         function saveToStorage(key, value) {
             return new Promise((resolve, reject) => {
                 try {
-                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.isVersionAtLeast && 
-                        window.Telegram.WebApp.isVersionAtLeast('6.0')) {
+                    if (isTelegram && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
                         window.Telegram.WebApp.CloudStorage.setItem(key, value)
                             .then(() => {
                                 console.log(`Сохранено в Telegram CloudStorage: ${key}`);
@@ -883,8 +882,7 @@
         function getFromStorage(key) {
             return new Promise((resolve, reject) => {
                 try {
-                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.isVersionAtLeast && 
-                        window.Telegram.WebApp.isVersionAtLeast('6.0')) {
+                    if (isTelegram && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
                         window.Telegram.WebApp.CloudStorage.getItem(key)
                             .then(value => {
                                 console.log(`Получено из Telegram CloudStorage: ${key}`);
