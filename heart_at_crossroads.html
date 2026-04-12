@@ -1183,117 +1183,161 @@
     const existingOverlay = document.getElementById('messenger-overlay');
     if (existingOverlay) existingOverlay.remove();
 
+    const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
+
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'messenger-overlay');
     svg.setAttribute('width', '240');
     svg.setAttribute('height', '400');
     svg.setAttribute('viewBox', '0 0 300 500');
-    svg.classList.add('phone-overlay'); // Добавляем класс из CSS
+    svg.classList.add('phone-overlay');
 
-    let avatarSrc, senderName, messages;
+    let avatarSrc = '';
+    let senderName = '';
+    let messages = [];
+
     if (sceneId === 7) {
         avatarSrc = "/heart_at_crossroads/assets/characters/lyosha/lyosha_messenger_ava.png";
         senderName = "Лёша";
         messages = [
-            { id: "msg1", x: 50, y: 120, width: 160, textX: 60, textY: 145, text: stats.language === "ru" ? "Тусим вечером" : "Party tonight" },
-            { id: "msg2", x: 50, y: 180, width: 100, textX: 60, textY: 205, text: stats.language === "ru" ? "Дима будет" : "Dima’s coming" },
-            { id: "msg3", x: 50, y: 240, width: 90, textX: 60, textY: 265, text: stats.language === "ru" ? "Приходи" : "Be there" }
+            "Тусим вечером",
+            "Дима будет",
+            "Приходи"
         ];
     } else if (sceneId === 21) {
         avatarSrc = "/heart_at_crossroads/assets/characters/mark/mark_messenger_ava.png";
         senderName = "Марк";
-        const fullText = stats.language === "ru" ? "Ты красивая, когда теряешься" : "You’re beautiful when you’re lost";
-        const maxCharsPerLine = 15;
-        const lines = [];
-        let currentLine = "";
-        fullText.split(" ").forEach(word => {
-            if ((currentLine + word).length <= maxCharsPerLine) {
-                currentLine += (currentLine ? " " : "") + word;
-            } else {
-                lines.push(currentLine);
-                currentLine = word;
-            }
-        });
-        if (currentLine) lines.push(currentLine);
-        messages = lines.map((line, idx) => ({
-            id: `msg${idx + 1}`,
-            x: 50,
-            y: 120 + idx * 40,
-            width: 180,
-            textX: 60,
-            textY: 145 + idx * 40,
-            text: line
-        }));
+        messages = stats.language === "ru"
+            ? ["Ты красивая,", "когда теряешься"]
+            : ["You’re beautiful", "when you’re lost"];
+    } else if (sceneData.phoneSenderName && sceneData.phoneMessages) {
+        const senderId = sceneData.phoneSenderId || 'unknown';
+        senderName = sceneData.phoneSenderName[stats.language] || sceneData.phoneSenderName.ru || "Unknown";
+        avatarSrc = `/heart_at_crossroads/assets/characters/${senderId}/${senderId}_messenger_ava.png`;
+
+        const rawMessages = sceneData.phoneMessages[stats.language] || [];
+        messages = Array.isArray(rawMessages) ? rawMessages : [String(rawMessages)];
     } else {
-        // Дефолтный случай для других сцен с "телефоном"
-        const sceneData = scriptData.scenes.find(s => s.id === sceneId) || {};
-        avatarSrc = `/heart_at_crossroads/assets/characters/${sceneData.speaker?.[stats.language]?.toLowerCase() || 'unknown'}/${sceneData.speaker?.[stats.language]?.toLowerCase() || 'unknown'}_messenger_ava.png`;
+        // Последний fallback — только чтобы не падало, но не для красоты
         senderName = sceneData.speaker?.[stats.language] || "Unknown";
-        messages = [{
-            id: "msg1",
-            x: 50,
-            y: 120,
-            width: 200,
-            textX: 60,
-            textY: 145,
-            text: sceneData.text?.[stats.language]?.substring(0, 50) || "Сообщение..."
-        }];
+
+        const senderId = (
+            sceneData.speaker?.en?.toLowerCase() ||
+            sceneData.speaker?.ru?.toLowerCase() ||
+            "unknown"
+        );
+
+        avatarSrc = `/heart_at_crossroads/assets/characters/${senderId}/${senderId}_messenger_ava.png`;
+
+        const fallbackText = sceneData.text?.[stats.language] || "Сообщение...";
+        messages = [fallbackText.length > 28 ? `${fallbackText.slice(0, 28)}...` : fallbackText];
     }
 
+    const bubbleX = 50;
+    const bubbleWidth = 180;
+    const bubblePaddingTop = 18;
+    const bubbleLineHeight = 18;
+    const bubbleGap = 14;
+
+    let currentY = 120;
+
+    const renderedMessages = messages.map((msg, idx) => {
+        const lines = wrapTextForSvg(msg, 18);
+        const bubbleHeight = Math.max(40, 18 + lines.length * bubbleLineHeight);
+
+        const tspans = lines.map((line, lineIdx) => {
+            const dy = lineIdx === 0 ? 0 : bubbleLineHeight;
+            return `<tspan x="${bubbleX + 12}" dy="${dy}">${escapeXml(line)}</tspan>`;
+        }).join('');
+
+        const block = `
+            <rect id="msg${idx + 1}" x="${bubbleX}" y="${currentY}" width="${bubbleWidth}" height="${bubbleHeight}" rx="10" fill="#E1F5C4"/>
+            <text id="text${idx + 1}" x="${bubbleX + 12}" y="${currentY + bubblePaddingTop}" fill="#000" font-size="14" font-family="Arial, sans-serif">
+                ${tspans}
+            </text>
+        `;
+
+        currentY += bubbleHeight + bubbleGap;
+        return block;
+    }).join('');
+
+    const replyBubbleY = currentY + 20;
+
     svg.innerHTML = `
-        <!-- Корпус смартфона -->
         <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
-        <!-- Экран смартфона с фоновым изображением -->
         <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
-        <image xlink:href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
-        <!-- Заголовок Telegram с именем пользователя и аватаркой -->
+        <image href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
+
         <rect x="30" y="50" width="240" height="50" fill="#fff"/>
         <clipPath id="avatarClip">
             <circle cx="60" cy="75" r="15"/>
         </clipPath>
-        <image xlink:href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)" onerror="console.error('Ошибка загрузки аватарки: ${avatarSrc}')"/>
+        <image href="${avatarSrc}" x="45" y="60" width="30" height="30" clip-path="url(#avatarClip)"/>
         <circle cx="60" cy="75" r="15" fill="none" stroke="#ccc" stroke-width="1"/>
-        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${senderName}</text>
-        <!-- Разделительная линия -->
+        <text x="85" y="85" fill="#000" font-size="16" font-family="Arial, sans-serif">${escapeXml(senderName)}</text>
         <line x1="30" y1="100" x2="270" y2="100" stroke="#ccc" stroke-width="1"/>
-        <!-- Сообщения -->
+
         <g class="messages">
-            ${messages.map((msg, idx) => `
-                <rect id="msg${idx + 1}" x="${msg.x}" y="${msg.y}" width="${msg.width}" height="${40 * (Math.ceil(msg.text.length / 15) || 1)}" rx="10" fill="#E1F5C4"/>
-                <text id="text${idx + 1}" x="${msg.textX}" y="${msg.textY}" fill="#000" font-size="14" font-family="Arial, sans-serif">${msg.text}</text>
-            `).join('')}
-            <!-- Пустое ответное сообщение -->
-            <rect id="msg${messages.length + 1}" x="120" y="${messages.length * 60 + 180}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
-            <text id="text${messages.length + 1}" x="130" y="${messages.length * 60 + 205}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
+            ${renderedMessages}
+            <rect id="reply-msg" x="120" y="${replyBubbleY}" width="100" height="40" rx="10" fill="#fff" stroke="#ccc" stroke-width="1"/>
+            <text id="reply-text" x="130" y="${replyBubbleY + 25}" fill="#000" font-size="14" font-family="Arial, sans-serif" opacity="0">...</text>
         </g>
     `;
 
-    console.log(`Добавление SVG в DOM для сцены ${sceneId}`);
     document.getElementById('game-container').appendChild(svg);
 
-    // Анимация появления
-    console.log(`Запуск анимации для сцены ${sceneId}`);
-    gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
-    messages.forEach((msg, idx) => {
-        gsap.from(`#msg${idx + 1}, #text${idx + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + idx * 0.5 });
-    });
-    gsap.from(`#msg${messages.length + 1}`, { y: 20, opacity: 0, duration: 1, delay: 0.5 + messages.length * 0.5 });
-    gsap.to(`#text${messages.length + 1}`, { 
-        opacity: 1, 
-        duration: 0, 
-        delay: 0.5 + messages.length * 0.5 + 0.5, 
-        onStart: function() {
-            let text = "...";
-            let index = 0;
-            let interval = setInterval(() => {
-                document.getElementById(`text${messages.length + 1}`).textContent = text.slice(0, index);
-                index++;
-                if (index > text.length) clearInterval(interval);
-            }, 100);
-        }
-    });
+    if (window.gsap) {
+        gsap.from(svg, { y: -20, opacity: 0, duration: 0.5 });
+        gsap.to('#reply-text', {
+            opacity: 1,
+            duration: 0,
+            delay: 0.6,
+            onStart: function () {
+                let text = "...";
+                let index = 0;
+                let interval = setInterval(() => {
+                    const el = document.getElementById('reply-text');
+                    if (!el) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    el.textContent = text.slice(0, index);
+                    index++;
+                    if (index > text.length) clearInterval(interval);
+                }, 100);
+            }
+        });
+    }
 
     return svg;
+}
+
+function wrapTextForSvg(text, maxCharsPerLine) {
+    const words = String(text).split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        if (testLine.length <= maxCharsPerLine) {
+            currentLine = testLine;
+        } else {
+            if (currentLine) lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+
+    if (currentLine) lines.push(currentLine);
+    return lines;
+}
+
+function escapeXml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
 }
 
 function createDefaultOverlay(sceneId, sceneData = {}) {
