@@ -1636,28 +1636,36 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
         }
 
         function saveChoice(choiceId, effects, memoryTag) {
-            choices.push(choiceId);
-            if (effects) {
-                for (let key in effects) {
-                    if (key === 'relationships') {
-                        for (let rel in effects[key]) {
-                            stats.relationships[rel] = (stats.relationships[rel] || 0) + effects[key][rel];
-                        }
-                    } else {
-                        stats[key] = (stats[key] || 0) + effects[key];
-                    }
+        choices.push(choiceId);
+
+        if (effects) {
+        for (const [key, delta] of Object.entries(effects)) {
+        if (key === 'relationships' && typeof delta === 'object' && delta !== null) {
+        for (const [rel, relDelta] of Object.entries(delta)) {
+        stats.relationships[rel] = (stats.relationships[rel] || 0) + relDelta;
                 }
+            } else if (key.startsWith('relationships.')) {
+                const rel = key.split('.')[1];
+                stats.relationships[rel] = (stats.relationships[rel] || 0) + delta;
+            } else {
+                stats[key] = (stats[key] || 0) + delta;
             }
-            if (memoryTag) {
-                stats.memories.push(memoryTag);
-                const notification = document.createElement('div');
-                notification.className = 'memory-notification';
-                notification.textContent = stats.language === "ru" ? "Вика запомнит ваш выбор" : "Vika will remember your choice";
-                document.getElementById('game-container').appendChild(notification);
-                setTimeout(() => notification.remove(), 3000);
-            }
-            saveSession();
         }
+      }
+
+    if (memoryTag) {
+        stats.memories.push(memoryTag);
+        const notification = document.createElement('div');
+        notification.className = 'memory-notification';
+        notification.textContent = stats.language === "ru"
+            ? "Вика запомнит ваш выбор"
+            : "Vika will remember your choice";
+        document.getElementById('game-container').appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+      }
+
+    saveSession();
+   }
 
             // Обновление прогресс-бара
 function updateProgress(sceneId, totalScenes) {
