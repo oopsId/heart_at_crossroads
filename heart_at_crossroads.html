@@ -2677,20 +2677,29 @@ function createCardElement(card, seriesKey, cardsContainer, clickSound, isRussia
         }
 
         function checkRequirements(requirements) {
-            if (!requirements) return true;
-            for (let key in requirements) {
-                const value = stats[key] || stats.relationships[key.split('.')[1]] || 0;
-                const req = requirements[key];
-                if (req.startsWith('>')) {
-                    const compareValue = req.includes('+') ? 
-                        (stats[req.split('+')[0].slice(1)] + stats[req.split('+')[1]]) : 
-                        parseInt(req.slice(1));
-                    return value > compareValue;
-                }
-                return value >= parseInt(req);
-            }
-            return true;
+       if (!requirements) return true;
+
+       for (const [key, req] of Object.entries(requirements)) {
+        let value;
+
+        if (key.startsWith('relationships.')) {
+            const rel = key.split('.')[1];
+            value = stats.relationships[rel] || 0;
+        } else {
+            value = stats[key] || 0;
         }
+
+        if (typeof req === 'string' && req.startsWith('>')) {
+            const threshold = parseInt(req.slice(1), 10);
+            if (!(value > threshold)) return false;
+        } else {
+            const threshold = parseInt(req, 10);
+            if (!(value >= threshold)) return false;
+        }
+    }
+
+    return true;
+     }
 
         function showEnding(ending) {
             const scene = ending.scenes[0];
