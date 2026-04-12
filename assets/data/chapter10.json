@@ -30,7 +30,7 @@
             "id": 1,
             "background": "bg_street_day_trash",
             "characterLeft": "anna_neutral_style1",
-            "characterRight": "dima_confident",
+            "characterRight": "dima_confident_style1",
             "speaker": {
                 "ru": "Дима",
                 "en": "Dima"
@@ -51,7 +51,7 @@
             "id": 2,
             "background": "bg_webstudio_day",
             "characterLeft": "anna_thoughtful_style1",
-            "characterRight": "mark_neutral",
+            "characterRight": "mark_neutral_style1",
             "speaker": {
                 "ru": "Марк",
                 "en": "Mark"
@@ -72,7 +72,7 @@
             "id": 3,
             "background": "bg_webstudio_day",
             "characterLeft": "anna_neutral_style1",
-            "characterRight": "sergey_confident",
+            "characterRight": "sergey_confident_style1",
             "speaker": {
                 "ru": "Сергей",
                 "en": "Sergey"
@@ -137,7 +137,10 @@
                         "en": "Leave with Dima"
                     },
                     "nextScene": 6,
-                    "effects": { "heart": 2, "relationships.dima": 2 },
+                    "effects": {
+                        "heart": 2,
+                        "relationships.dima": 2
+                    },
                     "leadsToEnding": "Свобода с Димой"
                 },
                 {
@@ -147,7 +150,11 @@
                         "en": "Stay with Mark"
                     },
                     "nextScene": 7,
-                    "effects": { "heart": 2, "leaf": 1, "relationships.mark": 2 },
+                    "effects": {
+                        "heart": 2,
+                        "leaf": 1,
+                        "relationships.mark": 2
+                    },
                     "leadsToEnding": "Тишина с Марком"
                 },
                 {
@@ -157,7 +164,10 @@
                         "en": "Trust Sergey"
                     },
                     "nextScene": 8,
-                    "effects": { "crown": 2, "relationships.sergey": 2 },
+                    "effects": {
+                        "crown": 2,
+                        "relationships.sergey": 2
+                    },
                     "leadsToEnding": "Вершина с Сергеем"
                 },
                 {
@@ -167,7 +177,10 @@
                         "en": "Stay with Vika"
                     },
                     "nextScene": 9,
-                    "effects": { "leaf": 2, "relationships.vika": 2 },
+                    "effects": {
+                        "leaf": 2,
+                        "relationships.vika": 2
+                    },
                     "leadsToEnding": "Дружба превыше всего"
                 },
                 {
@@ -177,7 +190,9 @@
                         "en": "Leave alone"
                     },
                     "nextScene": 10,
-                    "effects": { "crown": 2 },
+                    "effects": {
+                        "crown": 2
+                    },
                     "leadsToEnding": "Одинокий путь"
                 },
                 {
@@ -188,7 +203,11 @@
                     },
                     "nextScene": 11,
                     "cost": 20,
-                    "effects": { "crown": 1, "heart": 1, "leaf": 1 },
+                    "effects": {
+                        "crown": 1,
+                        "heart": 1,
+                        "leaf": 1
+                    },
                     "leadsToEnding": "Новый старт"
                 }
             ]
@@ -197,7 +216,7 @@
             "id": 6,
             "background": "bg_street_day_trash",
             "characterLeft": "anna_smile_style1",
-            "characterRight": "dima_happy",
+            "characterRight": "dima_happy_style1",
             "speaker": {
                 "ru": "Дима",
                 "en": "Dima"
@@ -218,7 +237,7 @@
             "id": 7,
             "background": "bg_webstudio_day",
             "characterLeft": "anna_smile_style1",
-            "characterRight": "mark_smile",
+            "characterRight": "mark_smile_style1",
             "speaker": {
                 "ru": "Марк",
                 "en": "Mark"
@@ -239,7 +258,7 @@
             "id": 8,
             "background": "bg_webstudio_day",
             "characterLeft": "anna_neutral_style1",
-            "characterRight": "sergey_smile",
+            "characterRight": "sergey_smile_style1",
             "speaker": {
                 "ru": "Сергей",
                 "en": "Sergey"
