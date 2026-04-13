@@ -1977,63 +1977,80 @@ function clearDialogueHandlers(dialogueBox) {
         }
 
         typeText(displayText, dialogueElement, () => {
-            console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
-            dialogueBox.style.pointerEvents = 'auto';
+            try {
+                console.log(`[${Date.now()}] Текст сцены ${sceneId} полностью показан`);
+                dialogueBox.style.pointerEvents = 'auto';
 
-            if (scene.choices && scene.choices.length > 0) {
-                handleChoices(scene, dialogueBox, overlay);
-                return;
-            }
+                if (scene.choices && scene.choices.length > 0) {
+                    console.log('[showScene] идём в handleChoices');
+                    handleChoices(scene, dialogueBox, overlay);
+                    return;
+                }
 
-            if (scene.nextScene !== null && scene.nextScene !== undefined) {
-                handleNextScene(scene, dialogueBox, overlay);
-                return;
-            }
+                if (scene.nextScene !== null && scene.nextScene !== undefined) {
+                    console.log('[showScene] идём в handleNextScene');
+                    handleNextScene(scene, dialogueBox, overlay);
+                    return;
+                }
 
-            const explicitSceneEnding = scene.leadsToEnding ? resolveEndingId(scene.leadsToEnding) : null;
-            const pendingEnding = window.pendingEndingId ? resolveEndingId(window.pendingEndingId) : null;
-            const finalEndingId = explicitSceneEnding || pendingEnding;
+                const explicitSceneEnding = scene.leadsToEnding ? resolveEndingId(scene.leadsToEnding) : null;
+                const pendingEnding = window.pendingEndingId ? resolveEndingId(window.pendingEndingId) : null;
+                const finalEndingId = explicitSceneEnding || pendingEnding;
 
-            if (scene.nextScene === null && finalEndingId) {
-                const handleEndingNext = (e) => {
+                console.log('[showScene] explicitSceneEnding =', explicitSceneEnding);
+                console.log('[showScene] pendingEnding =', pendingEnding);
+                console.log('[showScene] finalEndingId =', finalEndingId);
+
+                if (scene.nextScene === null && finalEndingId) {
+                    console.log('[showScene] ставим handleEndingNext');
+
+                    const handleEndingNext = (e) => {
+                        e.preventDefault();
+                        console.log(`[showScene] Переход к финалу ${finalEndingId}`);
+
+                        if (overlay) overlay.remove();
+
+                        dialogueBox.removeEventListener('touchstart', handleEndingNext, { passive: false });
+                        dialogueBox.removeEventListener('click', handleEndingNext);
+
+                        window.pendingEndingId = null;
+                        loadFinals(finalEndingId);
+                    };
+
+                    dialogueBox.addEventListener('touchstart', handleEndingNext, { passive: false });
+                    dialogueBox.addEventListener('click', handleEndingNext);
+                    return;
+                }
+
+                if (sceneId === totalScenes - 1) {
+                    console.log('[showScene] идём в goToNextChapter');
+                    goToNextChapter();
+                    return;
+                }
+
+                console.log('[showScene] ставим fallback next');
+
+                const handleFallbackNext = (e) => {
                     e.preventDefault();
-                    console.log(`[showScene] Переход к финалу ${finalEndingId}`);
+                    console.log(`[showScene] fallback переход к сцене ${sceneId + 1}`);
 
                     if (overlay) overlay.remove();
 
-                    dialogueBox.removeEventListener('touchstart', handleEndingNext, { passive: false });
-                    dialogueBox.removeEventListener('click', handleEndingNext);
+                    dialogueBox.removeEventListener('touchstart', handleFallbackNext, { passive: false });
+                    dialogueBox.removeEventListener('click', handleFallbackNext);
 
-                    window.pendingEndingId = null;
-                    loadFinals(finalEndingId);
+                    currentScene = sceneId + 1;
+                    saveSession();
+                    showScene(currentScene);
                 };
 
-                dialogueBox.addEventListener('touchstart', handleEndingNext, { passive: false });
-                dialogueBox.addEventListener('click', handleEndingNext);
-                return;
+                dialogueBox.addEventListener('touchstart', handleFallbackNext, { passive: false });
+                dialogueBox.addEventListener('click', handleFallbackNext);
+            } catch (err) {
+                console.error('[showScene callback] crash:', err);
+                console.error('[showScene callback] scene =', scene);
+                console.error('[showScene callback] currentChapter =', currentChapter, 'currentScene =', currentScene);
             }
-
-            if (sceneId === totalScenes - 1) {
-                goToNextChapter();
-                return;
-            }
-
-            const handleFallbackNext = (e) => {
-                e.preventDefault();
-                console.log(`[showScene] fallback переход к сцене ${sceneId + 1}`);
-
-                if (overlay) overlay.remove();
-
-                dialogueBox.removeEventListener('touchstart', handleFallbackNext, { passive: false });
-                dialogueBox.removeEventListener('click', handleFallbackNext);
-
-                currentScene = sceneId + 1;
-                saveSession();
-                showScene(currentScene);
-            };
-
-            dialogueBox.addEventListener('touchstart', handleFallbackNext, { passive: false });
-            dialogueBox.addEventListener('click', handleFallbackNext);
         });
     };
 
