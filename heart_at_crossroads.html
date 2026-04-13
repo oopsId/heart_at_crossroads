@@ -1854,7 +1854,46 @@ function clearDialogueHandlers(dialogueBox) {
     });
     }
 
-		
+	function handleNextScene(scene, dialogueBox, overlay) {
+    if (!scene.nextScene) return;
+
+    console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
+    console.log(`[handleNextScene] Параметры: scene.id=${scene.id}, dialogueBox=${dialogueBox ? 'найден' : 'не найден'}, overlay=${overlay ? 'найден' : 'не найден'}`);
+
+    if (!dialogueBox) {
+        console.error('[handleNextScene] dialogueBox не найден!');
+        return;
+    }
+
+    const handleNext = (e) => {
+        e.preventDefault();
+        console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
+
+        currentScene = scene.nextScene;
+        saveSession();
+
+        if (overlay) overlay.remove();
+
+        dialogueBox.style.pointerEvents = 'none';
+        dialogueBox.removeEventListener('touchstart', handleNext, { passive: false });
+        dialogueBox.removeEventListener('click', handleNext);
+
+        showScene(currentScene);
+    };
+
+    if (dialogueBox.touchHandler) {
+        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler, { passive: false });
+        dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
+        console.log('[handleNextScene] Очищены старые touchHandler');
+    }
+
+    dialogueBox.touchHandler = handleNext;
+    dialogueBox.addEventListener('touchstart', handleNext, { passive: false });
+    dialogueBox.addEventListener('click', handleNext);
+    dialogueBox.style.pointerEvents = 'auto';
+
+    console.log(`[handleNextScene] Обработчики установлены, pointerEvents: ${dialogueBox.style.pointerEvents}`);
+}	
    
     async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
