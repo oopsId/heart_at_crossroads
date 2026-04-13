@@ -1765,107 +1765,98 @@ function clearDialogueHandlers(dialogueBox) {
     document.querySelectorAll('.choice-btn').forEach(btn => btn.remove());
 }
 
-// Обработка выбора
-function handleChoices(scene, dialogueBox, overlay) {
+  // Обработка выбора
+   function handleChoices(scene, dialogueBox, overlay) {
     dialogueBox.style.pointerEvents = 'auto';
     if (!scene.choices || scene.choices.length === 0) return;
-    if (choice.leadsToEnding) {
-    window.pendingEndingId = choice.leadsToEnding;
-}
+
+    const resolveEndingId = (endingId) => {
+        const map = {
+            "Свобода с Димой": "freedom_with_dima",
+            "Тишина с Марком": "silence_with_mark",
+            "Вершина с Сергеем": "summit_with_sergey",
+            "Дружба превыше всего": "friendship_above_all",
+            "Одинокий путь": "lonely_path",
+            "Новый старт": "new_start"
+        };
+        return map[endingId] || endingId;
+    };
+
     console.log(`[handleChoices] Обработка выбора для сцены ${scene.id}`);
+
     if (scene.choices.some(c => c.timer)) {
         console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
         showSceneWithTimer(scene);
-    } else {
-        console.log(`[${Date.now()}] Показываем кнопки выбора`);
-        scene.choices.forEach(choice => {
-            const btn = createChoiceButton(choice);
-            if (choice.condition && !checkCondition(choice.condition)) {
-                btn.style.display = 'none';
-            } else if (choice.cost && stats.diamonds < choice.cost) {
-                btn.disabled = true;
-            } else {
-                const handleChoice = (e) => {
-                    e.preventDefault();
-                    console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
-                    if (choice.cost) stats.diamonds -= choice.cost;
-                    updateDiamondsDisplay();
-                    saveChoice(choice.id, choice.effects, choice.memoryTag);
-                    if (choice.effects) showChoiceEffects(choice.effects);
-                    if (overlay) overlay.remove();
-                    if (choice.nextScene !== undefined) {
-                        currentScene = choice.nextScene;
-                        saveSession();
-                        showScene(currentScene);
-                    } else if (choice.nextChapter) {
-                        currentChapter = choice.nextChapter;
-                        currentScene = 0;
-                        loadChapter(currentChapter).then(() => showScene(currentScene));
-                    }
-                };
-                btn.addEventListener('touchstart', handleChoice);
-                btn.addEventListener('click', handleChoice);
-            }
-            dialogueBox.appendChild(btn);
-        });
-    }
-}
-
-// Обработка следующей сцены
-       function handleNextScene(scene, dialogueBox, overlay) {
-    if (!scene.nextScene) return;
-
-    console.log(`[${Date.now()}] Установка обработчика для перехода к сцене ${scene.nextScene}`);
-    console.log(`[handleNextScene] Параметры: scene.id=${scene.id}, dialogueBox=${dialogueBox ? 'найден' : 'не найден'}, overlay=${overlay ? 'найден' : 'не найден'}`);
-    if (!dialogueBox) {
-        console.error('[handleNextScene] dialogueBox не найден!');
         return;
     }
 
-    const handleNext = (e) => {
-        e.preventDefault();
-        console.log(`[${Date.now()}] Тап: переход к сцене ${scene.nextScene}`);
-        currentScene = scene.nextScene;
-        saveSession();
-        if (overlay) overlay.remove();
-        dialogueBox.style.pointerEvents = 'none';
-        dialogueBox.removeEventListener('touchstart', handleNext, { passive: false });
-        dialogueBox.removeEventListener('click', handleNext);
-        showScene(currentScene);
-    };
+    console.log(`[${Date.now()}] Показываем кнопки выбора`);
 
-    // Очистка старых обработчиков
-    if (dialogueBox.touchHandler) {
-        dialogueBox.removeEventListener('touchstart', dialogueBox.touchHandler, { passive: false });
-        dialogueBox.removeEventListener('click', dialogueBox.touchHandler);
-        console.log('[handleNextScene] Очищены старые touchHandler');
+    scene.choices.forEach(choice => {
+        const btn = createChoiceButton(choice);
+
+        if (choice.condition && !checkCondition(choice.condition)) {
+            btn.style.display = 'none';
+        } else if (choice.cost && stats.diamonds < choice.cost) {
+            btn.disabled = true;
+        } else {
+            const handleChoice = (e) => {
+                e.preventDefault();
+                console.log(`[${Date.now()}] Выбор сделан: ${choice.id}`);
+
+                if (choice.cost) {
+                    stats.diamonds -= choice.cost;
+                }
+                updateDiamondsDisplay();
+
+                if (choice.leadsToEnding) {
+                    window.pendingEndingId = resolveEndingId(choice.leadsToEnding);
+                } else {
+                    window.pendingEndingId = null;
+                }
+
+                saveChoice(choice.id, choice.effects, choice.memoryTag);
+
+                if (choice.effects) {
+                    showChoiceEffects(choice.effects);
+                }
+
+                if (overlay) {
+                    overlay.remove();
+                }
+
+                if (choice.nextScene !== undefined && choice.nextScene !== null) {
+                    currentScene = choice.nextScene;
+                    saveSession();
+                    showScene(currentScene);
+                    return;
+                }
+
+                if (choice.nextChapter) {
+                    currentChapter = choice.nextChapter;
+                    currentScene = 0;
+                    saveSession();
+                    loadChapter(currentChapter).then(() => showScene(currentScene));
+                    return;
+                }
+
+                if (choice.leadsToEnding) {
+                    loadFinals(resolveEndingId(choice.leadsToEnding));
+                    return;
+                }
+            };
+
+            btn.addEventListener('touchstart', handleChoice, { passive: false });
+            btn.addEventListener('click', handleChoice);
+        }
+
+        dialogueBox.appendChild(btn);
+    });
     }
 
-    dialogueBox.touchHandler = handleNext;
-    dialogueBox.addEventListener('touchstart', handleNext, { passive: false });
-    dialogueBox.addEventListener('click', handleNext);
-    dialogueBox.style.pointerEvents = 'auto';
-    console.log(`[handleNextScene] Обработчики установлены, pointerEvents: ${dialogueBox.style.pointerEvents}`);
-}
-
-// Обработка конца главы
-   function handleChapterEnd(scene) {
-    if (scene.id !== scriptData.scenes.length - 1) return;
-
-    console.log(`[${Date.now()}] Конец главы ${currentChapter}, переход к следующей`);
-    currentChapter++;
-    currentScene = 0;
-    loadChapter(currentChapter).then(success => {
-        if (success) {
-            console.log(`Переход к сцене ${currentScene} главы ${currentChapter}`);
-            showScene(currentScene);
-        } else {
-            console.warn(`Не удалось загрузить главу ${currentChapter}`);
-        }
-    });
-}
-
-   async function showScene(sceneId) {
+		
+   
+    async function showScene(sceneId) {
     console.log(`Показ сцены ${sceneId}`);
     const scene = scriptData.scenes.find(s => s.id === sceneId);
 
@@ -1873,6 +1864,18 @@ function handleChoices(scene, dialogueBox, overlay) {
         console.error('Сцена не найдена:', sceneId);
         return;
     }
+
+    const resolveEndingId = (endingId) => {
+        const map = {
+            "Свобода с Димой": "freedom_with_dima",
+            "Тишина с Марком": "silence_with_mark",
+            "Вершина с Сергеем": "summit_with_sergey",
+            "Дружба превыше всего": "friendship_above_all",
+            "Одинокий путь": "lonely_path",
+            "Новый старт": "new_start"
+        };
+        return map[endingId] || endingId;
+    };
 
     const hasTimedChoices = Array.isArray(scene.choices) && scene.choices.some(c => c.timer);
     if (hasTimedChoices) {
@@ -1897,8 +1900,10 @@ function handleChoices(scene, dialogueBox, overlay) {
     const shouldFade = currentBackground !== newBackground || sceneId === scriptData.scenes.length - 1;
 
     const goToNextChapter = () => {
+        window.pendingEndingId = null;
         currentChapter++;
         currentScene = 0;
+
         loadChapter(currentChapter).then(success => {
             if (success) {
                 showScene(currentScene);
@@ -1946,6 +1951,29 @@ function handleChoices(scene, dialogueBox, overlay) {
                 return;
             }
 
+            const explicitSceneEnding = scene.leadsToEnding ? resolveEndingId(scene.leadsToEnding) : null;
+            const pendingEnding = window.pendingEndingId ? resolveEndingId(window.pendingEndingId) : null;
+            const finalEndingId = explicitSceneEnding || pendingEnding;
+
+            if (scene.nextScene === null && finalEndingId) {
+                const handleEndingNext = (e) => {
+                    e.preventDefault();
+                    console.log(`[showScene] Переход к финалу ${finalEndingId}`);
+
+                    if (overlay) overlay.remove();
+
+                    dialogueBox.removeEventListener('touchstart', handleEndingNext, { passive: false });
+                    dialogueBox.removeEventListener('click', handleEndingNext);
+
+                    window.pendingEndingId = null;
+                    loadFinals(finalEndingId);
+                };
+
+                dialogueBox.addEventListener('touchstart', handleEndingNext, { passive: false });
+                dialogueBox.addEventListener('click', handleEndingNext);
+                return;
+            }
+
             if (sceneId === totalScenes - 1) {
                 goToNextChapter();
                 return;
@@ -1978,15 +2006,9 @@ function handleChoices(scene, dialogueBox, overlay) {
     } else {
         await applyScene();
     }
-
-    if (scene.leadsToEnding) {
-        console.log(`Загрузка концовки: ${scene.leadsToEnding}`);
-        loadFinals(scene.leadsToEnding);
-    }
 }
 
-
-                        function showSceneWithTimer(scene, timeoutMs = 10000) {
+    function showSceneWithTimer(scene, timeoutMs = 10000) {
     console.log(`[showSceneWithTimer] Показ сцены ${scene.id} с таймером (${timeoutMs}мс)`);
 
     // Элементы DOM
