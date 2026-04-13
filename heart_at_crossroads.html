@@ -1769,7 +1769,9 @@ function clearDialogueHandlers(dialogueBox) {
 function handleChoices(scene, dialogueBox, overlay) {
     dialogueBox.style.pointerEvents = 'auto';
     if (!scene.choices || scene.choices.length === 0) return;
-
+    if (choice.leadsToEnding) {
+    window.pendingEndingId = choice.leadsToEnding;
+}
     console.log(`[handleChoices] Обработка выбора для сцены ${scene.id}`);
     if (scene.choices.some(c => c.timer)) {
         console.log(`[${Date.now()}] Переход к showSceneWithTimer`);
