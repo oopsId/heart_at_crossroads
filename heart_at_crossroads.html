@@ -1266,7 +1266,7 @@
     svg.innerHTML = `
         <rect x="20" y="20" width="260" height="460" rx="30" fill="#333" stroke="#555" stroke-width="2"/>
         <rect x="30" y="50" width="240" height="400" rx="10" fill="#fff"/>
-        <image href="/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
+        <image href="/heart_at_crossroads/assets/backgrounds/bg_phone_ui.png" x="30" y="50" width="240" height="400" preserveAspectRatio="xMidYMid slice" opacity="0.3"/>
 
         <rect x="30" y="50" width="240" height="50" fill="#fff"/>
         <clipPath id="avatarClip">
@@ -1344,7 +1344,7 @@ function createDefaultOverlay(sceneId, sceneData = {}) {
     console.log(`Создание стандартного оверлея для сцены ${sceneId}`);
     const overlay = document.createElement('div');
     overlay.classList.add('phone-overlay');
-    overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_messenger.png) no-repeat center/cover';
+    overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_ui.png) no-repeat center/cover';
     
     const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
     const avatar = document.createElement('img');
