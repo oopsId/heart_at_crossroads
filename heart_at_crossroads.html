@@ -2228,6 +2228,7 @@ function clearDialogueHandlers(dialogueBox) {
         // Создание оверлея для сцены с таймером (ТОЛЬКО showMessengerOverlay)
         let overlay = null;
         if (scene.choices && scene.choices.some(c => c.timer)) {
+			showOverlayDebugLabel(`scene ${scene.id}: SVG overlay (timer route)`);
             overlay = showMessengerOverlay(scene.id); // Используем showMessengerOverlay для сцен с таймером
             console.log(`[showSceneWithTimer] Создан оверлей с таймером для сцены ${scene.id}`);
         }
