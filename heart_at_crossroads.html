@@ -1342,39 +1342,94 @@ function escapeXml(str) {
 
 function createDefaultOverlay(sceneId, sceneData = {}) {
     console.log(`Создание стандартного оверлея для сцены ${sceneId}`);
+
+    const existingOverlay = document.getElementById('default-phone-overlay');
+    if (existingOverlay) existingOverlay.remove();
+
     const overlay = document.createElement('div');
+    overlay.id = 'default-phone-overlay';
     overlay.classList.add('phone-overlay');
+
     overlay.style.background = 'url(/heart_at_crossroads/assets/backgrounds/bg_phone_ui.png) no-repeat center/cover';
-    
-    const speaker = sceneData.speaker ? sceneData.speaker[stats.language] : 'Unknown';
-    const avatar = document.createElement('img');
-    avatar.src = `/heart_at_crossroads/assets/characters/${speaker.toLowerCase()}/${speaker.toLowerCase()}_messenger_ava.png`;
-    avatar.style.width = '40px';
-    avatar.style.height = '40px';
-    avatar.style.position = 'absolute';
-    avatar.style.top = '20px';
-    avatar.style.left = '20px';
-    avatar.onerror = () => console.warn(`Аватар для ${speaker} не найден`);
-    overlay.appendChild(avatar);
+    overlay.style.position = 'absolute';
+    overlay.style.top = '50%';
+    overlay.style.left = '50%';
+    overlay.style.transform = 'translate(-50%, -50%)';
+    overlay.style.width = '240px';
+    overlay.style.height = '400px';
+    overlay.style.borderRadius = '24px';
+    overlay.style.overflow = 'hidden';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.zIndex = '2';
 
-    const name = document.createElement('div');
-    name.textContent = speaker;
-    name.style.position = 'absolute';
-    name.style.top = '25px';
-    name.style.left = '70px';
-    name.style.color = '#fff';
-    name.style.fontSize = '16px';
-    overlay.appendChild(name);
+    const header = document.createElement('div');
+    header.textContent = stats.language === 'ru' ? 'Ответить' : 'Reply';
+    header.style.position = 'absolute';
+    header.style.top = '18px';
+    header.style.left = '0';
+    header.style.right = '0';
+    header.style.textAlign = 'center';
+    header.style.fontSize = '16px';
+    header.style.fontWeight = 'bold';
+    header.style.color = '#222';
+    overlay.appendChild(header);
 
-    const message = document.createElement('div');
-    message.textContent = sceneData.text ? sceneData.text[stats.language].substring(0, 100) : '';
-    message.style.position = 'absolute';
-    message.style.top = '70px';
-    message.style.left = '20px';
-    message.style.right = '20px';
-    message.style.color = '#fff';
-    message.style.fontSize = '14px';
-    overlay.appendChild(message);
+    const body = document.createElement('div');
+    body.style.position = 'absolute';
+    body.style.top = '70px';
+    body.style.left = '20px';
+    body.style.right = '20px';
+    body.style.bottom = '30px';
+    body.style.display = 'flex';
+    body.style.flexDirection = 'column';
+    body.style.justifyContent = 'flex-start';
+    body.style.gap = '10px';
+    overlay.appendChild(body);
+
+    const rawChoices = Array.isArray(sceneData.choices) ? sceneData.choices : [];
+    const visibleChoices = rawChoices
+        .filter(choice => choice && choice.text && choice.text[stats.language])
+        .slice(0, 3);
+
+    if (visibleChoices.length > 0) {
+        visibleChoices.forEach(choice => {
+            const bubble = document.createElement('div');
+
+            let text = choice.text[stats.language]
+                .replace(/\s*\(\d+\s*сек\)/i, '')
+                .replace(/\s*\(\d+\s*sec\)/i, '')
+                .replace(/\s*\(\d+\s*бриллиант(?:ов|а)?\)/i, '')
+                .replace(/\s*\(\d+\s*diamonds?\)/i, '')
+                .trim();
+
+            bubble.textContent = text;
+            bubble.style.alignSelf = 'flex-end';
+            bubble.style.maxWidth = '80%';
+            bubble.style.padding = '10px 12px';
+            bubble.style.borderRadius = '14px';
+            bubble.style.background = '#DCF8C6';
+            bubble.style.color = '#111';
+            bubble.style.fontSize = '13px';
+            bubble.style.lineHeight = '1.3';
+            bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
+
+            body.appendChild(bubble);
+        });
+    } else {
+        const draftBubble = document.createElement('div');
+        draftBubble.textContent = stats.language === 'ru' ? '...' : '...';
+        draftBubble.style.alignSelf = 'flex-end';
+        draftBubble.style.maxWidth = '50%';
+        draftBubble.style.padding = '10px 12px';
+        draftBubble.style.borderRadius = '14px';
+        draftBubble.style.background = '#DCF8C6';
+        draftBubble.style.color = '#111';
+        draftBubble.style.fontSize = '13px';
+        draftBubble.style.lineHeight = '1.3';
+        draftBubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
+
+        body.appendChild(draftBubble);
+    }
 
     document.getElementById('game-container').appendChild(overlay);
     return overlay;
