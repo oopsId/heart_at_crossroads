@@ -1791,25 +1791,7 @@ async function setupCharacters(scene, language, stats) {
     document.getElementById('speaker-name').textContent = speakerName;
     console.log(`[setupCharacters] Имя спикера: ${speakerName}`);
 }
-function showOverlayDebugLabel(text) {
-    const old = document.getElementById('overlay-debug-label');
-    if (old) old.remove();
 
-    const label = document.createElement('div');
-    label.id = 'overlay-debug-label';
-    label.textContent = text;
-    label.style.position = 'fixed';
-    label.style.top = '10px';
-    label.style.left = '10px';
-    label.style.zIndex = '9999';
-    label.style.background = 'rgba(0,0,0,0.75)';
-    label.style.color = '#fff';
-    label.style.padding = '6px 10px';
-    label.style.borderRadius = '6px';
-    label.style.fontSize = '12px';
-    label.style.fontFamily = 'Arial, sans-serif';
-    document.body.appendChild(label);
-}
 // Создание оверлея
    function createOverlayIfNeeded(sceneId, displayText, hasTimer = false) {
     console.log(`[createOverlayIfNeeded] Проверка сцены ${sceneId}, hasTimer: ${hasTimer}`);
@@ -1821,15 +1803,15 @@ function showOverlayDebugLabel(text) {
     if (hasPhoneField) {
         if (hasTimer) {
             console.log(`[createOverlayIfNeeded] Создаём showMessengerOverlay для сцены ${sceneId} (phone=1, hasTimer=true)`);
-			 showOverlayDebugLabel(`scene ${sceneId}: SVG overlay`);
+			 
             return showMessengerOverlay(sceneId);
         } else {
             console.log(`[createOverlayIfNeeded] Создаём createDefaultOverlay для сцены ${sceneId} (phone=1, hasTimer=false)`);
-			showOverlayDebugLabel(`scene ${sceneId}: DEFAULT overlay`);
+			
             return createDefaultOverlay(sceneId, sceneData);
         }
         }
-	  showOverlayDebugLabel(`scene ${sceneId}: no overlay`);
+	 
       return null;
       }
 
@@ -2228,7 +2210,7 @@ function clearDialogueHandlers(dialogueBox) {
         // Создание оверлея для сцены с таймером (ТОЛЬКО showMessengerOverlay)
         let overlay = null;
         if (scene.choices && scene.choices.some(c => c.timer)) {
-			showOverlayDebugLabel(`scene ${scene.id}: SVG overlay (timer route)`);
+			
             overlay = showMessengerOverlay(scene.id); // Используем showMessengerOverlay для сцен с таймером
             console.log(`[showSceneWithTimer] Создан оверлей с таймером для сцены ${scene.id}`);
         }
